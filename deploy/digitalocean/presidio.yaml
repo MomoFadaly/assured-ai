@@ -1,0 +1,36 @@
+# DigitalOcean App Platform spec for the Presidio sidecar.
+#
+# Deploys a single Python container running Microsoft Presidio analyzer +
+# anonymizer + custom MRN/HEALTH_PLAN_ID recognizers. Pulled from the
+# AssuredAI GitHub repo; built from deploy/presidio/Dockerfile.
+#
+# Apply with:
+#   doctl apps create --spec deploy/digitalocean/presidio.yaml
+# Update with:
+#   doctl apps update <APP_ID> --spec deploy/digitalocean/presidio.yaml
+
+name: assured-ai-presidio
+region: nyc
+
+services:
+  - name: presidio
+    dockerfile_path: deploy/presidio/Dockerfile
+    source_dir: deploy/presidio
+    github:
+      repo: MomoFadaly/assured-ai
+      branch: main
+      deploy_on_push: true
+    instance_size_slug: basic-xs
+    instance_count: 1
+    http_port: 5001
+    health_check:
+      http_path: /health
+      initial_delay_seconds: 60
+      period_seconds: 30
+      timeout_seconds: 10
+      success_threshold: 1
+      failure_threshold: 3
+    envs:
+      - key: PORT
+        value: '5001'
+        scope: RUN_AND_BUILD_TIME

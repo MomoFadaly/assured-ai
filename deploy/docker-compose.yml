@@ -1,0 +1,75 @@
+version: '3.9'
+
+# AssuredAI local development + self-host deployment
+#
+# Usage:
+#   docker compose up -d           # start everything
+#   docker compose up -d presidio  # just the redaction sidecar
+#   docker compose down            # stop everything
+#
+# In POC cloud mode, only `presidio` is run from this file (deployed to
+# Cloud Run). Postgres lives at Neon, Next.js lives at Vercel.
+#
+# In self-host mode, everything in this file runs inside the client's VPC.
+# pair with Helm chart for K8s deployments at scale.
+
+services:
+  presidio:
+    build:
+      context: ./presidio
+      dockerfile: Dockerfile
+    container_name: assured-ai-presidio
+    ports:
+      - '5001:5001'
+    environment:
+      - PORT=5001
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:5001/health']
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: assured-ai-postgres
+    ports:
+      - '5434:5432'
+    environment:
+      POSTGRES_USER: assured_ai
+      POSTGRES_PASSWORD: change_me_in_env
+      POSTGRES_DB: assured_ai
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ../packages/db/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U assured_ai']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  web:
+    build:
+      context: ..
+      dockerfile: deploy/web/Dockerfile
+    container_name: assured-ai-web
+    ports:
+      - '3000:3000'
+    env_file:
+      - ../.env
+    environment:
+      DATABASE_URL: postgresql://assured_ai:change_me_in_env@postgres:5432/assured_ai
+      PRESIDIO_ANALYZER_URL: http://presidio:5001/analyze
+      PRESIDIO_ANONYMIZER_URL: http://presidio:5001/anonymize
+    depends_on:
+      postgres:
+        condition: service_healthy
+      presidio:
+        condition: service_healthy
+    restart: unless-stopped
+    profiles:
+      - selfhost
+
+volumes:
+  postgres_data:

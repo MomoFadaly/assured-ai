@@ -1,0 +1,48 @@
+# DigitalOcean App Platform spec for the AssuredAI Presidio sidecar.
+#
+# Deploys ONLY the PHI redaction service. The main Next.js app runs on
+# Vercel and reaches this service over the public URL that App Platform
+# assigns (or a custom domain like presidio.assured-ai.com).
+#
+# Cost: $12/month for the basic-xs instance (1 GB RAM, needed for spaCy
+# en_core_web_lg). Cheaper $5 plan only gives 512 MB and Presidio crashes
+# on the spaCy model load.
+#
+# Deploy:
+#   1. Push this repo to a Git remote DO can pull from.
+#   2. From DO Console: Apps → Create App → Import from Git → point at this repo,
+#      branch=main, source dir=`deploy/presidio`, spec=this file.
+#   3. After first deploy, copy the public URL (e.g.
+#      assured-ai-presidio-xxx.ondigitalocean.app) and set it as
+#      PRESIDIO_ANALYZER_URL + PRESIDIO_ANONYMIZER_URL in Vercel env.
+#
+# Alternative cheaper option: a $6/month Droplet running docker-compose
+# from `deploy/docker-compose.yml`. See deploy/PRESIDIO_DEPLOY.md for steps.
+
+name: assured-ai-presidio
+region: nyc
+
+services:
+  - name: presidio
+    dockerfile_path: deploy/presidio/Dockerfile
+    source_dir: deploy/presidio
+    instance_count: 1
+    instance_size_slug: basic-xs # 1 GB RAM, 1 vCPU — required for spaCy en_core_web_lg
+    http_port: 5001
+
+    health_check:
+      http_path: /health
+      initial_delay_seconds: 60 # spaCy load is slow on cold start
+      period_seconds: 30
+      timeout_seconds: 10
+      success_threshold: 1
+      failure_threshold: 3
+
+    routes:
+      - path: /
+
+    envs:
+      - key: PORT
+        value: "5001"
+      - key: PYTHONUNBUFFERED
+        value: "1"

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>AssuredAI</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <header>
+      <div class="brand">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" aria-hidden="true">
+          <path d="M12 2.2 4 5.1v6.4c0 4.5 3.4 8.7 8 10.3 4.6-1.6 8-5.8 8-10.3V5.1L12 2.2Z" fill="#1c3d80" />
+          <path d="m8 12 2.8 2.8L16 9.6" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+        <strong>AssuredAI</strong>
+        <span class="tag">Verifier</span>
+      </div>
+    </header>
+
+    <main>
+      <section class="card">
+        <h2>Quick verify</h2>
+        <p class="muted">Paste any draft and run it through the full compliance pipeline.</p>
+        <textarea id="article" rows="6" placeholder="Paste an article…"></textarea>
+        <div class="row">
+          <select id="scenario">
+            <option value="healthcare">Healthcare</option>
+            <option value="government">Government</option>
+          </select>
+          <button id="verify-btn" class="primary">Verify</button>
+        </div>
+        <div id="verdict"></div>
+      </section>
+
+      <section class="card">
+        <h2>Settings</h2>
+        <label>
+          <span>API base URL</span>
+          <input id="api-base" type="text" placeholder="http://localhost:3030" />
+        </label>
+        <p class="muted small">Point at your AssuredAI deployment.</p>
+        <button id="save-settings">Save settings</button>
+      </section>
+
+      <section class="card hint">
+        <p>
+          <strong>Tip:</strong> highlight text on any page and press
+          <kbd>⌘⇧V</kbd> to verify the selection without opening this popup.
+        </p>
+      </section>
+    </main>
+
+    <script type="module" src="popup.js"></script>
+  </body>
+</html>

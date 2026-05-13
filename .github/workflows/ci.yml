@@ -1,0 +1,73 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  check:
+    name: typecheck + lint + test
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      # `next lint` was removed in Next 15+. Linting now happens via
+      # direct ESLint invocation when an .eslintrc is added. For now, typecheck
+      # + tests cover the contract.
+
+      - name: Test
+        run: pnpm test
+        env:
+          NODE_ENV: test
+          # Tests don't need real keys — provider singletons are stubbed
+          # at module boundary in test environments.
+          ANTHROPIC_API_KEY: 'sk-ant-test-key'
+          VOYAGE_API_KEY: 'pa-test-key'
+          DATABASE_URL: 'postgresql://test:test@localhost:5432/test'
+
+  build:
+    name: next build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Build
+        run: pnpm build
+        env:
+          NODE_ENV: production
+          ANTHROPIC_API_KEY: 'sk-ant-test-key'
+          VOYAGE_API_KEY: 'pa-test-key'
+          DATABASE_URL: 'postgresql://test:test@localhost:5432/test'
+          CLERK_SECRET_KEY: 'sk_test_dummy'
+          NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: 'pk_test_dummy'
