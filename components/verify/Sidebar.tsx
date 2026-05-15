@@ -131,7 +131,10 @@ export function Sidebar({
     <TooltipProvider delayDuration={200}>
       <aside
         className={cn(
-          'sticky top-14 flex h-[calc(100vh-3.5rem)] flex-col border-r border-border bg-card/40 backdrop-blur-sm transition-[width] duration-200 ease-out',
+          // Hidden on mobile/tablet — users get a single-column verifier flow.
+          // The main page already has scrollable history via the result thread.
+          // Above lg (1024px+), the sidebar reappears with the full history UI.
+          'hidden lg:flex sticky top-14 h-[calc(100vh-3.5rem)] flex-col border-r border-border bg-card/40 backdrop-blur-sm transition-[width] duration-200 ease-out',
           collapsed ? 'w-[56px]' : 'w-[280px]',
         )}
       >
