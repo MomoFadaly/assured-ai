@@ -85,7 +85,10 @@ export async function writeAudit(entry: AuditEntry): Promise<AuditWriteResult> {
     if (!row) {
       throw new Error('Audit insert returned no row');
     }
-    return { audit_log_id: row.id, hash: row.hash, prev_hash: row.prev_hash };
+    // node-pg returns BIGSERIAL columns as strings (BIGINT can exceed JS's
+    // safe-integer range). Coerce to number for the typed contract — audit
+    // IDs won't realistically exceed 2^53.
+    return { audit_log_id: Number(row.id), hash: row.hash, prev_hash: row.prev_hash };
   } catch (err) {
     logger.error({ err, outcome: entry.outcome }, 'audit write failed');
     throw new AuditWriteError('Failed to persist audit log', err);
@@ -143,7 +146,7 @@ export async function writeAuditWithEscalation(
       [row.id, escalation.category, escalation.severity, escalation.triggering_phrase],
     );
 
-    return { audit_log_id: row.id, hash: row.hash, prev_hash: row.prev_hash };
+    return { audit_log_id: Number(row.id), hash: row.hash, prev_hash: row.prev_hash };
   });
 }
 
