@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { ArrowRight, Menu, X } from 'lucide-react';
 import { BrandLockup } from '@/components/verify/Brand';
-import { ThemeToggle } from '@/components/verify/ThemeToggle';
 
 const NAV_ITEMS = [
   { href: '#audience', label: 'Who it’s for' },
@@ -55,7 +54,6 @@ export function MarketingHeader() {
         </nav>
 
         <div className="flex items-center gap-2">
-          <ThemeToggle />
           <Link
             href="/chat"
             className="hidden h-9 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-md bg-primary px-4 text-[13px] font-medium text-primary-foreground shadow-sm transition-opacity hover:opacity-90 lg:inline-flex"

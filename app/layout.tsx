@@ -3,7 +3,6 @@ import { Geist, Geist_Mono, Instrument_Serif } from 'next/font/google';
 import { Analytics } from '@vercel/analytics/next';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import './globals.css';
-import { ThemeScript } from '@/components/verify/ThemeToggle';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -69,10 +68,10 @@ export const metadata: Metadata = {
 };
 
 export const viewport = {
-  themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#fcfcfd' },
-    { media: '(prefers-color-scheme: dark)', color: '#0c0f18' },
-  ],
+  // Light-only — dark mode removed product-wide. Both media queries point
+  // to the same light surface so OS dark-mode users still get our light UI.
+  themeColor: '#fcfcfd',
+  colorScheme: 'light',
   width: 'device-width',
   initialScale: 1,
 };
@@ -99,9 +98,8 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" style={{ colorScheme: 'light' }} suppressHydrationWarning>
       <head>
-        <ThemeScript />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}

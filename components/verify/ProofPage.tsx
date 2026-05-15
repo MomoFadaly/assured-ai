@@ -15,7 +15,6 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { BrandLockup } from './Brand';
-import { ThemeScript } from './ThemeToggle';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { TooltipProvider } from '@/components/ui/tooltip';
@@ -73,7 +72,6 @@ export function ProofPage({ audit }: { audit: AuditProof }) {
 
   return (
     <TooltipProvider delayDuration={150}>
-      <ThemeScript />
       <div className="relative min-h-screen bg-background">
         <div className="pointer-events-none absolute inset-0 gradient-mesh" aria-hidden />
         <div className="relative">

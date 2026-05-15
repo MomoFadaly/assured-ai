@@ -4,7 +4,6 @@ import * as React from 'react';
 import Link from 'next/link';
 import { BookOpen, Activity, Bell, ShieldCheck } from 'lucide-react';
 import { BrandLockup } from './Brand';
-import { ThemeToggle } from './ThemeToggle';
 import {
   Tooltip,
   TooltipContent,
@@ -100,7 +99,6 @@ export function Header({
             {showScenarioSwitcher && (
               <ScenarioSwitcher value={scenario} onChange={onScenarioChange} />
             )}
-            <ThemeToggle />
           </div>
         </div>
       </header>
