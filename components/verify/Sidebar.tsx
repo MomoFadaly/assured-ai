@@ -224,8 +224,21 @@ export function Sidebar({
                 placeholder="Search history…"
                 value={filter}
                 onChange={(e) => setFilter(e.target.value)}
-                className="h-8 w-full rounded-md border border-border bg-card pl-8 pr-2.5 text-[12px] focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/20"
+                className="h-8 w-full rounded-md border border-border bg-card pl-8 pr-7 text-[12px] focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/20"
+                aria-label="Search verification history"
               />
+              {filter && (
+                <button
+                  type="button"
+                  onClick={() => setFilter('')}
+                  aria-label="Clear search"
+                  className="absolute right-1.5 top-1.5 rounded p-0.5 text-muted-foreground hover:bg-accent hover:text-foreground"
+                >
+                  <svg className="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                    <path d="M6 6l12 12M6 18L18 6" />
+                  </svg>
+                </button>
+              )}
             </div>
           </div>
         )}
@@ -233,12 +246,28 @@ export function Sidebar({
         {/* History list */}
         <div className="mt-3 flex-1 overflow-y-auto px-2 pb-3">
           {filtered.length === 0 && !collapsed && (
-            <div className="px-3 py-6 text-center text-[12px] text-muted-foreground">
-              <Sparkles className="mx-auto mb-2 h-4 w-4 opacity-50" />
-              <p>No history yet.</p>
-              <p className="mt-1 text-[11px] opacity-80">
-                Verifications you run will show up here for quick recall.
-              </p>
+            <div className="px-4 py-8 text-center text-[12px] text-muted-foreground">
+              {filter ? (
+                <>
+                  <Search className="mx-auto mb-2 h-4 w-4 opacity-50" />
+                  <p>No matches for &ldquo;{filter}&rdquo;.</p>
+                  <button
+                    type="button"
+                    onClick={() => setFilter('')}
+                    className="mt-2 text-[11px] text-foreground underline-offset-2 hover:underline"
+                  >
+                    Clear search
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Sparkles className="mx-auto mb-2 h-4 w-4 opacity-50" />
+                  <p>No history yet.</p>
+                  <p className="mt-1 text-[11px] opacity-80">
+                    Verifications you run show up here for quick recall.
+                  </p>
+                </>
+              )}
             </div>
           )}
 
@@ -271,7 +300,7 @@ export function Sidebar({
               <>
                 {pinned.length > 0 && (
                   <div className="mb-3">
-                    <div className="mb-1 flex items-center gap-1 px-2 text-[10px] font-semibold uppercase tracking-[0.1em] text-muted-foreground">
+                    <div className="sticky top-0 z-10 -mx-2 mb-1 flex items-center gap-1 bg-background/95 px-4 py-1 text-[10px] font-semibold uppercase tracking-[0.1em] text-muted-foreground backdrop-blur-sm">
                       <Pin className="h-2.5 w-2.5" /> Pinned
                     </div>
                     {pinned.map((h) => (
@@ -288,7 +317,7 @@ export function Sidebar({
                 )}
                 {Object.entries(grouped).map(([day, items]) => (
                   <div key={day} className="mb-3">
-                    <div className="mb-1 px-2 text-[10px] font-semibold uppercase tracking-[0.1em] text-muted-foreground">
+                    <div className="sticky top-0 z-10 -mx-2 mb-1 bg-background/95 px-4 py-1 text-[10px] font-semibold uppercase tracking-[0.1em] text-muted-foreground backdrop-blur-sm">
                       {day}
                     </div>
                     {items.map((h) => (
@@ -350,95 +379,150 @@ function HistoryRow({
   onTogglePin: () => void;
 }) {
   const isServerOnly = entry.source === 'server' && entry.payload === null;
+  const relativeTime = relativeFromNow(entry.occurred_at);
+
   return (
     <div
       className={cn(
-        'group relative flex items-start gap-2 rounded-lg pl-2 pr-1 py-1.5 text-[12.5px] leading-snug transition-colors',
-        active ? 'bg-accent text-foreground' : 'hover:bg-accent/60',
+        // Reserved right-gutter pattern: the right column always has content
+        // (relative time when idle, action icons on hover) so nothing ever
+        // overlaps the title text. No more absolute-positioned overlay.
+        'group relative flex items-stretch gap-2 rounded-lg pl-2 pr-2 py-2 transition-all duration-150',
+        active
+          ? 'bg-accent/80 ring-1 ring-ring/15'
+          : 'hover:bg-accent/40',
       )}
     >
+      {/* Left edge: pin marker, only when pinned (subtle accent stripe) */}
+      {entry.pinned && (
+        <span
+          aria-hidden
+          className="absolute left-0 top-2 bottom-2 w-[2px] rounded-full bg-amber-400"
+        />
+      )}
+
+      {/* Main content — title + meta. Click anywhere to open. */}
       <button
         type="button"
         onClick={onSelect}
-        className="flex flex-1 items-start gap-2 text-left"
+        className="flex min-w-0 flex-1 items-start gap-2 text-left focus-visible:outline-none"
+        aria-label={`Open ${entry.preview || 'untitled verification'}`}
       >
-        <span className="mt-0.5 shrink-0">
+        <span className="mt-[3px] shrink-0">
           <OutcomeIcon entry={entry} />
         </span>
         <span className="min-w-0 flex-1">
-          <span className="block truncate font-medium">
-            {entry.preview || 'Untitled verification'}
+          {/* Title — line-clamps to 2 lines, no awkward mid-word cuts. */}
+          <span
+            className={cn(
+              'block text-[12.5px] leading-[1.35] font-medium text-foreground',
+              'overflow-hidden [display:-webkit-box] [-webkit-line-clamp:2] [-webkit-box-orient:vertical]',
+            )}
+          >
+            {entry.preview || (
+              <span className="italic text-muted-foreground">Untitled verification</span>
+            )}
           </span>
-          <span className="mt-0.5 flex items-center gap-1 text-[11px] text-muted-foreground">
-            <span className="capitalize">{entry.scenario}</span>
-            <span>·</span>
+          {/* Meta line — compact mono, scenario implied by parent header context. */}
+          <span className="mt-1 flex items-center gap-1.5 text-[10.5px] leading-none text-muted-foreground">
             <ModeChip mode={entry.mode} />
             {entry.audit_log_id !== null && (
               <>
-                <span>·</span>
-                <span>#{entry.audit_log_id}</span>
+                <span aria-hidden className="opacity-50">·</span>
+                <span className="font-mono">#{entry.audit_log_id}</span>
               </>
             )}
             {isServerOnly && (
               <>
-                <span>·</span>
-                <Cloud className="h-2.5 w-2.5" />
+                <span aria-hidden className="opacity-50">·</span>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Cloud className="h-2.5 w-2.5" />
+                  </TooltipTrigger>
+                  <TooltipContent side="top">From server (not in this browser)</TooltipContent>
+                </Tooltip>
               </>
             )}
           </span>
         </span>
       </button>
-      <div className="invisible absolute right-1 top-1 flex items-center gap-0.5 group-hover:visible">
-        {entry.audit_log_id !== null && (
-          <a
-            href={`/v/${entry.audit_log_id}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={(e) => e.stopPropagation()}
-            title="Open public proof page (new tab)"
-            className="rounded p-1 text-muted-foreground hover:bg-accent hover:text-foreground"
-          >
-            <ExternalLink className="h-3 w-3" />
-          </a>
-        )}
-        <button
-          type="button"
-          onClick={(e) => {
-            e.stopPropagation();
-            onTogglePin();
-          }}
-          title={entry.pinned ? 'Unpin' : 'Pin'}
+
+      {/* Right gutter — fixed width, always reserved. Time when idle, actions on hover. */}
+      <div className="flex w-[60px] shrink-0 items-start justify-end pt-[3px]">
+        {/* Idle state: relative time (fades out on row hover). */}
+        <span
+          className="text-[10.5px] tabular-nums text-muted-foreground transition-opacity duration-150 group-hover:opacity-0 pointer-events-none"
+          aria-hidden
+        >
+          {relativeTime}
+        </span>
+        {/* Hover state: action icons (fade in, fully replace time). */}
+        <div
           className={cn(
-            'rounded p-1',
-            entry.pinned
-              ? 'visible text-amber-500 hover:bg-amber-500/10'
-              : 'text-muted-foreground hover:bg-accent hover:text-foreground',
+            'absolute right-2 top-1.5 flex items-center gap-0.5 rounded-md px-0.5',
+            'opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity duration-150',
+            // Subtle white backdrop so icons sit cleanly over the row bg
+            active ? 'bg-accent/80' : 'bg-card shadow-sm',
           )}
         >
-          <Star className={cn('h-3 w-3', entry.pinned && 'fill-current')} />
-        </button>
-        {!isServerOnly && (
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              onDelete();
-            }}
-            title="Remove from history"
-            className="rounded p-1 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
-          >
-            <svg className="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M6 6l12 12M6 18L18 6" />
-            </svg>
-          </button>
-        )}
+          {entry.audit_log_id !== null && (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <a
+                  href={`/v/${entry.audit_log_id}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={(e) => e.stopPropagation()}
+                  className="rounded p-1 text-muted-foreground hover:bg-accent-foreground/10 hover:text-foreground"
+                  aria-label="Open public proof page in new tab"
+                >
+                  <ExternalLink className="h-3 w-3" />
+                </a>
+              </TooltipTrigger>
+              <TooltipContent side="top">Public proof page</TooltipContent>
+            </Tooltip>
+          )}
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onTogglePin();
+                }}
+                aria-label={entry.pinned ? 'Unpin' : 'Pin'}
+                className={cn(
+                  'rounded p-1',
+                  entry.pinned
+                    ? 'text-amber-500 hover:bg-amber-500/15'
+                    : 'text-muted-foreground hover:bg-accent-foreground/10 hover:text-foreground',
+                )}
+              >
+                <Star className={cn('h-3 w-3', entry.pinned && 'fill-current')} />
+              </button>
+            </TooltipTrigger>
+            <TooltipContent side="top">{entry.pinned ? 'Unpin' : 'Pin'}</TooltipContent>
+          </Tooltip>
+          {!isServerOnly && (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onDelete();
+                  }}
+                  aria-label="Remove from history"
+                  className="rounded p-1 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
+                >
+                  <Trash2 className="h-3 w-3" />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent side="top">Remove</TooltipContent>
+            </Tooltip>
+          )}
+        </div>
       </div>
-      {entry.pinned && (
-        <Star
-          className="absolute -left-px top-2 h-2.5 w-2.5 fill-amber-500 text-amber-500"
-          aria-hidden
-        />
-      )}
     </div>
   );
 }
@@ -496,5 +580,32 @@ function prettyDate(iso: string): string {
     });
   } catch {
     return iso;
+  }
+}
+
+/**
+ * Compact relative time string for the sidebar gutter — designed to fit in
+ * ~5 chars max so it never breaks the row layout. Examples:
+ *   "now" · "12m" · "3h" · "2d" · "May 14" · "Jan '25"
+ */
+function relativeFromNow(iso: string): string {
+  try {
+    const then = new Date(iso).getTime();
+    if (Number.isNaN(then)) return '';
+    const diffSec = Math.max(0, (Date.now() - then) / 1000);
+    if (diffSec < 60) return 'now';
+    const diffMin = diffSec / 60;
+    if (diffMin < 60) return `${Math.floor(diffMin)}m`;
+    const diffHr = diffMin / 60;
+    if (diffHr < 24) return `${Math.floor(diffHr)}h`;
+    const diffDay = diffHr / 24;
+    if (diffDay < 7) return `${Math.floor(diffDay)}d`;
+    const d = new Date(iso);
+    const sameYear = d.getFullYear() === new Date().getFullYear();
+    return sameYear
+      ? d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
+      : d.toLocaleDateString(undefined, { month: 'short', year: '2-digit' });
+  } catch {
+    return '';
   }
 }
