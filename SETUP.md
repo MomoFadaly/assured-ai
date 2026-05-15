@@ -201,3 +201,20 @@ When you're ready to deploy AssuredAI for a real client, see:
 - `docs/PILLARS_ROADMAP.md` — the 11 pillars we documented but didn't build (rapid rollback, APM, governance committee, etc.)
 - `docs/adr/005-two-deployment-modes.md` — moving from Vercel/Neon to production managed hosting + self-host
 - `docs/adr/002-anthropic-claude-default.md` — swapping to Azure OpenAI (HIPAA BAA path) or Ollama (zero data egress)
+
+## Verifier strictness
+
+`RETRIEVAL_MIN_SIMILARITY` (default 0.65) controls how strictly the fact-check
+demands a match against the source corpus. Lower values (~0.30-0.45) mark more
+content as "supported" but let fabricated stats slip through inside otherwise-
+clean paragraphs. Higher values (~0.60-0.75) catch fabrications loudly but mark
+out-of-corpus clean content as "unsourced".
+
+**Production is set to 0.55** as the empirically-tuned sweet spot:
+- Clean DASH-eating-plan paragraph → marked supported ✓
+- PHI-containing paragraph → still supported (PII handled separately) ✓
+- Fabricated "green tea reduces cholesterol 47%" → marked unsourced ✓ (catches fabrication)
+- Cardiac emergency content → blocked by red-flag scan, doesn't reach fact-check ✓
+
+Lower the value (e.g. 0.45) to be more permissive on edge-of-corpus content;
+raise it (e.g. 0.65) to catch more fabrications at the cost of some false flags.
