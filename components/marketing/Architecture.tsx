@@ -199,11 +199,14 @@ export function Architecture() {
 
                 <dl className="mt-8 grid gap-px overflow-hidden rounded-xl border border-white/10 bg-white/10">
                   {l.details.map((d) => (
-                    <div key={d.label} className="grid grid-cols-[140px_1fr] gap-4 bg-[#06101c] px-5 py-3.5 sm:grid-cols-[180px_1fr]">
+                    <div
+                      key={d.label}
+                      className="grid grid-cols-1 gap-1.5 bg-[#06101c] px-5 py-3.5 sm:grid-cols-[140px_minmax(0,1fr)] sm:gap-4 md:grid-cols-[180px_minmax(0,1fr)]"
+                    >
                       <dt className="text-[11px] font-semibold uppercase tracking-[0.16em] text-white/40">
                         {d.label}
                       </dt>
-                      <dd className="font-mono text-[12.5px] text-white/85">{d.value}</dd>
+                      <dd className="min-w-0 break-words font-mono text-[12.5px] text-white/85">{d.value}</dd>
                     </div>
                   ))}
                 </dl>

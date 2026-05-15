@@ -58,7 +58,7 @@ export function MarketingHeader() {
           <ThemeToggle />
           <Link
             href="/chat"
-            className="hidden h-9 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-md bg-primary px-4 text-[13px] font-medium text-primary-foreground shadow-sm transition-opacity hover:opacity-90 sm:inline-flex"
+            className="hidden h-9 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-md bg-primary px-4 text-[13px] font-medium text-primary-foreground shadow-sm transition-opacity hover:opacity-90 lg:inline-flex"
           >
             Try the verifier
             <ArrowRight className="h-3 w-3" />

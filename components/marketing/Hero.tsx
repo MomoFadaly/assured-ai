@@ -25,6 +25,7 @@ export function Hero({ proofExampleId }: { proofExampleId: number | null }) {
         src="https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=1920&q=70"
         intensity="subtle"
         position="center"
+        priority
       />
 
       <div className="pointer-events-none absolute inset-0 grid-dot opacity-30 mask-fade-b" aria-hidden />

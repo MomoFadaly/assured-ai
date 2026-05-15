@@ -6,17 +6,20 @@ export function Stakes() {
     <section id="stakes" className="relative isolate overflow-hidden bg-[#070e1a] text-white">
       {/* Full-bleed cinematic photo — a moment of trust between provider + patient/document */}
       <ParallaxLayer strength={-0.16} className="absolute inset-0 -z-10">
-        <div
-          className="absolute -inset-[8%] ken-burns photo-cinematic"
-          style={{
-            backgroundImage:
-              'url(https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=2400&q=80)',
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            filter: 'saturate(70%) brightness(0.4)',
-          }}
-          aria-hidden
-        />
+        <div className="absolute -inset-[8%] ken-burns photo-cinematic" aria-hidden>
+          <img
+            aria-hidden
+            alt=""
+            src="https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=960&auto=format&fit=crop&q=75"
+            srcSet="https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=640&auto=format&fit=crop&q=70 640w, https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=960&auto=format&fit=crop&q=75 960w, https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=1440&auto=format&fit=crop&q=75 1440w, https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=1920&auto=format&fit=crop&q=78 1920w"
+            sizes="100vw"
+            loading="lazy"
+            decoding="async"
+            fetchPriority="low"
+            className="size-full object-cover"
+            style={{ filter: 'saturate(70%) brightness(0.4)' }}
+          />
+        </div>
       </ParallaxLayer>
       <div className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-b from-[#070e1a]/70 via-[#050b15]/55 to-[#070e1a]/90" aria-hidden />
       <div className="pointer-events-none absolute inset-0 -z-10 aurora-bg opacity-[0.12]" aria-hidden />

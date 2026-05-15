@@ -45,6 +45,38 @@ const PRESETS = {
   },
 } as const;
 
+/**
+ * Rewrites a single Unsplash URL into an srcset across 4 widths.
+ * Mobile gets ~640px instead of the original 2000-2400px requested by some callers.
+ *
+ * Replaces the `&w=` query param (or appends one) so the same source URL
+ * can serve responsive sizes via `<img srcset>`.
+ */
+function unsplashSrcset(src: string): string {
+  if (!src.includes('unsplash.com')) return src; // no-op for non-Unsplash
+  const widths = [640, 960, 1440, 1920];
+  return widths
+    .map((w) => {
+      const u = src.replace(/&w=\d+/g, '').replace(/(\?|&)$/, '');
+      const sep = u.includes('?') ? '&' : '?';
+      return `${u}${sep}w=${w} ${w}w`;
+    })
+    .join(', ');
+}
+
+/**
+ * Pick the smallest reasonable default (mobile-first).
+ */
+function unsplashDefaultSrc(src: string): string {
+  if (!src.includes('unsplash.com')) return src;
+  return src.replace(/&w=\d+/g, '').replace(/(\?|&)$/, '') + (src.includes('?') ? '&' : '?') + 'w=960';
+}
+
+interface BackdropProps2 extends BackdropProps {
+  /** When true, eagerly load (use only above-the-fold). Defaults to lazy. */
+  priority?: boolean;
+}
+
 export function SectionBackdrop({
   src,
   darkSrc,
@@ -52,33 +84,53 @@ export function SectionBackdrop({
   position = 'center',
   blur = true,
   fade = true,
-}: BackdropProps) {
+  priority = false,
+}: BackdropProps2) {
   const preset = PRESETS[intensity];
   const blurStr = blur ? 'blur(2px) ' : '';
+  const sizes = '(max-width: 640px) 100vw, (max-width: 1024px) 100vw, 100vw';
+
+  // Build src + srcset for both light and dark layers
+  const lightSrc = unsplashDefaultSrc(src);
+  const lightSrcSet = unsplashSrcset(src);
+  const darkSrcUrl = unsplashDefaultSrc(darkSrc ?? src);
+  const darkSrcSet = unsplashSrcset(darkSrc ?? src);
+
+  const commonImgClass = 'pointer-events-none absolute inset-0 size-full object-cover photo-cinematic ken-burns';
 
   return (
     <>
       {/* Light-mode photo layer */}
-      <div
+      <img
         aria-hidden
-        className="pointer-events-none absolute inset-0 photo-cinematic ken-burns dark:hidden"
+        alt=""
+        src={lightSrc}
+        srcSet={lightSrcSet}
+        sizes={sizes}
+        loading={priority ? 'eager' : 'lazy'}
+        decoding="async"
+        fetchPriority={priority ? 'high' : 'low'}
+        className={`${commonImgClass} dark:hidden`}
         style={{
-          backgroundImage: `url(${src})`,
-          backgroundSize: 'cover',
-          backgroundPosition: position,
+          objectPosition: position,
           filter: `${blurStr}saturate(${preset.light.saturate}%) brightness(${preset.light.brightness})`,
           opacity: preset.light.opacity,
         }}
       />
 
       {/* Dark-mode photo layer (defaults to same src) */}
-      <div
+      <img
         aria-hidden
-        className="pointer-events-none absolute inset-0 photo-cinematic ken-burns hidden dark:block"
+        alt=""
+        src={darkSrcUrl}
+        srcSet={darkSrcSet}
+        sizes={sizes}
+        loading={priority ? 'eager' : 'lazy'}
+        decoding="async"
+        fetchPriority={priority ? 'high' : 'low'}
+        className={`${commonImgClass} hidden dark:block`}
         style={{
-          backgroundImage: `url(${darkSrc ?? src})`,
-          backgroundSize: 'cover',
-          backgroundPosition: position,
+          objectPosition: position,
           filter: `${blurStr}saturate(${preset.dark.saturate}%) brightness(${preset.dark.brightness})`,
           opacity: preset.dark.opacity,
         }}

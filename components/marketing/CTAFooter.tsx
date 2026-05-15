@@ -9,17 +9,20 @@ export function CTAFooter({ proofExampleId }: { proofExampleId: number | null })
       <section id="cta" className="relative isolate overflow-hidden border-b border-border/60 bg-[#06101c] text-white">
         {/* Full-bleed cinematic backdrop — data viz / server / abstract tech */}
         <ParallaxLayer strength={-0.15} className="absolute inset-0 -z-10">
-          <div
-            className="absolute -inset-[10%] ken-burns photo-cinematic"
-            style={{
-              backgroundImage:
-                'url(https://images.unsplash.com/photo-1639762681485-074b7f938ba0?auto=format&fit=crop&w=2400&q=70)',
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
-              filter: 'saturate(85%) brightness(0.45)',
-            }}
-            aria-hidden
-          />
+          <div className="absolute -inset-[10%] ken-burns photo-cinematic" aria-hidden>
+            <img
+              aria-hidden
+              alt=""
+              src="https://images.unsplash.com/photo-1639762681485-074b7f938ba0?w=960&auto=format&fit=crop&q=70"
+              srcSet="https://images.unsplash.com/photo-1639762681485-074b7f938ba0?w=640&auto=format&fit=crop&q=65 640w, https://images.unsplash.com/photo-1639762681485-074b7f938ba0?w=960&auto=format&fit=crop&q=70 960w, https://images.unsplash.com/photo-1639762681485-074b7f938ba0?w=1440&auto=format&fit=crop&q=72 1440w, https://images.unsplash.com/photo-1639762681485-074b7f938ba0?w=1920&auto=format&fit=crop&q=72 1920w"
+              sizes="100vw"
+              loading="lazy"
+              decoding="async"
+              fetchPriority="low"
+              className="size-full object-cover"
+              style={{ filter: 'saturate(85%) brightness(0.45)' }}
+            />
+          </div>
         </ParallaxLayer>
 
         <div className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-b from-[#04101c]/80 via-[#06101c]/65 to-[#04101c]/90" aria-hidden />

@@ -69,11 +69,15 @@
   html {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    /* Belt-and-suspenders: clip absolute decorations / oversized children
+       that would otherwise force a horizontal scrollbar on small phones. */
+    overflow-x: clip;
   }
   body {
     @apply bg-background text-foreground;
     font-feature-settings: 'cv11', 'ss01', 'ss03', 'ss04';
     text-rendering: optimizeLegibility;
+    overflow-x: clip;
   }
   ::selection {
     background: hsl(var(--primary) / 0.15);
