@@ -34,7 +34,7 @@ export function FeaturedArtifacts({ proofExampleId }: { proofExampleId: number |
       index: '02',
       title: 'Compliance PDF for the CISO',
       blurb:
-        'One-click filable PDF stamped with audit ID, hash, sources, and disclaimers. Drops into the same evidence binder your security team is already filing for SOC 2 and HIPAA assessments.',
+        'One-click filable PDF stamped with audit ID, hash, sources, and disclaimers. Drops into the same evidence binder your security team is already filing for SOC 2, HIPAA, FINRA, and FedRAMP assessments.',
       hrefLabel: 'See a sample PDF',
       href: '/audit',
       icon: <FileText className="h-4 w-4" />,
@@ -189,7 +189,7 @@ function PdfVisual() {
             <Row label="Model" value="claude-sonnet-4-5" />
             <Row label="PII redacted" value="2 tokens · PERSON, EMAIL_ADDRESS" />
             <Row label="Sources cited" value="5 · CDC, NIH/NHLBI" />
-            <Row label="Disclaimer" value="auto-injected · HIPAA-aware" />
+            <Row label="Disclaimer" value="auto-injected · pack-aware" />
             <Row label="Previous hash" value="cb12…ffc8" mono />
             <Row label="Current hash" value="8192…c539" mono />
             <Row label="Chain status" value="VALID" highlight />

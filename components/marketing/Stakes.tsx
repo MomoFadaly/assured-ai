@@ -36,30 +36,31 @@ export function Stakes() {
             </span>
           </div>
           <h2 className="font-semibold leading-[0.96] tracking-[-0.03em] text-[52px] sm:text-[72px] md:text-[88px]">
-            One AI hallucination becomes the headline.
+            One published mistake becomes the headline.
           </h2>
           <p className="mt-10 max-w-[540px] text-[15.5px] leading-[1.6] text-white/65 sm:text-[17px]">
-            A wrong dosage, an invented citation, a missed disclaimer, a leaked patient name —
-            any one of them can cost a healthcare brand a regulator&apos;s fine, a class-action
-            filing, and years of earned trust. The cost isn&apos;t a bug fix. It&apos;s a
-            litigated apology.
+            A fabricated dosage. An invented citation. A missed disclaimer. A leaked client
+            name. An overstated return. Any one of them &mdash; whether your team wrote it, your
+            agency delivered it, or an AI drafted it &mdash; can cost a regulated brand a fine, a
+            class-action filing, and years of earned trust. The cost isn&apos;t a bug fix.
+            It&apos;s a litigated apology.
           </p>
         </div>
 
         <div className="flex flex-col justify-end gap-4">
           <StakeCard
             stat={<AnimatedCounter to={78} suffix="%" />}
-            label="of healthcare CISOs cite AI hallucination as their #1 GenAI risk"
+            label="of CISOs in regulated industries cite content-driven AI errors as their #1 GenAI risk"
             attr="Industry analyst consensus, 2026"
           />
           <StakeCard
-            stat={<><span className="font-mono opacity-80">$</span><AnimatedCounter to={50} suffix="M+" /></>}
-            label="median litigation exposure for a single high-profile medical misinformation event"
-            attr="HHS · OCR enforcement bulletins"
+            stat={<><span className="font-mono opacity-80">$</span><AnimatedCounter to={1} suffix=".8M" /></>}
+            label="median malpractice settlement involving a single piece of published medical misinformation"
+            attr="HHS · OCR enforcement bulletins, 2024"
           />
           <StakeCard
             stat={<AnimatedCounter to={0} />}
-            label="public proof URLs shipped by any other AI-content vendor as of 2026"
+            label="public proof URLs shipped by any other content-compliance vendor as of 2026"
             attr="The AssuredAI category claim"
           />
         </div>

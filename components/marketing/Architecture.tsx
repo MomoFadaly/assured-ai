@@ -20,25 +20,25 @@ const LAYERS: Layer[] = [
     title: 'I/O boundary redaction',
     subtitle: 'Microsoft Presidio sidecar · runs in your VPC',
     details: [
-      { label: 'Entities', value: 'PERSON · MRN · EMAIL · PHONE · IP · DATE' },
+      { label: 'Entities', value: 'PERSON · MRN · ACCT · EMAIL · PHONE · IP · DATE · client-id' },
       { label: 'Latency', value: '~80ms p99' },
-      { label: 'Egress', value: 'Zero — PHI never leaves your perimeter' },
+      { label: 'Egress', value: 'Zero — PHI / PII never leaves your perimeter' },
     ],
     body:
-      'Every prompt and every response passes through a Presidio container running inside your network. Detected PHI is replaced with typed tokens before any model call. The original mapping is held in a per-session cache that is wiped at the close of the audit entry.',
+      'Every prompt and every response passes through a Presidio container running inside your network. Detected PHI, PII, and pack-specific identifiers (account numbers, client names, MRNs) are replaced with typed tokens before any model call. The original mapping is held in a per-session cache that is wiped at the close of the audit entry.',
   },
   {
     index: '02',
     icon: <Shield className="h-5 w-5" strokeWidth={1.5} />,
-    title: 'Red-flag classifier',
-    subtitle: 'Domain-tuned safety layer · pre-LLM',
+    title: 'Vertical red-flag classifier',
+    subtitle: 'Pack-tuned safety layer · pre-LLM',
     details: [
-      { label: 'Topics', value: 'cardiac · suicidal · overdose · stroke · anaphylaxis' },
+      { label: 'Topics', value: 'crisis · suitability · privilege · safety · disclosure' },
       { label: 'Decision', value: 'binary route · no LLM if matched' },
-      { label: 'Fallback', value: '988 · 911 · poison control · NSPL' },
+      { label: 'Fallback', value: '988 · 911 · escalation queue · compliance review' },
     ],
     body:
-      'A specialized classifier inspects every inbound prompt for medical emergencies, ideation, or symptom-prompting content. Matched prompts bypass the LLM entirely and surface a hard-coded hotline routing screen — there is no scenario in which an emergency reaches a generative model.',
+      'A pack-specific classifier inspects every inbound piece against the rules for your vertical — crisis-line routing for healthcare and government, suitability and risk-language for finance, privilege and Rule 1.6(b) for legal. Matched pieces bypass the LLM entirely and surface the right escalation path. There is no scenario in which a flagged piece reaches a generative model unchecked.',
   },
   {
     index: '03',
@@ -47,11 +47,11 @@ const LAYERS: Layer[] = [
     subtitle: 'pgvector · HNSW · voyage-3 1024-dim',
     details: [
       { label: 'Index', value: 'HNSW · cosine · m=16 ef_construction=200' },
-      { label: 'Cells', value: 'CDC · NIH · FDA · HHS · NEJM · provider-uploaded' },
+      { label: 'Cells', value: 'CDC · FDA · SEC · FINRA · ABA · OPM · plus client-uploaded' },
       { label: 'Refresh', value: 'incremental · weekly · trace-logged' },
     ],
     body:
-      'Your retrieval cell is built from the canonical sources you trust — CDC topic pages, NIH bulletins, your own clinical content. The corpus is embedded with voyage-3 (1024-dim) and queried with HNSW cosine. Retrieved chunks are passed to the model as context, never as training data.',
+      'Your retrieval cell is built from the canonical sources you trust &mdash; per-pack seed libraries (CDC/FDA/AHA for healthcare, SEC/FINRA/FRB for finance, OPM/state archives for government, ABA opinions for legal) plus your own approved corpus. Embedded with voyage-3 (1024-dim), queried with HNSW cosine. Retrieved chunks pass to the model as context, never as training data.',
   },
   {
     index: '04',

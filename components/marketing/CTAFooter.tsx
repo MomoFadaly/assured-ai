@@ -37,10 +37,11 @@ export function CTAFooter({ proofExampleId }: { proofExampleId: number | null })
           <h2 className="mx-auto text-balance font-semibold leading-[0.98] tracking-[-0.025em] text-white text-[44px] sm:text-[60px] md:text-[72px]">
             See it for yourself in 60 seconds.
           </h2>
-          <p className="mx-auto mt-6 max-w-[640px] text-balance text-[16px] leading-[1.6] text-white/70 sm:text-[18px]">
-            Paste any healthcare article. Watch the pipeline run. Rewrite an unsourced claim with
-            one click. Send the verified draft to a mock WordPress queue. Share the cryptographic
-            proof URL. Download the CISO-filable PDF.
+          <p className="mx-auto mt-6 max-w-[680px] text-balance text-[16px] leading-[1.6] text-white/70 sm:text-[18px]">
+            Paste any piece of regulated content &mdash; yours, your agency&rsquo;s, or an
+            LLM&rsquo;s. Watch the pipeline run. Rewrite an unsourced claim with one click. Send
+            the verified draft into your CMS queue. Share the cryptographic proof URL. Download
+            the CISO-filable PDF.
           </p>
           <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
             <Link
@@ -49,7 +50,7 @@ export function CTAFooter({ proofExampleId }: { proofExampleId: number | null })
             >
               <span className="beam" />
               <span className="relative z-10 inline-flex items-center gap-2">
-                Try the verifier
+                Configure your AssuredAI
                 <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
               </span>
             </Link>
@@ -59,7 +60,7 @@ export function CTAFooter({ proofExampleId }: { proofExampleId: number | null })
                 className="inline-flex h-12 items-center gap-2 rounded-md border border-white/20 bg-white/5 px-6 text-[14.5px] font-medium text-white backdrop-blur hover:bg-white/10"
               >
                 <Lock className="h-4 w-4" />
-                See an example proof
+                See a live proof
               </Link>
             ) : null}
           </div>
@@ -71,9 +72,10 @@ export function CTAFooter({ proofExampleId }: { proofExampleId: number | null })
           <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-5">
             <div className="lg:col-span-2">
               <BrandLockup />
-              <p className="mt-3 max-w-[280px] text-[12.5px] leading-relaxed text-muted-foreground">
-                Compliance-grade AI verification for healthcare and government content. Built
-                on industry-consensus principles for trust-centric AI in regulated industries.
+              <p className="mt-3 max-w-[300px] text-[12.5px] leading-relaxed text-muted-foreground">
+                The proof layer for regulated publishing. Healthcare, finance, government,
+                legal. Hash-chained audit log + public proof URL on every piece &mdash; whether
+                your team wrote it, your agency delivered it, or an LLM drafted it.
               </p>
             </div>
             <FooterCol

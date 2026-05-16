@@ -12,14 +12,43 @@ interface FAQItem {
 
 const ITEMS: FAQItem[] = [
   {
-    q: 'How does PHI redaction work in practice?',
+    q: 'Does this work for content humans wrote, or only AI-generated content?',
+    a: (
+      <>
+        Both. The compliance pipeline operates on text &mdash; it doesn&rsquo;t care whether the
+        words came from an editor, a freelance writer, a marketing agency, a press release a
+        partner sent over, or an LLM. Same PHI/PII recognizers, same source-anchored
+        verification, same red-flag rules, same audit row, same proof URL. AssuredAI is the
+        single gate every piece passes through before it ships, regardless of where the draft
+        came from.
+      </>
+    ),
+  },
+  {
+    q: 'Does this work for finance, government, and legal — or only healthcare?',
+    a: (
+      <>
+        All four. Each vertical ships with its own pack: a recognizer set, a disclaimer library,
+        and a red-flag ruleset tuned to that regulatory environment. <strong>Healthcare</strong>{' '}
+        ships with HIPAA Safe-Harbor PHI recognizers and cardiac / mental-health / overdose
+        escalation. <strong>Finance</strong> ships with SEC + FINRA + SOX + PCI-DSS recognizers
+        and suitability-language detection. <strong>Government</strong> ships with Section 508
+        disclaimer checks and crisis-line routing. <strong>Legal</strong> ships with ABA Model
+        Rules privilege detection and Rule 1.6(b) imminent-harm escalation. Custom packs
+        available on the Enterprise plan.
+      </>
+    ),
+  },
+  {
+    q: 'How does PHI / PII redaction work in practice?',
     a: (
       <>
         Every inbound prompt and outbound response passes through a Microsoft Presidio container
-        running inside your VPC. Detected entities — PERSON, MRN, EMAIL, PHONE, IP, DATE — are
-        replaced with typed tokens (e.g., <code className="rounded bg-muted px-1 py-0.5 font-mono text-[11px]">&lt;PERSON_1&gt;</code>) before any model call. The mapping is held
-        in a per-session cache that is wiped at the close of the audit entry. PHI never leaves
-        your perimeter.
+        running inside your VPC. Detected entities &mdash; PERSON, MRN, EMAIL, PHONE, IP, DATE,
+        account numbers, client identifiers &mdash; are replaced with typed tokens (e.g.,
+        {' '}<code className="rounded bg-muted px-1 py-0.5 font-mono text-[11px]">&lt;PERSON_1&gt;</code>) before any model call. The mapping is held
+        in a per-session cache that is wiped at the close of the audit entry. Sensitive data
+        never leaves your perimeter.
       </>
     ),
   },
@@ -97,9 +126,9 @@ export function FAQ() {
         <SectionEyebrow>FAQ</SectionEyebrow>
         <SectionHeadline>Questions a CISO asks first.</SectionHeadline>
         <SectionLede>
-          The technical and procurement questions that come up in every healthcare-AI sales
-          cycle, answered up front. If yours isn&apos;t here, the live verifier at /chat is the
-          fastest way to find out.
+          The technical and procurement questions that come up in every regulated-publishing
+          sales cycle &mdash; healthcare, finance, government, legal &mdash; answered up front.
+          If yours isn&apos;t here, the live verifier at /chat is the fastest way to find out.
         </SectionLede>
 
         <div className="mt-16 divide-y divide-border border-y border-border">

@@ -7,19 +7,19 @@ type Cell = 'yes' | 'no' | 'partial';
 
 // Only 2 alternative columns now — AssuredAI gets its own hero card above
 const ROWS: Array<{ label: string; sub: string; us: Cell; cells: [Cell, Cell] }> = [
-  { label: 'PII / PHI redaction at I/O boundary', sub: 'Patient names, MRNs, emails caught before the LLM sees them', us: 'yes', cells: ['no', 'no'] },
-  { label: 'Medical red-flag auto-block', sub: 'Cardiac, suicidal, overdose routes to a hotline, not the model', us: 'yes', cells: ['no', 'no'] },
+  { label: 'PHI / PII / client-identifier redaction', sub: 'Patient initials, account numbers, client names — caught before the content ships', us: 'yes', cells: ['no', 'no'] },
+  { label: 'Vertical red-flag auto-block', sub: 'Crisis, suitability, privilege, safety — routed to escalation, not to publish', us: 'yes', cells: ['no', 'no'] },
   { label: 'Sentence-level source verification', sub: 'Every claim matched against your vetted library', us: 'yes', cells: ['no', 'no'] },
-  { label: 'Public cryptographic proof URL', sub: 'Anyone with a browser can re-verify SHA-256 chain', us: 'yes', cells: ['no', 'no'] },
+  { label: 'Public cryptographic proof URL', sub: 'Anyone with a browser can re-verify the SHA-256 chain', us: 'yes', cells: ['no', 'no'] },
   { label: 'Hash-chained tamper-evident audit log', sub: 'Postgres trigger enforces append-only', us: 'yes', cells: ['no', 'partial'] },
   { label: 'Compliance PDF export for CISO filing', sub: 'One-click filable evidence', us: 'yes', cells: ['no', 'partial'] },
-  { label: 'Brand voice profile + scoring', sub: '17 metrics from your archive', us: 'yes', cells: ['no', 'no'] },
-  { label: 'Ships in weeks, not quarters', sub: 'Drops into your existing CMS', us: 'yes', cells: ['partial', 'no'] },
+  { label: 'Brand voice profile + scoring', sub: '17 metrics derived from your published archive', us: 'yes', cells: ['no', 'no'] },
+  { label: 'Source-agnostic — human, agency, or AI drafts', sub: 'Same compliance gate regardless of who or what wrote the piece', us: 'yes', cells: ['no', 'no'] },
 ];
 
 const ALT_COLS = [
-  { label: 'Generic enterprise LLM', sub: 'writing only' },
-  { label: 'Build in-house', sub: 'quarters of work' },
+  { label: 'Editorial compliance incumbents', sub: 'Veeva, Acrolinx — pre-LLM stack' },
+  { label: 'Generic LLM / build in-house', sub: 'Quarters of work, no audit chain' },
 ] as const;
 
 export function Comparison() {
@@ -39,9 +39,10 @@ export function Comparison() {
           <span className="font-semibold">a proof URL.</span>
         </h2>
         <SectionLede>
-          Authoring tools and enterprise LLMs are great at writing. None of them give a CISO an
-          auditable trust artifact for the article that gets published. AssuredAI is the proof
-          layer that sits on top of whatever you already use.
+          Editorial compliance incumbents (Veeva, Acrolinx) were built before LLMs and have no
+          audit chain. Generic enterprise LLMs are great at writing and ship zero compliance
+          artifacts. AssuredAI is the only stack that gives a CISO a tamper-evident, publicly
+          re-verifiable proof URL for every piece &mdash; regardless of who or what drafted it.
         </SectionLede>
 
         {/* HERO column — AssuredAI as the protagonist, pulled out of the table */}

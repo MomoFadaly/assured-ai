@@ -2,8 +2,8 @@ import { Check, Sparkles } from 'lucide-react';
 import { SectionEyebrow } from './Pipeline';
 
 const LAYERS = [
-  { label: 'PHI redaction at the I/O boundary', meta: 'Presidio sidecar · zero egress' },
-  { label: 'Medical red-flag routing — pre-LLM', meta: '6 categories · hotline-routed' },
+  { label: 'PHI / PII redaction at the I/O boundary', meta: 'Presidio sidecar · zero egress' },
+  { label: 'Vertical red-flag routing — pre-LLM', meta: 'Crisis · suitability · privilege · safety' },
   { label: 'Sentence-level sourced retrieval', meta: 'pgvector · voyage-3 · 1024-dim' },
   { label: 'Hash-chained audit log', meta: 'Postgres trigger · SHA-256 · append-only' },
   { label: 'Public cryptographic proof URLs', meta: 'Re-verifiable in any browser' },
@@ -18,13 +18,14 @@ export function Origin() {
         <SectionEyebrow n="04">Why AssuredAI exists</SectionEyebrow>
 
         <h2 className="mx-auto max-w-[1020px] text-balance text-center font-semibold leading-[1.0] tracking-[-0.028em] text-[42px] sm:text-[60px] md:text-[76px]">
-          The hard part of healthcare AI isn&apos;t the AI.
+          The hard part of regulated publishing isn&apos;t the AI.
         </h2>
 
         <p className="mx-auto mt-6 max-w-[720px] text-balance text-center text-[17px] leading-[1.55] text-muted-foreground sm:text-[19px]">
-          It is the verification, the redaction, the audit trail, the regulatory posture —
-          everything that has to be true <em>around</em> the model for the model to be safe to
-          ship. That everything is the work. AssuredAI is the work.
+          It&apos;s the verification, the redaction, the audit trail, the regulatory posture &mdash;
+          everything that has to be true <em>around</em> the content for the content to be safe
+          to ship. Whether a human wrote it or an LLM did. That everything is the work. AssuredAI
+          is the work.
         </p>
 
         {/* Visual proof of the argument: disproportion between "the AI" and "the work around it" */}
@@ -78,7 +79,7 @@ export function Origin() {
                 Everything around the model.
               </div>
               <p className="mt-3 max-w-[560px] text-[13.5px] leading-[1.55] text-muted-foreground sm:text-[14.5px]">
-                The six layers that make a healthcare publish defensible — built end-to-end,
+                The six layers that make a regulated publish defensible &mdash; built end-to-end,
                 wired together, deployable in your VPC by Monday. Not a feature menu. A
                 compliance pipeline.
               </p>
@@ -124,7 +125,7 @@ export function Origin() {
             AssuredAI is open source under MIT, runs on infrastructure you already have, and is
             architected so a CISO can audit every layer.
             <span className="text-muted-foreground">
-              {' '}Built so the next healthcare brand on the front page for an AI hallucination
+              {' '}Built so the next regulated brand on the front page for a published mistake
               isn&apos;t yours.
             </span>
           </p>

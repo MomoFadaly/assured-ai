@@ -46,14 +46,14 @@ export function Pipeline() {
               step={1}
               tone="amber"
               icon={<EyeOff className="h-5 w-5" />}
-              title="PII / PHI redaction"
-              blurb="Patient names, MRNs, emails, phones, IPs — replaced with typed tokens before anything leaves your editor."
+              title="PHI / PII redaction"
+              blurb="Patient initials, account numbers, client names, emails, phones — replaced with typed tokens before anything leaves your editor."
               example={
                 <div className="space-y-1.5">
-                  <Strike>Patient John Smith, MRN 123456</Strike>
+                  <Strike>Client Avery Patel, acct 8842-91</Strike>
                   <div className="flex items-start gap-1.5 font-mono text-[10.5px] text-amber-700 dark:text-amber-300">
                     <ArrowRight className="mt-0.5 h-3 w-3 shrink-0" />
-                    <span>Patient &lt;PERSON_1&gt;, &lt;MRN_1&gt;</span>
+                    <span>Client &lt;PERSON_1&gt;, &lt;ACCT_1&gt;</span>
                   </div>
                 </div>
               }
@@ -64,13 +64,13 @@ export function Pipeline() {
               step={2}
               tone="red"
               icon={<Heart className="h-5 w-5" />}
-              title="Medical red flags"
-              blurb="Cardiac, suicidal ideation, overdose, stroke, severe bleeding, anaphylaxis — auto-routes to the right hotline. Never reaches the LLM."
+              title="Vertical red flags"
+              blurb="Crisis, suitability, privilege, safety — vertical-specific rulesets auto-route the content out of the LLM path and into the right escalation."
               example={
                 <div className="rounded-md border border-red-300 bg-red-50/60 p-2.5 text-[10.5px] text-red-900 dark:border-red-900 dark:bg-red-950/30 dark:text-red-200">
                   <div className="flex items-center gap-1.5 font-semibold">
                     <AlertTriangle className="h-3 w-3" />
-                    <span>Cardiac · 911</span>
+                    <span>Crisis · 988 routing</span>
                   </div>
                   <p className="mt-0.5">Bypassed the LLM entirely.</p>
                 </div>
@@ -102,7 +102,7 @@ export function Pipeline() {
               tone="primary"
               icon={<Stamp className="h-5 w-5" />}
               title="Disclaimer enforcement"
-              blurb="Required healthcare or government disclaimer detected, or auto-injected if missing. House style preserved."
+              blurb="Required pack disclaimer (HIPAA, FINRA, § 508, ABA) detected, or auto-injected if missing. House style preserved."
               example={
                 <div className="flex items-start gap-1.5 rounded-md border-l-2 border-primary bg-primary/5 px-2 py-1.5 text-[10.5px] italic text-muted-foreground">
                   <Stamp className="mt-0.5 h-3 w-3 shrink-0 not-italic text-primary" />

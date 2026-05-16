@@ -12,12 +12,12 @@ export function ProofSection({ proofExampleId }: { proofExampleId: number }) {
       <div className="relative mx-auto max-w-[1240px] px-5 py-24">
         <SectionEyebrow>The differentiator</SectionEyebrow>
         <SectionHeadline>
-          The first AI compliance vendor to ship cryptographic proof URLs.
+          The first content-compliance vendor to ship cryptographic proof URLs.
         </SectionHeadline>
         <SectionLede>
-          Every verification produces a shareable URL anyone — a CISO, a regulator, a journalist,
-          a patient — can re-verify in their browser. No vendor lock-in. No &ldquo;trust us.&rdquo;
-          Just SHA-256, walking from genesis to head, in your own tab.
+          Every verification produces a shareable URL anyone &mdash; a CISO, a regulator, a
+          journalist, a customer &mdash; can re-verify in their browser. No vendor lock-in. No
+          &ldquo;trust us.&rdquo; Just SHA-256, walking from genesis to head, in your own tab.
         </SectionLede>
 
         <div className="mt-14 grid items-start gap-8 lg:grid-cols-[1.1fr_1fr]">

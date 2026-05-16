@@ -27,16 +27,16 @@ export function WhitePaperQuote() {
         <figure className="mx-auto max-w-[920px] text-center text-white">
           <QuoteIcon className="mx-auto h-12 w-12 text-primary/70" />
           <blockquote className="mt-8 text-balance text-[28px] font-medium leading-[1.3] tracking-tight text-white sm:text-[36px] md:text-[42px]">
-            &ldquo;Patients will not distinguish &lsquo;the AI made a mistake&rsquo; from &lsquo;your
-            hospital gave me false information.&rsquo; A single high-profile AI error can shatter
-            the hard-won trust a healthcare brand has built over years.&rdquo;
+            &ldquo;Customers will not distinguish &lsquo;the AI made a mistake&rsquo; from
+            &lsquo;your firm gave me false information.&rsquo; A single high-profile published
+            error can shatter the hard-won trust a regulated brand has built over years.&rdquo;
           </blockquote>
           <figcaption className="mt-9 inline-flex items-center gap-3">
             <span className="inline-block size-10 rounded-full bg-gradient-to-br from-primary/40 to-emerald-400/20 ring-1 ring-white/20" />
             <span className="text-left">
               <span className="block text-[14px] font-semibold">Foley &amp; Lardner LLP</span>
               <span className="block text-[12.5px] text-white/60">
-                healthcare AI compliance counsel, 2026
+                regulated-content compliance counsel, 2026
               </span>
             </span>
           </figcaption>
