@@ -3,7 +3,7 @@
 import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { Download, Loader2, ShieldCheck } from 'lucide-react';
-import { ALL_EVIDENCE_TABLES, type EvidenceTable } from '@/lib/evidence';
+import { ALL_EVIDENCE_TABLES, type EvidenceTable } from '@/lib/evidence/constants';
 
 interface TenantSummary {
   id: string;

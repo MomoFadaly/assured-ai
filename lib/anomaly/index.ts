@@ -21,6 +21,8 @@ import '@/lib/server-only';
 import { query } from '@/lib/db/client';
 import { logger } from '@/lib/logger';
 import { notifyEvent } from '@/lib/notifications/dispatch';
+export type { AnomalyKind, AnomalySeverity, ScanReport } from './types';
+import type { AnomalyKind, AnomalySeverity, ScanReport } from './types';
 
 const LOOKBACK_HOURS = 24;
 const BASELINE_DAYS = 14;
@@ -29,15 +31,6 @@ const RECOGNIZER_RATIO = 5;
 const API_KEY_RATIO = 10;
 const VOLUME_COLLAPSE_RATIO = 0.25;
 const VOLUME_BASELINE_MIN = 20;
-
-export type AnomalyKind =
-  | 'red_flag_spike'
-  | 'volume_collapse'
-  | 'recognizer_storm'
-  | 'api_key_burst'
-  | 'kill_switch_engaged';
-
-export type AnomalySeverity = 'info' | 'warning' | 'critical';
 
 export interface DetectedAnomaly {
   kind: AnomalyKind;
@@ -50,16 +43,7 @@ export interface DetectedAnomaly {
   window_end: Date;
 }
 
-export interface ScanReport {
-  scanned_at: string;
-  window_start: string;
-  window_end: string;
-  detected: number;
-  inserted: number;
-  skipped_duplicate: number;
-  notified: number;
-  anomalies: Array<{ kind: AnomalyKind; severity: AnomalySeverity; summary: string }>;
-}
+// (ScanReport is re-exported from ./types — see top of file.)
 
 export async function runAnomalyScan(): Promise<ScanReport> {
   const now = new Date();

@@ -24,6 +24,9 @@ import { gzipSync } from 'node:zlib';
 import { query } from '@/lib/db/client';
 import { logger } from '@/lib/logger';
 
+export { ALL_EVIDENCE_TABLES, type EvidenceTable } from './constants';
+import { ALL_EVIDENCE_TABLES, type EvidenceTable } from './constants';
+
 export interface EvidenceExportInput {
   tenantId: string | null;
   windowStart: Date;
@@ -32,31 +35,6 @@ export interface EvidenceExportInput {
   /** Subset of tables to include. Defaults to all SOC 2-relevant tables. */
   includeTables?: EvidenceTable[];
 }
-
-export type EvidenceTable =
-  | 'audit_log'
-  | 'admin_actions'
-  | 'notification_deliveries'
-  | 'usage_events'
-  | 'monitor_findings'
-  | 'monitor_scan_runs'
-  | 'login_history'
-  | 'api_keys'
-  | 'teammate_invites'
-  | 'anomaly_events';
-
-export const ALL_EVIDENCE_TABLES: EvidenceTable[] = [
-  'audit_log',
-  'admin_actions',
-  'notification_deliveries',
-  'usage_events',
-  'monitor_findings',
-  'monitor_scan_runs',
-  'login_history',
-  'api_keys',
-  'teammate_invites',
-  'anomaly_events',
-];
 
 export interface EvidenceExportResult {
   id: string;
