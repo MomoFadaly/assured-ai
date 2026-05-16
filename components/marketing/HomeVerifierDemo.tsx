@@ -401,8 +401,15 @@ export function HomeVerifierDemo() {
           </div>
         </div>
 
-        <div className="relative">
-          <AnimatePresence initial={false}>
+        {/* min-h locks the container so the absolutely-positioned RunningPane
+            has somewhere to render while the ComposePane's exit animation
+            finishes. mode="wait" serializes the picker→running→result
+            transitions so two phases never render simultaneously — fixes
+            the overlay bug where the textarea ghosted behind the streaming
+            log. All four branches have explicit exit props, so wait mode
+            never wedges. */}
+        <div className="relative min-h-[488px]">
+          <AnimatePresence initial={false} mode="wait">
             {phase === 'compose' && (
               <ComposePane
                 key="compose"
