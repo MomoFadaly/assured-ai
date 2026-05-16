@@ -139,17 +139,15 @@ async function detectRedFlagSpike(
        SELECT tenant_id,
               COUNT(*)::float / GREATEST(EXTRACT(EPOCH FROM ($2::timestamptz - $3::timestamptz)) / 86400.0, 1) AS per_day
          FROM audit_log
-        WHERE escalation_severity IS NOT NULL
-          AND escalation_severity IN ('emergency','urgent')
-          AND created_at >= $3 AND created_at < $1
+        WHERE red_flag_category IS NOT NULL
+          AND occurred_at >= $3 AND occurred_at < $1
         GROUP BY tenant_id
      ),
      recent AS (
        SELECT tenant_id, COUNT(*)::int AS cnt
          FROM audit_log
-        WHERE escalation_severity IS NOT NULL
-          AND escalation_severity IN ('emergency','urgent')
-          AND created_at >= $1 AND created_at < $2
+        WHERE red_flag_category IS NOT NULL
+          AND occurred_at >= $1 AND occurred_at < $2
         GROUP BY tenant_id
      )
      SELECT r.tenant_id, r.cnt AS recent_count, COALESCE(b.per_day, 0) AS baseline_mean
@@ -191,14 +189,14 @@ async function detectVolumeCollapse(
        SELECT tenant_id,
               COUNT(*)::float / GREATEST(EXTRACT(EPOCH FROM ($2::timestamptz - $3::timestamptz)) / 86400.0, 1) AS per_day
          FROM audit_log
-        WHERE created_at >= $3 AND created_at < $1
+        WHERE occurred_at >= $3 AND occurred_at < $1
         GROUP BY tenant_id
        HAVING COUNT(*) > $5
      ),
      recent AS (
        SELECT tenant_id, COUNT(*)::int AS cnt
          FROM audit_log
-        WHERE created_at >= $1 AND created_at < $2
+        WHERE occurred_at >= $1 AND occurred_at < $2
         GROUP BY tenant_id
      )
      SELECT b.tenant_id, COALESCE(r.cnt, 0) AS recent_count, b.per_day AS baseline_mean
@@ -242,13 +240,13 @@ async function detectRecognizerStorm(
               SUM(COALESCE((verification_detail->>'recognizer_hits')::int, 0))::float
                 / GREATEST(EXTRACT(EPOCH FROM ($2::timestamptz - $3::timestamptz)) / 86400.0, 1) AS per_day
          FROM audit_log
-        WHERE created_at >= $3 AND created_at < $1
+        WHERE occurred_at >= $3 AND occurred_at < $1
         GROUP BY tenant_id
      ),
      recent AS (
        SELECT tenant_id, SUM(COALESCE((verification_detail->>'recognizer_hits')::int, 0))::int AS s
          FROM audit_log
-        WHERE created_at >= $1 AND created_at < $2
+        WHERE occurred_at >= $1 AND occurred_at < $2
         GROUP BY tenant_id
      )
      SELECT r.tenant_id, r.s AS recent_sum, COALESCE(b.per_day, 0) AS baseline_mean

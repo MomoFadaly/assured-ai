@@ -152,11 +152,11 @@ async function buildCsvForTable(
   switch (table) {
     case 'audit_log':
       return queryToCsv(
-        `SELECT id, scenario, vertical_pack_slug, outcome, input_mode,
-                user_session_id, citation_count, escalation_severity,
-                created_at, hash_self, hash_prev
+        `SELECT id, scenario, outcome, user_session_id, red_flag_category,
+                pii_detected_input, pii_detected_output, model_used, latency_ms,
+                occurred_at, hash_self, hash_prev
            FROM audit_log
-          WHERE created_at >= $1 AND created_at < $2
+          WHERE occurred_at >= $1 AND occurred_at < $2
             ${input.tenantId ? 'AND tenant_id = $3' : ''}
           ORDER BY id ASC`,
         input,
@@ -164,9 +164,9 @@ async function buildCsvForTable(
     case 'admin_actions':
       return queryToCsv(
         `SELECT id, actor_email, actor_role, action, target_kind, target_id,
-                reason, created_at
+                reason, occurred_at
            FROM admin_actions
-          WHERE created_at >= $1 AND created_at < $2
+          WHERE occurred_at >= $1 AND occurred_at < $2
             ${input.tenantId ? 'AND tenant_id = $3' : ''}
           ORDER BY id ASC`,
         input,
@@ -183,10 +183,10 @@ async function buildCsvForTable(
       );
     case 'usage_events':
       return queryToCsv(
-        `SELECT id, kind, provider, model, prompt_tokens, completion_tokens,
-                total_tokens, cost_usd, audit_log_id, created_at
+        `SELECT id, kind, provider, model, input_tokens, output_tokens,
+                cost_micro_usd, audit_log_id, source, api_key_id, occurred_at
            FROM usage_events
-          WHERE created_at >= $1 AND created_at < $2
+          WHERE occurred_at >= $1 AND occurred_at < $2
             ${input.tenantId ? 'AND tenant_id = $3' : ''}
           ORDER BY id ASC`,
         input,
@@ -194,17 +194,17 @@ async function buildCsvForTable(
     case 'monitor_findings':
       return queryToCsv(
         `SELECT id, site_id, page_url, severity, status, summary, audit_log_id,
-                created_at, acknowledged_at, resolved_at
+                scanned_at, acknowledged_at, resolved_at
            FROM monitor_findings
-          WHERE created_at >= $1 AND created_at < $2
+          WHERE scanned_at >= $1 AND scanned_at < $2
             ${input.tenantId ? 'AND tenant_id = $3' : ''}
           ORDER BY id ASC`,
         input,
       );
     case 'monitor_scan_runs':
       return queryToCsv(
-        `SELECT id, site_id, status, started_at, finished_at, pages_seen,
-                findings_count, error
+        `SELECT id, site_id, status, started_at, finished_at,
+                pages_discovered, pages_scanned, pages_failed, new_findings, error
            FROM monitor_scan_runs
           WHERE started_at >= $1 AND started_at < $2
             ${input.tenantId ? 'AND tenant_id = $3' : ''}
@@ -228,8 +228,8 @@ async function buildCsvForTable(
       }
     case 'api_keys':
       return queryToCsv(
-        `SELECT id, name, prefix, scopes, pack_restriction, last_used_at,
-                created_at, revoked_at
+        `SELECT id, name, prefix, scopes, allowed_pack_slugs, last_used_at,
+                use_count, created_at, revoked_at
            FROM api_keys
           WHERE created_at < $2
             ${input.tenantId ? 'AND tenant_id = $3' : ''}
