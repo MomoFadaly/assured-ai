@@ -14,6 +14,8 @@ import { Architecture } from '@/components/marketing/Architecture';
 import { FeaturedArtifacts } from '@/components/marketing/FeaturedArtifacts';
 import { ShowcaseStrip } from '@/components/marketing/ShowcaseStrip';
 import { HashChainCanvas } from '@/components/marketing/HashChainCanvas';
+import { OutcomesStrip } from '@/components/marketing/OutcomesStrip';
+import { getGlobalMetrics } from '@/lib/marketing/global-metrics';
 import { WhitePaperQuote } from '@/components/marketing/Quote';
 import { VoiceSection, WordPressDiagram } from '@/components/marketing/VoiceSection';
 import { Comparison } from '@/components/marketing/Comparison';
@@ -51,7 +53,11 @@ export default async function LandingPage() {
   // etc.) over the latest raw audit row, since the showcase is engineered
   // to be visually compelling. Falls back to the latest audit when the
   // showcase table is empty (e.g. first deploy after the migration).
-  const [hero, latestId] = await Promise.all([getHeroShowcase(), getLatestAuditId()]);
+  const [hero, latestId, metrics] = await Promise.all([
+    getHeroShowcase(),
+    getLatestAuditId(),
+    getGlobalMetrics(),
+  ]);
   const proofExampleId = hero?.audit_log_id ?? latestId;
   return (
     <div className="relative min-h-screen bg-background">
@@ -60,6 +66,7 @@ export default async function LandingPage() {
       <MarketingHeader authChip={<HeaderAuthChip />} />
       <main>
         <Hero proofExampleId={proofExampleId} />
+        <OutcomesStrip metrics={metrics} />
         <Audience />
         <TrustStrip />
         <FailureModes />
