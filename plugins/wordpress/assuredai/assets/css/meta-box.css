@@ -1,0 +1,98 @@
+/* AssuredAI — meta-box styling. Kept minimal so WP admin themes stay in charge. */
+#assuredai-meta-box .assuredai-label {
+  display: block;
+  margin-bottom: 4px;
+  font-weight: 600;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #50575e;
+}
+
+#assuredai-meta-box select {
+  width: 100%;
+}
+
+#assuredai-meta-box .assuredai-warn {
+  margin: 0 0 12px 0;
+  padding: 10px 12px;
+  border-left: 4px solid #f0b849;
+  background: #fff8e6;
+  font-size: 12.5px;
+  color: #50575e;
+}
+
+#assuredai-meta-box .assuredai-error {
+  margin: 10px 0 0 0;
+  padding: 10px 12px;
+  border-left: 4px solid #d63638;
+  background: #fef2f2;
+  font-size: 12.5px;
+  color: #8a1d1d;
+}
+
+#assuredai-meta-box .assuredai-result {
+  margin-top: 14px;
+  padding: 12px;
+  border: 1px solid #dcdcde;
+  border-radius: 6px;
+  background: #f6f7f7;
+}
+
+#assuredai-meta-box .assuredai-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12.5px;
+  padding: 4px 0;
+}
+
+#assuredai-meta-box .assuredai-row + .assuredai-row {
+  border-top: 1px solid #e5e7eb;
+}
+
+#assuredai-meta-box .assuredai-row-label {
+  color: #50575e;
+}
+
+#assuredai-meta-box .assuredai-row-value {
+  font-weight: 600;
+  color: #1d2327;
+  font-variant-numeric: tabular-nums;
+}
+
+#assuredai-meta-box .assuredai-badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 2px 8px;
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+#assuredai-meta-box .assuredai-badge-answered {
+  background: #e7f5ee;
+  color: #1c7c47;
+  box-shadow: inset 0 0 0 1px #b9e3c8;
+}
+
+#assuredai-meta-box .assuredai-badge-cannot_answer {
+  background: #fff6e0;
+  color: #8a5a00;
+  box-shadow: inset 0 0 0 1px #f0d18b;
+}
+
+#assuredai-meta-box .assuredai-badge-blocked,
+#assuredai-meta-box .assuredai-badge-escalated {
+  background: #fdecec;
+  color: #8a1d1d;
+  box-shadow: inset 0 0 0 1px #f1b5b5;
+}
+
+#assuredai-meta-box .assuredai-badge-unknown {
+  background: #eef0f2;
+  color: #50575e;
+  box-shadow: inset 0 0 0 1px #d6d8da;
+}

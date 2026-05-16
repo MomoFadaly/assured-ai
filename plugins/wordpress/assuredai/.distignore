@@ -1,0 +1,11 @@
+# Files excluded from the distributable WP plugin zip.
+.git
+.github
+.gitignore
+.distignore
+node_modules/
+tests/
+phpunit.xml
+.editorconfig
+README.md
+composer.lock
