@@ -320,9 +320,12 @@ export function HomeVerifierDemo() {
         tone: tone.tone === 'pass' ? 'pass' : tone.tone === 'block' ? 'block' : 'warn',
         text: `${tone.headline} · ${(r.elapsed_ms / 1000).toFixed(1)}s · audit #${r.audit_log_id ?? '—'}`,
       });
-      // Small dramatic pause so the user reads the final log line before
-      // the panel morphs into the result view.
-      setTimeout(() => setPhase('result'), 350);
+      // Transition to result phase immediately — earlier setTimeout-based
+      // dramatic pause silently dropped some result transitions in prod
+      // (phase stayed 'running' even after audit#X log line appeared).
+      // The brief enter animation on the result pane provides enough
+      // dramatic beat by itself.
+      setPhase('result');
       return;
     }
 
