@@ -1,4 +1,4 @@
-import { Newspaper, Stethoscope, FlaskConical, Landmark } from 'lucide-react';
+import { Stethoscope, Banknote, Landmark, Scale } from 'lucide-react';
 import { SectionEyebrow } from './Pipeline';
 import { SectionBackdrop } from './SectionBackdrop';
 
@@ -11,50 +11,58 @@ interface AudienceCell {
 
 const AUDIENCES: AudienceCell[] = [
   {
-    icon: <Newspaper className="h-5 w-5" strokeWidth={1.5} />,
-    segment: 'Health publishers',
-    role: 'Brand and editorial teams shipping AI-assisted health content at scale.',
-    story: (
-      <>
-        Where a single hallucinated stat can land on the front page of the trade press,
-        AssuredAI ships every article with a public proof URL and a CISO-filable PDF —
-        editorial keeps the velocity, your CISO keeps the receipts.
-      </>
-    ),
-  },
-  {
     icon: <Stethoscope className="h-5 w-5" strokeWidth={1.5} />,
-    segment: 'Hospital & clinical systems',
-    role: 'Patient-education and marketing teams inside hospitals and clinics.',
+    segment: 'Healthcare publishers',
+    role: 'Hospital systems, payers, pharma communications, patient-education teams.',
     story: (
       <>
-        PHI is redacted at the I/O boundary — it never leaves your perimeter. Every published
-        claim traces to an approved internal protocol or a federal source, so a leaked patient
-        token never becomes an OCR file.
+        A single unredacted patient initial lands on the front page of the trade press —
+        and an OCR letter on your CISO&rsquo;s desk. AssuredAI verifies every published claim
+        against your medical-affairs-approved corpus, redacts PHI at the I/O boundary, and
+        ships a hash-chained proof URL on every article. Whether the draft came from your
+        editorial team, a freelance writer, or an LLM.
       </>
     ),
   },
   {
-    icon: <FlaskConical className="h-5 w-5" strokeWidth={1.5} />,
-    segment: 'Pharma & life sciences',
-    role: 'Patient-resource and HCP-comms teams in regulated environments.',
+    icon: <Banknote className="h-5 w-5" strokeWidth={1.5} />,
+    segment: 'Financial services',
+    role: 'Banks, wealth managers, insurers, fintech communications and marketing teams.',
     story: (
       <>
-        Sentence-level verification against your medical-affairs-approved corpus, with a
-        hash-chained audit trail behind every submission. Off-label-sounding language never
-        clears legal because it never makes it past the verifier.
+        Every public-facing piece — fund factsheets, retirement explainers, social posts,
+        account-opening flows — touches FINRA suitability, SEC marketing rules, or your
+        firm&rsquo;s own risk-language playbook. AssuredAI verifies against your compliance
+        corpus, flags suitability-triggering phrasing before it ships, and produces an audit
+        row your CCO can file. Source-agnostic: the gate doesn&rsquo;t care if your CMO&rsquo;s
+        intern wrote it or Claude did.
       </>
     ),
   },
   {
     icon: <Landmark className="h-5 w-5" strokeWidth={1.5} />,
-    segment: 'Government & public health',
-    role: 'Federal and state health agencies, policy publishers, 988-style services.',
+    segment: 'Government & public services',
+    role: 'Federal agencies, state and municipal publishers, crisis-line and public-health services.',
     story: (
       <>
-        FedRAMP-ready architecture. Hash-chained audit logs that meet evidentiary standards.
-        Public proof URLs anyone can re-verify in their browser — built for transparency
-        mandates that require every claim be auditable by citizens.
+        FOIA-ready audit trails. Section 508 disclaimer checks. Plain-language verification
+        against your authoritative sources. Crisis-line routing on every piece of
+        symptom-prompting content. Public proof URLs anyone can re-verify in their browser —
+        built for transparency mandates that require every published claim be traceable to
+        its origin.
+      </>
+    ),
+  },
+  {
+    icon: <Scale className="h-5 w-5" strokeWidth={1.5} />,
+    segment: 'Legal & professional services',
+    role: 'Law firms, professional service firms, regulated consultancies with public-facing content.',
+    story: (
+      <>
+        ABA Model Rules and your privilege protocol enforced before the post goes live.
+        Client name detection. Imminent-harm escalation per Rule 1.6(b). Whether the case
+        study was drafted by an associate, a marketing freelancer, or an AI tool — same
+        compliance gate, same audit row, same proof URL.
       </>
     ),
   },
@@ -74,14 +82,15 @@ export function Audience() {
           <div>
             <SectionEyebrow n="01">Built for</SectionEyebrow>
             <h2 className="tracking-[-0.025em] leading-[1.02] text-[40px] sm:text-[56px] md:text-[64px]">
-              <span className="font-semibold">Health-content teams</span>{' '}
-              <span className="font-light text-foreground/70">that answer to a CISO.</span>
+              <span className="font-semibold">Regulated teams</span>{' '}
+              <span className="font-light text-foreground/70">that publish anyway.</span>
             </h2>
           </div>
           <p className="text-[15px] leading-[1.65] text-muted-foreground sm:text-[16.5px]">
-            Four buyer profiles. One operating reality: a single AI mistake in a health-facing
-            article is not a content bug — it is a regulator letter, a legal filing, a board
-            conversation. AssuredAI is built for the teams that have to publish anyway.
+            Four buyer profiles. One operating reality: a single mistake in a published
+            piece &mdash; whether it came from your team, your vendors, or your AI tools &mdash;
+            isn&rsquo;t a content bug. It&rsquo;s a regulator letter, a settlement filing, a
+            board conversation. AssuredAI is built for the teams that have to publish anyway.
           </p>
         </div>
 

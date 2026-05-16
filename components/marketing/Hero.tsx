@@ -11,7 +11,7 @@ import {
   FileCheck2,
   FileLock2,
   Scale,
-  FileText,
+  Landmark,
   ExternalLink,
 } from 'lucide-react';
 import { ParallaxLayer } from './Parallax';
@@ -20,7 +20,7 @@ import { SectionBackdrop } from './SectionBackdrop';
 export function Hero({ proofExampleId }: { proofExampleId: number | null }) {
   return (
     <section id="hero" className="relative isolate overflow-hidden bg-background">
-      {/* Atmospheric healthcare photo backdrop — light + dark mode correct */}
+      {/* Atmospheric photo backdrop — light + dark mode correct */}
       <SectionBackdrop
         src="https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=1920&q=70"
         intensity="subtle"
@@ -47,11 +47,11 @@ export function Hero({ proofExampleId }: { proofExampleId: number | null }) {
           </span>
           <span className="h-px w-12 bg-foreground/25" aria-hidden />
           <span className="text-[14px] font-semibold uppercase tracking-[0.22em] text-foreground">
-            The proof layer for healthcare AI
+            The proof layer for regulated publishing
           </span>
           <span className="hidden h-px flex-1 bg-foreground/15 sm:block" aria-hidden />
           <span className="hidden text-[12px] font-medium uppercase tracking-[0.16em] text-foreground/45 sm:inline">
-            Reference implementation · MIT
+            Healthcare · Finance · Government · Legal
           </span>
         </div>
 
@@ -59,27 +59,29 @@ export function Hero({ proofExampleId }: { proofExampleId: number | null }) {
           className="reveal-up text-balance font-semibold tracking-[-0.035em] leading-[0.94] text-[60px] sm:text-[88px] md:text-[104px] lg:text-[120px]"
           style={{ animationDelay: '60ms' }}
         >
-          Stop AI mistakes before they{' '}
-          <span className="font-serif italic font-normal text-primary">cost you.</span>
+          Nothing publishes under your name without{' '}
+          <span className="font-serif italic font-normal text-primary">proof.</span>
         </h1>
 
         <p
-          className="reveal-up mt-8 max-w-[860px] text-[19px] font-medium leading-[1.45] tracking-tight text-foreground/75 sm:text-[22px]"
+          className="reveal-up mt-8 max-w-[920px] text-[19px] font-medium leading-[1.45] tracking-tight text-foreground/75 sm:text-[22px]"
           style={{ animationDelay: '120ms' }}
         >
-          One hallucinated dosage. One fabricated citation. One patient name that leaks into a
-          published draft. In healthcare, a single AI mistake is a settled lawsuit, a regulator
-          letter, and a brand crisis your team is still answering for next quarter.
+          One fabricated number. One leaked client name. One missing disclaimer. In regulated
+          industries, a single mistake — whether your team wrote it, an LLM drafted it, or an
+          agency delivered it — becomes a regulator letter, a settled lawsuit, and a brand
+          crisis your team is still answering for next quarter.
         </p>
 
         {/* Two-column lower fold */}
         <div className="mt-16 grid items-start gap-12 lg:grid-cols-[1fr_1.1fr] lg:gap-16">
           <div className="reveal-up" style={{ animationDelay: '180ms' }}>
-            <p className="max-w-[540px] text-[16px] leading-[1.6] text-foreground/75 sm:text-[17.5px]">
-              AssuredAI runs every draft — yours, your writers&apos;, or any AI tool&apos;s —
-              through a four-check compliance pipeline. PHI redaction. Red-flag routing.
-              Sentence-level sourcing. Disclaimer enforcement. Then it produces evidence your
-              CISO can file.
+            <p className="max-w-[560px] text-[16px] leading-[1.6] text-foreground/75 sm:text-[17.5px]">
+              AssuredAI is the gate every piece passes through before it goes out. Whether your
+              editor wrote it, a freelancer delivered it, an agency turned it in, or an AI tool
+              drafted it — same compliance pipeline. PII redaction. Source-anchored
+              verification. Red-flag routing. Disclaimer enforcement. The output is a
+              hash-chained audit row and a public proof URL your CISO can hand to a regulator.
             </p>
 
             <div className="mt-8 flex flex-wrap items-center gap-3">
@@ -89,7 +91,7 @@ export function Hero({ proofExampleId }: { proofExampleId: number | null }) {
               >
                 <span className="beam" />
                 <span className="relative z-10 inline-flex items-center gap-2">
-                  Try the verifier
+                  Configure your AssuredAI
                   <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
                 </span>
               </Link>
@@ -99,7 +101,7 @@ export function Hero({ proofExampleId }: { proofExampleId: number | null }) {
                   className="inline-flex h-12 items-center gap-2 rounded-md border border-border bg-transparent px-6 text-[14.5px] font-medium hover:bg-accent"
                 >
                   <Lock className="h-4 w-4" />
-                  See an example proof
+                  See a live proof
                 </Link>
               ) : null}
             </div>
@@ -129,11 +131,11 @@ export function Hero({ proofExampleId }: { proofExampleId: number | null }) {
               key={k}
               className="flex shrink-0 items-center gap-12 pr-12 text-[40px] font-medium tracking-[-0.02em] sm:text-[64px]"
             >
-              <span>No hallucinations.</span>
+              <span>No fabricated claims.</span>
               <span className="text-primary/70">/</span>
-              <span>No PHI leaks.</span>
+              <span>No PII leaks.</span>
               <span className="text-primary/70">/</span>
-              <span>No missed disclaimers.</span>
+              <span>No missing disclaimers.</span>
               <span className="text-primary/70">/</span>
               <span className="italic">No surprises.</span>
               <span className="text-primary/70">/</span>
@@ -151,7 +153,7 @@ function TrustBadgeRow() {
     { label: 'SOC 2', sub: 'architected', icon: <FileLock2 className="h-4 w-4" strokeWidth={1.5} /> },
     { label: 'BAA', sub: 'friendly', icon: <Scale className="h-4 w-4" strokeWidth={1.5} /> },
     { label: 'FedRAMP', sub: 'ready', icon: <FileCheck2 className="h-4 w-4" strokeWidth={1.5} /> },
-    { label: 'MIT', sub: 'licensed', icon: <FileText className="h-4 w-4" strokeWidth={1.5} /> },
+    { label: 'FINRA', sub: 'aware', icon: <Landmark className="h-4 w-4" strokeWidth={1.5} /> },
   ];
   return (
     <div className="grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-border bg-border sm:grid-cols-3 lg:grid-cols-5">

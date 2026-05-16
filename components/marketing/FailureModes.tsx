@@ -1,10 +1,11 @@
 import { SectionEyebrow, SectionHeadline, SectionLede } from './Pipeline';
 import { RevealOnScroll } from './Parallax';
 import { SectionBackdrop } from './SectionBackdrop';
-import { Pill, FileWarning, UserX, Stethoscope, AlertTriangle } from 'lucide-react';
+import { Pill, TrendingUp, Lock, LifeBuoy, AlertTriangle } from 'lucide-react';
 
 interface Failure {
   index: string;
+  vertical: string;
   icon: React.ReactNode;
   category: string;
   title: string;
@@ -15,9 +16,10 @@ interface Failure {
 const FAILURES: Failure[] = [
   {
     index: '01',
+    vertical: 'Healthcare',
     icon: <Pill className="h-5 w-5" strokeWidth={1.5} />,
-    category: 'Hallucinated dosage',
-    title: 'The AI invents a number that sounds clinical.',
+    category: 'Fabricated dose',
+    title: 'The number sounds clinical. The pharmacology says otherwise.',
     example: (
       <span>
         &ldquo;Adults can safely take{' '}
@@ -26,50 +28,56 @@ const FAILURES: Failure[] = [
       </span>
     ),
     consequence:
-      'The actual OTC ceiling is 1,200 mg. The published article becomes Exhibit A in a malpractice filing.',
+      'The actual OTC ceiling is 1,200 mg. The published article becomes Exhibit A in a malpractice filing. Doesn’t matter if a nurse, a freelancer, or an LLM wrote it.',
   },
   {
     index: '02',
-    icon: <FileWarning className="h-5 w-5" strokeWidth={1.5} />,
-    category: 'Fabricated citation',
-    title: 'The AI references a study that does not exist.',
+    vertical: 'Finance',
+    icon: <TrendingUp className="h-5 w-5" strokeWidth={1.5} />,
+    category: 'Overstated return',
+    title: 'A precise number the data does not back up.',
     example: (
       <span>
-        &ldquo;A 2024 JAMA meta-analysis (<Mark>Chen et al., n=12,847</Mark>)
-        demonstrated a 47% reduction in cardiovascular events.&rdquo;
+        &ldquo;Our flagship balanced fund delivered an{' '}
+        <Mark>annualized 11.8% over the last decade</Mark>, outperforming the S&amp;P
+        in 7 of those 10 years.&rdquo;
       </span>
     ),
     consequence:
-      'A reader checks the source. The study is invented. The brand is publicly accused of inventing medical evidence.',
+      'Six of those ten years underperformed. The post triggers a FINRA suitability flag and the firm pulls every mention from LinkedIn within 48 hours.',
   },
   {
     index: '03',
-    icon: <UserX className="h-5 w-5" strokeWidth={1.5} />,
-    category: 'PHI leaked into output',
-    title: 'A patient name from a prompt ends up in the article.',
+    vertical: 'Legal',
+    icon: <Lock className="h-5 w-5" strokeWidth={1.5} />,
+    category: 'Privilege leak',
+    title: 'A case study sounds like a win. It breaches privilege.',
     example: (
       <span>
-        &ldquo;Patients like{' '}
-        <Mark>Margaret Hutchinson (MRN 8842-91)</Mark> often respond well to
-        the DASH protocol.&rdquo;
+        &ldquo;After{' '}
+        <Mark>Pemberton Industries&rsquo; Q3 board meeting</Mark>, our team
+        restructured the disputed Daniels Pension settlement for $4.7M favorable to
+        the company.&rdquo;
       </span>
     ),
     consequence:
-      'A single PHI exposure is a HIPAA-reportable breach. $50K minimum fine per violation. OCR audit follows.',
+      'The “anonymous” case study is identifiable to anyone who follows the industry. The firm faces a bar complaint under ABA Rule 1.6 — whether it was the associate, the marketing team, or an AI that drafted it.',
   },
   {
     index: '04',
-    icon: <Stethoscope className="h-5 w-5" strokeWidth={1.5} />,
-    category: 'Missed medical disclaimer',
-    title: 'Symptom-prompting content publishes without a 911 routing line.',
+    vertical: 'Government',
+    icon: <LifeBuoy className="h-5 w-5" strokeWidth={1.5} />,
+    category: 'Missing crisis routing',
+    title: 'Symptom-prompting content publishes without the safety line.',
     example: (
       <span>
-        &ldquo;If you are experiencing crushing chest pain, try lying down and
-        taking <Mark>deep, slow breaths</Mark> until it passes.&rdquo;
+        &ldquo;If you&rsquo;re feeling overwhelmed and thinking about ending things,
+        try{' '}
+        <Mark>writing down three things you&rsquo;re grateful for</Mark>.&rdquo;
       </span>
     ),
     consequence:
-      'No 911 routing. A reader follows the advice during a real cardiac event. A wrongful-death suit follows.',
+      'No 988 routing. A reader follows the advice during a real crisis. A wrongful-death suit follows, plus a Section 508 violation, plus federal review of every other piece of guidance the agency has published.',
   },
 ];
 
@@ -83,11 +91,12 @@ export function FailureModes() {
       />
       <div className="relative mx-auto max-w-[1320px] px-5 py-24 sm:py-32">
         <SectionEyebrow n="02">The problem</SectionEyebrow>
-        <SectionHeadline>This is what your AI gets wrong.</SectionHeadline>
+        <SectionHeadline>These are the mistakes that ship anyway.</SectionHeadline>
         <SectionLede>
-          Generic LLMs were trained on the open web — not on your formulary, your style guide,
-          or your compliance posture. Four failure modes show up over and over in real
-          healthcare publishing. Each one is a small editorial error, and a large legal one.
+          It doesn&rsquo;t matter whether your editor wrote it, your agency delivered it, or an
+          LLM drafted it. Four failure modes show up over and over in regulated publishing &mdash;
+          across healthcare, finance, government, and legal. Each one is a small editorial
+          error and a large legal one. AssuredAI catches each one before publish.
         </SectionLede>
 
         {/* Bento grid — one large featured failure on the left, three satellite ones in a column on the right */}
@@ -117,6 +126,7 @@ export function FailureModes() {
 
 function FailureCard({
   index,
+  vertical,
   icon,
   category,
   title,
@@ -131,6 +141,10 @@ function FailureCard({
         <div className="flex items-center gap-3">
           <span className="font-mono text-[11.5px] font-semibold tabular-nums text-foreground/45">
             CASE NO. {index}
+          </span>
+          <span className="h-3 w-px bg-foreground/15" />
+          <span className="text-[10.5px] font-semibold uppercase tracking-[0.2em] text-foreground/55">
+            {vertical}
           </span>
           <span className="h-3 w-px bg-foreground/15" />
           <span className="text-[10.5px] font-semibold uppercase tracking-[0.2em] text-red-700 dark:text-red-300">
