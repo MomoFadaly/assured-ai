@@ -438,7 +438,12 @@ function ProvisionRunning({ accent, activePhase }: { accent: string; activePhase
         <span className="text-[11.5px] text-muted-foreground">transactional · &lt;3s</span>
       </div>
 
-      <ul className="mt-6 space-y-2">
+      <ul
+        className="mt-6 space-y-2"
+        role="status"
+        aria-live="polite"
+        aria-label={`Provisioning progress. Current phase: ${activePhase >= 0 && activePhase < PROVISION_PHASES.length ? PROVISION_PHASES[activePhase]!.label : 'starting'}.`}
+      >
         {PROVISION_PHASES.map((phase, i) => {
           const isDone = i < activePhase;
           const isActive = i === activePhase;

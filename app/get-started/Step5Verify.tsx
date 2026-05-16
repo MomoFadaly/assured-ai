@@ -343,8 +343,16 @@ function SampleChip({
 // =============================================================
 
 function PipelineRunning({ accent, activeNode }: { accent: string; activeNode: number }) {
+  const activeLabel = activeNode >= 0 && activeNode < PIPELINE_NODES.length
+    ? PIPELINE_NODES[activeNode]!.label
+    : 'starting';
   return (
-    <div className="rounded-2xl border border-border bg-card p-6 shadow-md">
+    <div
+      className="rounded-2xl border border-border bg-card p-6 shadow-md"
+      role="status"
+      aria-live="polite"
+      aria-label={`Pipeline running. Currently processing: ${activeLabel}.`}
+    >
       <div className="flex items-center justify-between">
         <div className="inline-flex items-center gap-2 text-[11.5px] font-semibold uppercase tracking-[0.18em] text-foreground/70">
           <motion.div
@@ -359,23 +367,23 @@ function PipelineRunning({ accent, activeNode }: { accent: string; activeNode: n
         <span className="text-[11.5px] text-muted-foreground">streaming · live</span>
       </div>
 
-      {/* Pipeline node graph — horizontal flow with active state */}
-      <div className="mt-7 overflow-x-auto">
-        <div className="flex min-w-[640px] items-center gap-2">
+      {/* Pipeline node graph — horizontal on sm+, vertical stack on mobile */}
+      <div className="mt-7">
+        <div className="flex flex-col items-stretch gap-2 sm:flex-row sm:items-center">
           {PIPELINE_NODES.map((node, i) => {
             const isDone = i < activeNode;
             const isActive = i === activeNode;
             const isPending = i > activeNode;
             return (
-              <div key={node.id} className="flex flex-1 items-center gap-2">
+              <div key={node.id} className="flex flex-row items-center gap-3 sm:flex-1 sm:flex-col sm:items-stretch sm:gap-0">
                 <motion.div
-                  className="flex flex-1 flex-col items-center"
+                  className="flex flex-1 flex-row items-center gap-3 sm:flex-col sm:items-center sm:gap-0"
                   animate={{
                     opacity: isPending ? 0.35 : 1,
                   }}
                 >
                   <motion.div
-                    className="relative flex h-12 w-full items-center justify-center rounded-lg border bg-background"
+                    className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-lg border bg-background sm:w-full"
                     animate={{
                       borderColor: isDone || isActive ? accent : 'hsl(var(--border))',
                       backgroundColor: isActive ? `${accent}10` : 'hsl(var(--background))',
@@ -409,14 +417,16 @@ function PipelineRunning({ accent, activeNode }: { accent: string; activeNode: n
                       )}
                     </AnimatePresence>
                   </motion.div>
-                  <div className="mt-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-foreground/70">
-                    {node.label}
+                  <div className="flex flex-1 flex-col sm:items-center">
+                    <div className="text-[10.5px] font-semibold uppercase tracking-[0.14em] text-foreground/70 sm:mt-2">
+                      {node.label}
+                    </div>
+                    <div className="text-[10px] text-muted-foreground">{node.detail}</div>
                   </div>
-                  <div className="text-[9.5px] text-muted-foreground">{node.detail}</div>
                 </motion.div>
                 {i < PIPELINE_NODES.length - 1 && (
                   <motion.div
-                    className="h-px flex-1 max-w-8"
+                    className="h-6 w-px shrink-0 sm:h-px sm:w-auto sm:flex-1 sm:max-w-8"
                     animate={{
                       backgroundColor: i < activeNode ? accent : 'rgba(10,10,11,0.08)',
                     }}

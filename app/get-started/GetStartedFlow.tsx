@@ -97,6 +97,10 @@ export function GetStartedFlow() {
         {/* Left — active step */}
         <div className="relative min-h-[680px] border-b border-border/70 lg:border-b-0 lg:border-r">
           <div className="px-6 py-10 sm:px-10 sm:py-14">
+            {/* Mobile-only sandbox summary strip — the right-rail materialisation
+                is below the fold on narrow viewports, so we mirror the essential
+                signals up here. Hidden on lg+ where the full preview is visible. */}
+            <MobileSandboxStrip state={state} accent={accent} />
             <StepHeader state={state} />
             <div className="mt-10">
               <AnimatePresence mode="wait">
@@ -837,7 +841,12 @@ function WorkspacePreview({
           {/* Seed sources stagger in once industry is picked */}
           {meta && (
             <PreviewSection label={`Seed sources · ${sources.length}`} delay={0.2}>
-              <div className="space-y-1.5">
+              <div
+                className="space-y-1.5"
+                role="status"
+                aria-live="polite"
+                aria-label={`Loading ${sources.length} ${meta.name} seed sources`}
+              >
                 {sources.map((src, i) => (
                   <motion.div
                     key={src.url}
@@ -1098,5 +1107,70 @@ function PlaceholderBackToStep1() {
     <div className="rounded-xl border border-border bg-card p-5 text-[13.5px] text-foreground/80">
       Pick an industry first &mdash; that drives every default downstream.
     </div>
+  );
+}
+
+// =============================================================
+// Mobile-only sandbox summary strip
+// =============================================================
+//
+// On lg+ the right rail shows the full materialising workspace. On
+// narrow viewports it's stacked below the fold — invisible without
+// scrolling past the entire active step. This compact strip puts the
+// essential signals at the top of the wizard column so mobile users
+// still feel the workspace coming together with each pick.
+
+function MobileSandboxStrip({ state, accent }: { state: WizardState; accent: string }) {
+  const meta = state.industry ? INDUSTRY_META[state.industry] : null;
+  if (!meta) return null;
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: -8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={EASE}
+      className="mb-6 flex flex-wrap items-center gap-2 rounded-xl border bg-card p-3 shadow-sm lg:hidden"
+      style={{ borderColor: `${accent}30`, backgroundColor: `${meta.accentSoft}30` }}
+      role="status"
+      aria-live="polite"
+      aria-label={`Sandbox preview: ${meta.name} pack${state.role ? `, role ${state.role}` : ''}${state.contentSources.length > 0 ? `, ${state.contentSources.length} content sources` : ''}`}
+    >
+      <span
+        className="inline-flex h-6 items-center gap-1.5 rounded-full px-2 text-[10.5px] font-semibold uppercase tracking-[0.12em] text-white"
+        style={{ backgroundColor: accent }}
+      >
+        <span className="size-1.5 rounded-full bg-white/80" />
+        {meta.name}
+      </span>
+      <span className="text-[11.5px] text-foreground/70">8 sources</span>
+      {state.role && state.industry && (
+        <span className="text-[11.5px] text-foreground/70">
+          ·{' '}
+          {ROLES_BY_INDUSTRY[state.industry].find((r) => r.id === state.role)?.label.split(' ')[0]}
+        </span>
+      )}
+      {state.contentSources.length > 0 && (
+        <span className="text-[11.5px] text-foreground/70">
+          · {state.contentSources.length} source{state.contentSources.length === 1 ? '' : 's'}
+        </span>
+      )}
+      {state.compliance.baaNeeded && (
+        <span className="text-[11.5px] font-semibold" style={{ color: accent }}>
+          · BAA
+        </span>
+      )}
+      {state.compliance.fedrampNeeded && (
+        <span className="text-[11.5px] font-semibold" style={{ color: accent }}>
+          · FedRAMP
+        </span>
+      )}
+      {state.verification.auditLogId && (
+        <span className="ml-auto inline-flex items-center gap-1 text-[11px] font-mono text-foreground/65">
+          audit #{state.verification.auditLogId}
+        </span>
+      )}
+      <span className="ml-auto text-[10.5px] text-muted-foreground lg:hidden">
+        full preview below ↓
+      </span>
+    </motion.div>
   );
 }
