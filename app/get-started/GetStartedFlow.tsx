@@ -22,6 +22,7 @@
  */
 
 import { useReducer, useMemo, useCallback, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import {
   motion,
@@ -85,6 +86,30 @@ const EASE: Transition = { duration: 0.32, ease: [0.22, 1, 0.36, 1] };
 export function GetStartedFlow() {
   const [state, dispatch] = useReducer(wizardReducer, INITIAL_WIZARD_STATE);
   const reduceMotion = useReducedMotion();
+  const searchParams = useSearchParams();
+
+  // Pre-fill from URL params on first mount so paid-traffic / email-signature
+  // campaigns can deep-link visitors into a tailored start state:
+  //   /get-started?industry=healthcare&role=ciso&step=2
+  useEffect(() => {
+    const industryParam = searchParams.get('industry');
+    const roleParam = searchParams.get('role');
+    const stepParam = searchParams.get('step');
+    if (industryParam && INDUSTRIES.includes(industryParam as Industry)) {
+      dispatch({ type: 'set_industry', industry: industryParam as Industry });
+      if (roleParam) {
+        const validRoles = ROLES_BY_INDUSTRY[industryParam as Industry].map((r) => r.id);
+        if (validRoles.includes(roleParam)) {
+          dispatch({ type: 'set_role', role: roleParam });
+        }
+      }
+      if (stepParam) {
+        const n = parseInt(stepParam, 10);
+        if (n >= 1 && n <= 6) dispatch({ type: 'goto', step: n as WizardState['step'] });
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const accent = state.industry ? INDUSTRY_META[state.industry].accent : '#0a0a0b';
   const accentSoft = state.industry ? INDUSTRY_META[state.industry].accentSoft : '#e2e8f0';

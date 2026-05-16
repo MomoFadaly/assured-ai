@@ -17,6 +17,7 @@
  */
 
 import Link from 'next/link';
+import { Suspense } from 'react';
 import { ArrowLeft, Calendar, Mail, ArrowUpRight, ShieldCheck } from 'lucide-react';
 import { BrandLockup } from '@/components/verify/Brand';
 import { GetStartedFlow } from './GetStartedFlow';
@@ -81,8 +82,12 @@ export default function GetStartedPage() {
         </div>
       </section>
 
-      {/* The wizard itself — split canvas, owns the viewport */}
-      <GetStartedFlow />
+      {/* The wizard itself — split canvas, owns the viewport. Suspense
+          required because GetStartedFlow reads URL params via
+          useSearchParams (which suspends until they hydrate). */}
+      <Suspense fallback={<div className="min-h-[680px] bg-background" />}>
+        <GetStartedFlow />
+      </Suspense>
 
       {/* Below the wizard — the honest path to production */}
       <ProductionPath />
