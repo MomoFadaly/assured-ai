@@ -8,7 +8,7 @@ import { ImageResponse } from 'next/og';
  */
 
 export const runtime = 'edge';
-export const alt = 'AssuredAI — Stop AI mistakes before they cost you';
+export const alt = 'AssuredAI — Nothing publishes under your name without proof';
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
 
@@ -61,7 +61,7 @@ export default async function OpenGraphImage() {
             </div>
             <span style={{ color: '#0f172a', fontSize: '24px', letterSpacing: '-0.01em', textTransform: 'none' }}>AssuredAI</span>
           </div>
-          <span style={{ marginLeft: 'auto' }}>The proof layer · MIT</span>
+          <span style={{ marginLeft: 'auto' }}>The proof layer for regulated publishing</span>
         </div>
 
         {/* Middle — massive headline */}
@@ -70,18 +70,21 @@ export default async function OpenGraphImage() {
             marginTop: 'auto',
             display: 'flex',
             flexDirection: 'column',
-            fontSize: '100px',
+            fontSize: '92px',
             fontWeight: 600,
             lineHeight: 0.98,
             letterSpacing: '-0.035em',
             color: '#0c1422',
           }}
         >
-          <div style={{ display: 'flex' }}>Stop AI mistakes</div>
+          <div style={{ display: 'flex' }}>Nothing publishes</div>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.25em' }}>
-            <span>before they</span>
+            <span>under your name</span>
+          </div>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.25em' }}>
+            <span>without</span>
             <span style={{ fontStyle: 'italic', color: '#1e3a8a', fontWeight: 500 }}>
-              cost you.
+              proof.
             </span>
           </div>
         </div>
@@ -92,20 +95,20 @@ export default async function OpenGraphImage() {
             marginTop: '48px',
             display: 'flex',
             alignItems: 'center',
-            gap: '32px',
+            gap: '28px',
             fontSize: '20px',
             color: '#64748b',
             paddingTop: '36px',
             borderTop: '1px solid #e2e8f0',
           }}
         >
-          <span>Healthcare AI · verification layer</span>
+          <span>Healthcare</span>
           <span style={{ color: '#cbd5e1' }}>·</span>
-          <span>HIPAA-aware</span>
+          <span>Finance</span>
           <span style={{ color: '#cbd5e1' }}>·</span>
-          <span>SOC 2-architected</span>
+          <span>Government</span>
           <span style={{ color: '#cbd5e1' }}>·</span>
-          <span>Open source</span>
+          <span>Legal</span>
           <span style={{ marginLeft: 'auto', color: '#0c1422', fontWeight: 600 }}>
             assuredai.online
           </span>

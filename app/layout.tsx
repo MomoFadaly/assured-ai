@@ -25,21 +25,28 @@ const instrumentSerif = Instrument_Serif({
 export const metadata: Metadata = {
   metadataBase: new URL('https://assuredai.online'),
   title: {
-    default: 'AssuredAI — Stop AI mistakes before they cost you',
+    default: 'AssuredAI — Nothing publishes under your name without proof',
     template: '%s · AssuredAI',
   },
   description:
-    'The proof layer for healthcare AI. Sentence-level verification, PHI redaction, hash-chained audit logs, and public proof URLs on every published article. Drops into your existing CMS.',
+    'The proof layer for regulated publishing. Every piece of content — written by your team, delivered by an agency, or drafted by an AI tool — passes through one compliance pipeline before it ships. Healthcare, finance, government, legal. Hash-chained audit log + public proof URL on every published article.',
   applicationName: 'AssuredAI',
   authors: [{ name: 'AssuredAI', url: 'https://assuredai.online' }],
   keywords: [
-    'healthcare AI verification',
-    'AI content compliance',
-    'PHI redaction',
-    'HIPAA AI',
+    'regulated content compliance',
+    'editorial compliance platform',
+    'HIPAA content verification',
+    'FINRA marketing review',
+    'ABA Rule 1.6 compliance',
+    'PHI / PII redaction',
+    'hash-chained audit log',
+    'AI content governance',
     'AI hallucination detection',
-    'cryptographic audit log',
+    'public proof URL',
     'healthcare publishers',
+    'financial services compliance',
+    'government plain-language',
+    'legal marketing compliance',
   ],
   robots: {
     index: true,
@@ -52,19 +59,19 @@ export const metadata: Metadata = {
     locale: 'en_US',
     url: 'https://assuredai.online/',
     siteName: 'AssuredAI',
-    title: 'AssuredAI — Stop AI mistakes before they cost you',
+    title: 'AssuredAI — Nothing publishes under your name without proof',
     description:
-      'The proof layer for healthcare AI. Sentence-level verification, PHI redaction, hash-chained audit logs, and public proof URLs on every published article.',
+      'The proof layer for regulated publishing. Healthcare, finance, government, legal. Hash-chained audit + public proof URL on every piece — whether your team wrote it, your agency delivered it, or an LLM drafted it.',
     // images intentionally omitted — Next.js auto-discovers app/opengraph-image.tsx
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'AssuredAI — Stop AI mistakes before they cost you',
+    title: 'AssuredAI — Nothing publishes under your name without proof',
     description:
-      'The proof layer for healthcare AI. Sentence-level verification, PHI redaction, hash-chained audit logs, public proof URLs.',
+      'The proof layer for regulated publishing. Healthcare · finance · government · legal. Hash-chained audit + public proof URL on every piece.',
     // images intentionally omitted — Next auto-uses opengraph-image
   },
-  category: 'Healthcare AI',
+  category: 'Regulated content compliance',
 };
 
 export const viewport = {
@@ -81,10 +88,10 @@ const jsonLd = {
   '@type': 'SoftwareApplication',
   name: 'AssuredAI',
   applicationCategory: 'BusinessApplication',
-  applicationSubCategory: 'Healthcare AI Compliance',
+  applicationSubCategory: 'Regulated Content Compliance',
   operatingSystem: 'Web',
   description:
-    'The proof layer for healthcare AI. Sentence-level verification, PHI redaction, hash-chained audit logs, and public proof URLs.',
+    'The proof layer for regulated publishing — healthcare, finance, government, legal. PHI / PII redaction, sentence-level verification, hash-chained audit logs, and public proof URLs on every piece, regardless of whether a human or AI drafted it.',
   url: 'https://assuredai.online/',
   publisher: {
     '@type': 'Organization',
