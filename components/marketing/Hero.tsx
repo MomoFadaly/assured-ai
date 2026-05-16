@@ -17,6 +17,7 @@ import {
 import { ParallaxLayer } from './Parallax';
 import { SectionBackdrop } from './SectionBackdrop';
 import { MeshBackground } from '@/components/ui/MeshBackground';
+import { HomeVerifierDemo } from './HomeVerifierDemo';
 
 export function Hero({ proofExampleId }: { proofExampleId: number | null }) {
   return (
@@ -104,11 +105,14 @@ export function Hero({ proofExampleId }: { proofExampleId: number | null }) {
             </div>
           </div>
 
-          {/* Right column: just the verifier mock */}
+          {/* Right column: REAL working verifier embedded in the hero.
+              The Linear move — actual product running on the home page,
+              not a screenshot. Visitor clicks a sample, real pipeline
+              runs, real /v/<id> proof URL produced before signup. */}
           <div className="relative">
             <ParallaxLayer strength={-0.04} className="reveal-up">
               <div style={{ animationDelay: '240ms' }}>
-                <HeroMock />
+                <HomeVerifierDemo />
               </div>
             </ParallaxLayer>
           </div>
