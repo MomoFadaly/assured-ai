@@ -13,6 +13,7 @@ import { Pipeline } from '@/components/marketing/Pipeline';
 import { Architecture } from '@/components/marketing/Architecture';
 import { FeaturedArtifacts } from '@/components/marketing/FeaturedArtifacts';
 import { ShowcaseStrip } from '@/components/marketing/ShowcaseStrip';
+import { HashChainCanvas } from '@/components/marketing/HashChainCanvas';
 import { WhitePaperQuote } from '@/components/marketing/Quote';
 import { VoiceSection, WordPressDiagram } from '@/components/marketing/VoiceSection';
 import { Comparison } from '@/components/marketing/Comparison';
@@ -73,6 +74,12 @@ export default async function LandingPage() {
         <Origin />
         <Pipeline />
         <FeaturedArtifacts proofExampleId={proofExampleId} />
+        {/* Signature brand visualization — animated hash chain. The single
+            most iconic image on the site; represents AssuredAI's defining
+            claim: every audit row links to the one before it. */}
+        <section className="mx-auto max-w-[1240px] px-5 py-12 sm:py-16">
+          <HashChainCanvas />
+        </section>
         <ShowcaseStrip />
         <Architecture />
         <WhitePaperQuote />
