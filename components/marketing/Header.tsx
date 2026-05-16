@@ -59,7 +59,7 @@ export function MarketingHeader({ authChip }: { authChip?: ReactNode }) {
             href="/chat"
             className="hidden h-9 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-md bg-primary px-4 text-[13px] font-medium text-primary-foreground shadow-sm transition-opacity hover:opacity-90 lg:inline-flex"
           >
-            Try the verifier
+            Configure your AssuredAI
             <ArrowRight className="h-3 w-3" />
           </Link>
 
@@ -108,7 +108,7 @@ export function MarketingHeader({ authChip }: { authChip?: ReactNode }) {
               onClick={() => setMobileOpen(false)}
               className="mt-4 inline-flex h-11 w-full items-center justify-center gap-2 rounded-md bg-primary px-4 text-[14px] font-medium text-primary-foreground shadow-sm"
             >
-              Try the verifier
+              Configure your AssuredAI
               <ArrowRight className="h-3.5 w-3.5" />
             </Link>
           </div>
