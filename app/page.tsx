@@ -15,6 +15,7 @@ import { FeaturedArtifacts } from '@/components/marketing/FeaturedArtifacts';
 import { ShowcaseStrip } from '@/components/marketing/ShowcaseStrip';
 import { HashChainCanvas } from '@/components/marketing/HashChainCanvas';
 import { OutcomesStrip } from '@/components/marketing/OutcomesStrip';
+import { SectorTrust } from '@/components/marketing/SectorTrust';
 import { getGlobalMetrics } from '@/lib/marketing/global-metrics';
 import { WhitePaperQuote } from '@/components/marketing/Quote';
 import { VoiceSection, WordPressDiagram } from '@/components/marketing/VoiceSection';
@@ -67,6 +68,7 @@ export default async function LandingPage() {
       <main>
         <Hero proofExampleId={proofExampleId} />
         <OutcomesStrip metrics={metrics} />
+        <SectorTrust />
         <Audience />
         <TrustStrip />
         <FailureModes />
