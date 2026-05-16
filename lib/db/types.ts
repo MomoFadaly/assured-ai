@@ -20,7 +20,7 @@ export type Outcome =
   | 'kill_switch_engaged'
   | 'kill_switch_disengaged';
 
-export type UserRole = 'admin' | 'auditor' | 'operator';
+export type UserRole = 'admin' | 'auditor' | 'operator' | 'customer';
 
 export type RuleType = 'presidio_recognizer' | 'regex' | 'denylist';
 

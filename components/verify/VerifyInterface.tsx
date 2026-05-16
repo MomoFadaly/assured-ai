@@ -23,7 +23,9 @@ interface ThreadEntry {
   submittedAt: string;
   // Snapshot of the submitted request so it shows in the thread
   request: {
-    scenario: Scenario;
+    /** Vertical-pack slug. Typed as string so non-legacy packs (finance,
+     *  legal, custom) are valid. */
+    scenario: string;
     mode: InputMode;
     article?: string;
     brief?: string;
@@ -40,7 +42,9 @@ export function VerifyInterface({
 }: {
   initialScenario?: Scenario;
 }) {
-  const [scenario, setScenario] = React.useState<Scenario>(initialScenario);
+  // Holds a vertical-pack slug. Typed as a string so non-built-in packs
+  // (finance, legal, custom) populated from /api/packs are valid values.
+  const [scenario, setScenario] = React.useState<string>(initialScenario);
   const [mode, setMode] = React.useState<InputMode>('paste');
   const [article, setArticle] = React.useState('');
   const [brief, setBrief] = React.useState('');
@@ -115,8 +119,13 @@ export function VerifyInterface({
       const effBrief = override?.brief ?? brief;
       const effFormat = override?.format ?? format;
 
+      // Send vertical_pack_slug — the resolver in /api/verify accepts
+      // slug, id, or legacy scenario. We send slug so the verifier can
+      // operate on packs introduced after this build shipped.
       const request = {
-        scenario: effScenario,
+        vertical_pack_slug: effScenario,
+        // scenario stays for any back-compat consumer; identical to slug today.
+        scenario: effScenario as 'healthcare' | 'government',
         input_mode: effMode,
         article: effMode === 'paste' ? effArticle : undefined,
         brief: effMode === 'draft' ? effBrief : undefined,
@@ -398,6 +407,7 @@ export function VerifyInterface({
                         onFormatChange={setFormat}
                         submitting={submitting}
                         onSubmit={handleSubmit}
+                        packSlug={scenario}
                       />
                     </div>
                   </div>
@@ -471,7 +481,7 @@ function ThreadEntryView({
   onReset,
 }: {
   entry: ThreadEntry;
-  scenario: Scenario;
+  scenario: string;
   onToggleCollapse: () => void;
   onDelete: () => void;
   onRegenerate: () => void;

@@ -3,7 +3,32 @@ const $ = (id) => document.getElementById(id);
 async function init() {
   const settings = await chrome.runtime.sendMessage({ type: 'assured-ai/get-settings' });
   $('api-base').value = settings?.apiBase || 'http://localhost:3030';
-  $('scenario').value = settings?.scenario || 'healthcare';
+  const savedSlug = settings?.scenario || 'healthcare';
+
+  // Dynamically load packs from the configured AssuredAI instance.
+  // Falls back to the static defaults if the call fails (e.g. CORS or offline).
+  try {
+    const apiBase = ($('api-base').value || '').replace(/\/$/, '');
+    const r = await fetch(`${apiBase}/api/packs`, { cache: 'no-store' });
+    if (r.ok) {
+      const data = await r.json();
+      const select = $('scenario');
+      select.innerHTML = '';
+      for (const p of data.packs ?? []) {
+        const opt = document.createElement('option');
+        opt.value = p.slug;
+        opt.textContent = p.compliance_framework
+          ? `${p.name} · ${p.compliance_framework}`
+          : p.name;
+        select.appendChild(opt);
+      }
+      if ([...select.options].some((o) => o.value === savedSlug)) {
+        select.value = savedSlug;
+      }
+    }
+  } catch {
+    // Static fallback in popup.html.
+  }
 }
 
 async function verify() {
@@ -48,9 +73,11 @@ function renderVerdict(result) {
       result.audit_log_id != null
         ? `${$('api-base').value || 'http://localhost:3030'}/v/${result.audit_log_id}`
         : null;
+    const packLabel = r.pack?.name ? `<li>Pack: ${escapeHtml(r.pack.name)}</li>` : '';
     el.innerHTML = `
       <span class="${isClean ? 'clean' : 'notes'}">${isClean ? '✓ Clean' : '⚠ Verified with notes'}</span>
       <ul>
+        ${packLabel}
         <li>${supported} supported paragraph${supported === 1 ? '' : 's'}</li>
         ${unsourced > 0 ? `<li>${unsourced} unsourced — editor review</li>` : ''}
         ${pii > 0 ? `<li>${pii} PII / PHI redacted</li>` : ''}

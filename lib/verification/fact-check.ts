@@ -91,16 +91,26 @@ const SENTENCE_THRESHOLD_OFFSET = 0.05;
 /** Below this length we don't bother embedding — too short to be a meaningful claim. */
 const MIN_SENTENCE_CHARS = 12;
 
+export interface FactCheckOverrides {
+  /** Pack-level min-similarity override; falls back to env default. */
+  minSimilarity?: number;
+  /** Pack-level top-K override (we still cap at 3 for the per-sentence search). */
+  topK?: number;
+}
+
 export async function factCheckParagraphs(
   paragraphs: string[],
   scenario: Scenario,
+  overrides: FactCheckOverrides = {},
 ): Promise<FactCheckResult> {
   const config = getConfig();
-  const supportThreshold = Math.max(
-    0.05,
-    config.RETRIEVAL_MIN_SIMILARITY - SENTENCE_THRESHOLD_OFFSET,
-  );
+  const minSim = overrides.minSimilarity ?? config.RETRIEVAL_MIN_SIMILARITY;
+  const supportThreshold = Math.max(0.05, minSim - SENTENCE_THRESHOLD_OFFSET);
+  // We always retrieve the top 3 chunks per sentence regardless of pack top-K
+  // (which controls UI / synthesis-context top-K elsewhere). The 3-cap keeps
+  // per-sentence retrieval tight and predictable.
   const topK = 3;
+  void overrides.topK;
 
   if (paragraphs.length === 0) {
     return {

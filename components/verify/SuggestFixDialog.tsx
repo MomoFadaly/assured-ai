@@ -39,7 +39,7 @@ export function SuggestFixDialog({
   onOpenChange: (v: boolean) => void;
   originalSentence: string;
   bestMatch: SupportingCitation;
-  scenario: 'healthcare' | 'government';
+  scenario: string;
   surroundingParagraph?: string;
   onAccept: (rewrite: string) => void;
 }) {
@@ -62,6 +62,7 @@ export function SuggestFixDialog({
           body: JSON.stringify({
             sentence: originalSentence,
             chunk_id: bestMatch.chunk_id,
+            vertical_pack_slug: scenario,
             scenario,
             paragraph: surroundingParagraph,
           }),

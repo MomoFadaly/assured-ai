@@ -11,6 +11,7 @@
 
 import { getConfig } from '@/lib/config';
 import { logger } from '@/lib/logger';
+import { recordUsage } from '@/lib/usage';
 
 /** Document-vs-query distinction. Some providers tune for one or the other. */
 export type EmbeddingInputType = 'document' | 'query';
@@ -59,5 +60,18 @@ export async function embedOne(text: string, inputType: EmbeddingInputType): Pro
     logger.error({ inputType }, 'embedding provider returned empty result');
     throw new Error('Embedding provider returned no embeddings');
   }
+  // Best-effort usage record. Doesn't know about pack context here; the
+  // dashboard rolls these up under pack_slug = '' (unset) for retrieval calls.
+  // Caller-level provenance (corpus ingest vs sentence-level retrieval) is
+  // captured in the `source` label.
+  void recordUsage({
+    kind: 'embedding',
+    provider: provider.name,
+    model: result.model,
+    inputTokens: result.inputTokens ?? null,
+    outputTokens: 0,
+    latencyMs: result.latencyMs,
+    source: inputType === 'query' ? 'retrieval' : 'corpus_ingest',
+  });
   return result.embeddings[0];
 }

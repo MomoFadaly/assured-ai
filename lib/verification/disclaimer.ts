@@ -1,60 +1,35 @@
 /**
- * Disclaimer detection and auto-injection.
+ * Disclaimer detection and auto-injection — pack-aware.
  *
- * Healthcare publishers must include a "not a substitute for professional
- * medical advice" line on patient-facing content. Government publishers
- * have a softer norm but a similar pattern.
+ * Each vertical pack defines:
+ *   - The canonical disclaimer text to inject when missing
+ *   - A list of detection regex patterns (so writers who phrased their own
+ *     disclaimer differently aren't double-stamped)
  *
- * This module:
- *   - Detects whether the article already contains a disclaimer
- *     matching the scenario.
- *   - If absent, returns the canonical disclaimer to be appended.
- *
- * The detection is regex-based on a few signature phrases — not a perfect
- * NLP match, but reliable enough that we don't double-add a disclaimer
- * when the writer already wrote one in their own words.
+ * Patterns are compiled per-call (cheap; cached by pack updated_at in the
+ * registry layer). Callers pass the resolved `VerticalPackRow`.
  */
 
-import type { Scenario } from '@/lib/db/types';
+import type { VerticalPackRow } from '@/lib/packs/types';
 
 export interface DisclaimerResult {
-  scenario: Scenario;
   required: boolean;
   present: boolean;
-  /** The canonical disclaimer text. Append to the article if `present` is false. */
+  /** The canonical disclaimer text — append when `present` is false. */
   canonical: string;
 }
 
-const HEALTHCARE_DISCLAIMER =
-  'This information is for educational purposes only and is not a substitute for professional medical advice, diagnosis, or treatment. Always consult a qualified clinician about your individual health needs.';
+export function checkDisclaimer(article: string, pack: VerticalPackRow): DisclaimerResult {
+  const patterns = pack.config.disclaimer.detection_patterns
+    .map((p) => safeRegex(p))
+    .filter((r): r is RegExp => r !== null);
 
-const GOVERNMENT_DISCLAIMER =
-  'This information is provided for general reference. Policies and procedures may change; consult the official source for the most current information before making decisions.';
-
-const HEALTHCARE_SIGNATURE_PHRASES = [
-  /not\s+a?\s*substitute\s+for\s+(professional\s+)?(medical|clinical)\s+(advice|guidance)/i,
-  /consult\s+(a\s+|your\s+)?(qualified\s+)?(clinician|doctor|health\s*care\s*provider|physician)/i,
-  /educational\s+purposes\s+only/i,
-  /is\s+not\s+intended\s+to\s+(replace|substitute)/i,
-];
-
-const GOVERNMENT_SIGNATURE_PHRASES = [
-  /consult\s+(the\s+)?official\s+(source|website|guidance)/i,
-  /policies\s+and\s+procedures\s+may\s+change/i,
-  /for\s+(general|informational)\s+(reference|purposes)/i,
-];
-
-export function checkDisclaimer(article: string, scenario: Scenario): DisclaimerResult {
-  const phrases =
-    scenario === 'healthcare' ? HEALTHCARE_SIGNATURE_PHRASES : GOVERNMENT_SIGNATURE_PHRASES;
-
-  const present = phrases.some((p) => p.test(article));
+  const present = patterns.some((p) => p.test(article));
 
   return {
-    scenario,
     required: true,
     present,
-    canonical: scenario === 'healthcare' ? HEALTHCARE_DISCLAIMER : GOVERNMENT_DISCLAIMER,
+    canonical: pack.config.disclaimer.canonical,
   };
 }
 
@@ -65,11 +40,19 @@ export function checkDisclaimer(article: string, scenario: Scenario): Disclaimer
  */
 export function ensureDisclaimer(
   article: string,
-  scenario: Scenario,
+  pack: VerticalPackRow,
 ): { article: string; injected: boolean } {
-  const check = checkDisclaimer(article, scenario);
+  const check = checkDisclaimer(article, pack);
   if (check.present) {
     return { article, injected: false };
   }
   return { article: `${article.trim()}\n\n${check.canonical}`, injected: true };
+}
+
+function safeRegex(source: string): RegExp | null {
+  try {
+    return new RegExp(source, 'i');
+  } catch {
+    return null;
+  }
 }

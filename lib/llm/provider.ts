@@ -113,13 +113,20 @@ export function llmFailureOutcome(): Outcome {
 
 import { getConfig } from '@/lib/config';
 import { AnthropicProvider } from './anthropic';
+import { AzureOpenAiProvider } from './azure-openai';
+import { OllamaProvider } from './ollama';
 
 let _provider: LlmProvider | null = null;
 
 /**
  * Returns the singleton LLM provider for the current process.
  *
- * The choice is locked at first call. To switch providers, restart the process.
+ * The choice is locked at first call. To switch providers, restart the
+ * process. Available providers:
+ *
+ *   - anthropic    Cloud Anthropic API (Sonnet + Haiku). Default.
+ *   - azure-openai HIPAA-BAA path via Microsoft. Set AZURE_OPENAI_*.
+ *   - ollama       Zero-egress on-prem (Llama / Mixtral / etc).
  */
 export function getLlmProvider(): LlmProvider {
   if (_provider !== null) return _provider;
@@ -130,13 +137,11 @@ export function getLlmProvider(): LlmProvider {
       _provider = new AnthropicProvider();
       return _provider;
     case 'azure-openai':
-      // Implementation deferred. Configuration is validated; runtime error here
-      // is intentional until Azure provider lands.
-      throw new Error(
-        'Azure OpenAI provider not yet implemented. Set LLM_PROVIDER=anthropic for now.',
-      );
+      _provider = new AzureOpenAiProvider();
+      return _provider;
     case 'ollama':
-      throw new Error('Ollama provider not yet implemented. Set LLM_PROVIDER=anthropic for now.');
+      _provider = new OllamaProvider();
+      return _provider;
   }
 }
 

@@ -15,12 +15,17 @@ import type {
   AuditCitation,
   EscalationSeverity,
   Outcome,
-  RedFlagCategory,
   Scenario,
 } from '@/lib/db/types';
 
 export interface AuditEntry {
   scenario: Scenario;
+  /** Vertical pack the verification ran under. NULL only for very old rows
+   *  written before migration 004. New writes always populate it. */
+  vertical_pack_id?: string | null;
+  /** Tenant the verification ran under. NULL only for very old rows.
+   *  New writes always populate it via lib/tenants. */
+  tenant_id?: string | null;
   user_session_id: string | null;
   query_redacted: string;
   response_redacted: string | null;
@@ -33,7 +38,8 @@ export interface AuditEntry {
   outcome_reason: string | null;
   pii_detected_input: boolean;
   pii_detected_output: boolean;
-  red_flag_category: RedFlagCategory | null;
+  /** Free-text now (was an enum). Pack rules can introduce any string. */
+  red_flag_category: string | null;
   latency_ms: number | null;
   model_used: string | null;
 }
@@ -54,14 +60,16 @@ export async function writeAudit(entry: AuditEntry): Promise<AuditWriteResult> {
   try {
     const result = await query<{ id: number; hash: string; prev_hash: string | null }>(
       `INSERT INTO audit_log
-       (scenario, user_session_id, query_redacted, response_redacted,
+       (scenario, vertical_pack_id, tenant_id, user_session_id, query_redacted, response_redacted,
         retrieved_chunk_ids, citations, verification_detail, confidence_score,
         outcome, outcome_reason, pii_detected_input, pii_detected_output,
         red_flag_category, latency_ms, model_used)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)
        RETURNING id, hash, prev_hash`,
       [
         entry.scenario,
+        entry.vertical_pack_id ?? null,
+        entry.tenant_id ?? null,
         entry.user_session_id,
         entry.query_redacted,
         entry.response_redacted,
@@ -85,9 +93,6 @@ export async function writeAudit(entry: AuditEntry): Promise<AuditWriteResult> {
     if (!row) {
       throw new Error('Audit insert returned no row');
     }
-    // node-pg returns BIGSERIAL columns as strings (BIGINT can exceed JS's
-    // safe-integer range). Coerce to number for the typed contract — audit
-    // IDs won't realistically exceed 2^53.
     return { audit_log_id: Number(row.id), hash: row.hash, prev_hash: row.prev_hash };
   } catch (err) {
     logger.error({ err, outcome: entry.outcome }, 'audit write failed');
@@ -102,7 +107,7 @@ export async function writeAudit(entry: AuditEntry): Promise<AuditWriteResult> {
 export async function writeAuditWithEscalation(
   entry: AuditEntry,
   escalation: {
-    category: RedFlagCategory;
+    category: string;
     severity: EscalationSeverity;
     triggering_phrase: string | null;
   },
@@ -110,14 +115,16 @@ export async function writeAuditWithEscalation(
   return transaction(async (client) => {
     const result = await client.query<{ id: number; hash: string; prev_hash: string | null }>(
       `INSERT INTO audit_log
-       (scenario, user_session_id, query_redacted, response_redacted,
+       (scenario, vertical_pack_id, tenant_id, user_session_id, query_redacted, response_redacted,
         retrieved_chunk_ids, citations, verification_detail, confidence_score,
         outcome, outcome_reason, pii_detected_input, pii_detected_output,
         red_flag_category, latency_ms, model_used)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)
        RETURNING id, hash, prev_hash`,
       [
         entry.scenario,
+        entry.vertical_pack_id ?? null,
+        entry.tenant_id ?? null,
         entry.user_session_id,
         entry.query_redacted,
         entry.response_redacted,
@@ -140,11 +147,26 @@ export async function writeAuditWithEscalation(
     const row = result.rows[0];
     if (!row) throw new Error('Audit insert returned no row');
 
-    await client.query(
-      `INSERT INTO escalations (audit_log_id, category, severity, triggering_phrase)
-       VALUES ($1, $2, $3, $4)`,
-      [row.id, escalation.category, escalation.severity, escalation.triggering_phrase],
-    );
+    // The escalations.category column is the legacy red_flag_category enum
+    // (cardiac/mental_health_crisis/overdose/etc). Pack rules may emit
+    // categories outside that enum (e.g. 'fraud_disclosure' in finance) —
+    // in that case we omit the escalations row and rely on the audit_log
+    // red_flag_category TEXT column as the source of truth.
+    const ENUM_CATEGORIES = new Set([
+      'cardiac',
+      'mental_health_crisis',
+      'overdose',
+      'severe_bleeding',
+      'stroke',
+      'anaphylaxis',
+    ]);
+    if (ENUM_CATEGORIES.has(escalation.category)) {
+      await client.query(
+        `INSERT INTO escalations (audit_log_id, category, severity, triggering_phrase, vertical_pack_id)
+         VALUES ($1, $2, $3, $4, $5)`,
+        [row.id, escalation.category, escalation.severity, escalation.triggering_phrase, entry.vertical_pack_id ?? null],
+      );
+    }
 
     return { audit_log_id: Number(row.id), hash: row.hash, prev_hash: row.prev_hash };
   });

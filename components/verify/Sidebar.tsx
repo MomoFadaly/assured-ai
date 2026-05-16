@@ -42,7 +42,8 @@ export interface HistoryEntry {
   id: string;
   audit_log_id: number | null;
   occurred_at: string;
-  scenario: 'healthcare' | 'government';
+  /** Vertical-pack slug. Free-form string for custom packs. */
+  scenario: string;
   mode: 'paste' | 'draft';
   outcome: 'verified' | 'red_flag_blocked' | 'kill_switch' | 'error';
   preview: string;

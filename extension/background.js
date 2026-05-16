@@ -72,6 +72,7 @@ async function runVerify(text) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
+        vertical_pack_slug: scenario || 'healthcare',
         scenario: scenario || 'healthcare',
         input_mode: 'paste',
         article: text,

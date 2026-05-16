@@ -38,11 +38,16 @@ const ConfigSchema = z.object({
   PRESIDIO_ANALYZER_URL: z.string().default('http://localhost:5001/analyze'),
   PRESIDIO_ANONYMIZER_URL: z.string().default('http://localhost:5001/anonymize'),
 
-  // Auth
-  CLERK_PUBLISHABLE_KEY: z.string().optional(),
-  CLERK_SECRET_KEY: z.string().optional(),
-  NEXT_PUBLIC_CLERK_SIGN_IN_URL: z.string().default('/admin/sign-in'),
-  NEXT_PUBLIC_CLERK_SIGN_UP_URL: z.string().default('/admin/sign-up'),
+  // Auth (Auth.js v5 — NextAuth)
+  // AUTH_SECRET is required in production for JWT signing; optional in dev
+  // (NextAuth derives a dev-only secret from process info when missing).
+  AUTH_SECRET: z.string().optional(),
+  AUTH_URL: z.string().optional(),
+  GOOGLE_CLIENT_ID: z.string().optional(),
+  GOOGLE_CLIENT_SECRET: z.string().optional(),
+  // Email transport (Resend) — optional; missing key falls back to log-only.
+  RESEND_API_KEY: z.string().optional(),
+  EMAIL_FROM: z.string().optional(),
 
   // Observability
   SENTRY_DSN: z.string().optional(),

@@ -1,5 +1,6 @@
 import { query } from '@/lib/db/client';
 import { MarketingHeader } from '@/components/marketing/Header';
+import { HeaderAuthChip } from '@/components/marketing/HeaderAuth';
 import { ScrollProgress } from '@/components/marketing/Parallax';
 import { SectionNav } from '@/components/marketing/SectionNav';
 import { Hero } from '@/components/marketing/Hero';
@@ -11,6 +12,7 @@ import { Stakes } from '@/components/marketing/Stakes';
 import { Pipeline } from '@/components/marketing/Pipeline';
 import { Architecture } from '@/components/marketing/Architecture';
 import { FeaturedArtifacts } from '@/components/marketing/FeaturedArtifacts';
+import { ShowcaseStrip } from '@/components/marketing/ShowcaseStrip';
 import { WhitePaperQuote } from '@/components/marketing/Quote';
 import { VoiceSection, WordPressDiagram } from '@/components/marketing/VoiceSection';
 import { Comparison } from '@/components/marketing/Comparison';
@@ -19,6 +21,7 @@ import { Pricing } from '@/components/marketing/Pricing';
 import { FAQ } from '@/components/marketing/FAQ';
 import { CTAFooter } from '@/components/marketing/CTAFooter';
 import { BackToTop } from '@/components/marketing/BackToTop';
+import { getHeroShowcase } from '@/lib/demo/queries';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -43,12 +46,17 @@ async function getLatestAuditId(): Promise<number | null> {
 }
 
 export default async function LandingPage() {
-  const proofExampleId = await getLatestAuditId();
+  // Hero CTA: prefer a curated showcase ("PHI caught", "fraud blocked",
+  // etc.) over the latest raw audit row, since the showcase is engineered
+  // to be visually compelling. Falls back to the latest audit when the
+  // showcase table is empty (e.g. first deploy after the migration).
+  const [hero, latestId] = await Promise.all([getHeroShowcase(), getLatestAuditId()]);
+  const proofExampleId = hero?.audit_log_id ?? latestId;
   return (
     <div className="relative min-h-screen bg-background">
       <ScrollProgress />
       <SectionNav />
-      <MarketingHeader />
+      <MarketingHeader authChip={<HeaderAuthChip />} />
       <main>
         <Hero proofExampleId={proofExampleId} />
         <Audience />
@@ -65,6 +73,7 @@ export default async function LandingPage() {
         <Origin />
         <Pipeline />
         <FeaturedArtifacts proofExampleId={proofExampleId} />
+        <ShowcaseStrip />
         <Architecture />
         <WhitePaperQuote />
         <VoiceSection />

@@ -23,7 +23,7 @@ const instrumentSerif = Instrument_Serif({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://assured-ai.com'),
+  metadataBase: new URL('https://assuredai.online'),
   title: {
     default: 'AssuredAI — Stop AI mistakes before they cost you',
     template: '%s · AssuredAI',
@@ -31,7 +31,7 @@ export const metadata: Metadata = {
   description:
     'The proof layer for healthcare AI. Sentence-level verification, PHI redaction, hash-chained audit logs, and public proof URLs on every published article. Drops into your existing CMS.',
   applicationName: 'AssuredAI',
-  authors: [{ name: 'AssuredAI', url: 'https://assured-ai.com' }],
+  authors: [{ name: 'AssuredAI', url: 'https://assuredai.online' }],
   keywords: [
     'healthcare AI verification',
     'AI content compliance',
@@ -46,11 +46,11 @@ export const metadata: Metadata = {
     follow: true,
     googleBot: { index: true, follow: true, 'max-image-preview': 'large', 'max-snippet': -1 },
   },
-  alternates: { canonical: 'https://assured-ai.com/' },
+  alternates: { canonical: 'https://assuredai.online/' },
   openGraph: {
     type: 'website',
     locale: 'en_US',
-    url: 'https://assured-ai.com/',
+    url: 'https://assuredai.online/',
     siteName: 'AssuredAI',
     title: 'AssuredAI — Stop AI mistakes before they cost you',
     description:
@@ -85,11 +85,11 @@ const jsonLd = {
   operatingSystem: 'Web',
   description:
     'The proof layer for healthcare AI. Sentence-level verification, PHI redaction, hash-chained audit logs, and public proof URLs.',
-  url: 'https://assured-ai.com/',
+  url: 'https://assuredai.online/',
   publisher: {
     '@type': 'Organization',
     name: 'AssuredAI',
-    url: 'https://assured-ai.com/',
+    url: 'https://assuredai.online/',
   },
   offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD', availability: 'https://schema.org/InStock', priceValidUntil: '2099-12-31' },
 };

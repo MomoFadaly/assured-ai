@@ -16,10 +16,23 @@ import 'dotenv/config';
 import { closePool } from '@/lib/db/client';
 import { runVerifyLifecycle } from '@/lib/verification/lifecycle';
 import { logger } from '@/lib/logger';
+import { getPackBySlug } from '@/lib/packs/registry';
+import type { VerifyRequest } from '@/lib/verification/lifecycle';
+
+// Smoke-case shape uses the legacy scenario+session keys; we transform
+// into the pack-shaped VerifyRequest inside runCase().
+interface SmokeRequest {
+  scenario: 'healthcare' | 'government';
+  input_mode: 'paste' | 'draft';
+  user_session_id: string;
+  article?: string;
+  brief?: string;
+  format?: 'qa' | 'handout' | 'faq' | 'social' | 'email';
+}
 
 interface Case {
   label: string;
-  request: Parameters<typeof runVerifyLifecycle>[0];
+  request: SmokeRequest;
   expectedKind: 'verified' | 'red_flag_blocked' | 'kill_switch' | 'error';
   /** Optional checks against the verified response. */
   expectMinSupported?: number;
@@ -80,7 +93,19 @@ const CASES: Case[] = [
 
 async function runCase(c: Case): Promise<{ passed: boolean; reason: string | null; auditId: number | null; ms: number }> {
   try {
-    const result = await runVerifyLifecycle(c.request);
+    const pack = await getPackBySlug(c.request.scenario);
+    if (!pack) {
+      return { passed: false, reason: `pack ${c.request.scenario} not found in DB`, auditId: null, ms: 0 };
+    }
+    const req: VerifyRequest = {
+      pack,
+      input_mode: c.request.input_mode,
+      user_session_id: c.request.user_session_id,
+      article: c.request.article,
+      brief: c.request.brief,
+      format: c.request.format,
+    };
+    const result = await runVerifyLifecycle(req);
     if (result.kind !== c.expectedKind) {
       return {
         passed: false,

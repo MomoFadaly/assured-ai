@@ -64,7 +64,7 @@ export function AnnotatedArticle({
   disclaimerInjected: boolean;
   highlight: HighlightSelection | null;
   setHighlight: (h: HighlightSelection | null) => void;
-  scenario?: 'healthcare' | 'government';
+  scenario?: string;
 }) {
   const [fixTarget, setFixTarget] = React.useState<SuggestFixTarget | null>(null);
   // Client-only accepted rewrites: paragraphIndex:sentenceIndex → new text.

@@ -134,7 +134,7 @@ function ProofVisual({ proofDisplay }: { proofDisplay: string }) {
           </div>
           <div className="ml-2 inline-flex items-center gap-1 rounded border border-border bg-background px-2 py-0.5 text-muted-foreground">
             <Lock className="h-2.5 w-2.5" />
-            assured-ai.com{proofDisplay}
+            assuredai.online{proofDisplay}
           </div>
         </div>
         <div className="space-y-3 p-6">
@@ -195,7 +195,7 @@ function PdfVisual() {
             <Row label="Chain status" value="VALID" highlight />
             <div className="mt-4 rounded border border-border bg-muted/20 p-2 text-center">
               <div className="text-[8px] uppercase tracking-[0.15em] text-muted-foreground">Re-verify in browser</div>
-              <div className="mt-0.5 font-mono text-[9.5px] text-primary">assured-ai.com/v/214</div>
+              <div className="mt-0.5 font-mono text-[9.5px] text-primary">assuredai.online/v/214</div>
             </div>
           </div>
         </div>
@@ -230,7 +230,7 @@ function EmbedVisual() {
           </div>
           <pre className="overflow-x-auto p-5 font-mono text-[11.5px] leading-[1.7]">
 {`<iframe
-  src="https://assured-ai.com/embed/v/214"
+  src="https://assuredai.online/embed/v/214"
   width="100%" height="92"
   loading="lazy"
   style="border:0;border-radius:12px">

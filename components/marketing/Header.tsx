@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import Link from 'next/link';
 import { ArrowRight, Menu, X } from 'lucide-react';
 import { BrandLockup } from '@/components/verify/Brand';
@@ -14,7 +14,7 @@ const NAV_ITEMS = [
   { href: '#pricing', label: 'Deploy' },
 ] as const;
 
-export function MarketingHeader() {
+export function MarketingHeader({ authChip }: { authChip?: ReactNode }) {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   // Close mobile menu on route or anchor change + on Escape
@@ -54,6 +54,7 @@ export function MarketingHeader() {
         </nav>
 
         <div className="flex items-center gap-2">
+          {authChip}
           <Link
             href="/chat"
             className="hidden h-9 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-md bg-primary px-4 text-[13px] font-medium text-primary-foreground shadow-sm transition-opacity hover:opacity-90 lg:inline-flex"

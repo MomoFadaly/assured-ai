@@ -20,9 +20,11 @@ function getPool(): Pool {
     _pool = new Pool({
       connectionString: config.DATABASE_URL,
       // Reasonable defaults for serverless and self-host alike.
+      // Neon serverless cold-start can exceed 10s; bumped to 30s to absorb
+      // first-connect latency without breaking app startup.
       max: 10,
       idleTimeoutMillis: 30_000,
-      connectionTimeoutMillis: 10_000,
+      connectionTimeoutMillis: 30_000,
     });
 
     _pool.on('error', (err) => {

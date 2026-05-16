@@ -40,14 +40,12 @@ export interface RedactionResult {
 
 const TIMEOUT_MS = 5_000;
 
-// Healthcare-scoped PII/PHI recognizers. Intentionally excludes LOCATION and
-// DATE_TIME — those are NOT PHI under HIPAA and over-redacting them destroys
-// legitimate retrieval signal (e.g. hospital names, visiting hours). The
-// HIPAA Safe Harbor identifiers are: names, geographic subdivisions smaller
-// than state, dates more specific than year, phone, fax, email, SSN, MRN,
-// health-plan numbers, account numbers, certificate/license numbers, vehicle
-// identifiers, device identifiers, URLs, IPs, biometric identifiers, photos,
-// and any other unique identifying number. We approximate that set here.
+// Default recognizer set — used only when the caller doesn't pass a pack-
+// specific list. Each vertical pack overrides this via `pack.config.recognizers`
+// (e.g. healthcare adds MRN + HEALTH_PLAN_ID; finance adds IBAN_CODE + ITIN).
+// Intentionally excludes LOCATION and DATE_TIME — those are NOT PHI under
+// HIPAA Safe Harbor and over-redacting them destroys legitimate retrieval
+// signal (e.g. hospital names, visiting hours).
 const DEFAULT_RECOGNIZERS = [
   'PHONE_NUMBER',
   'EMAIL_ADDRESS',
@@ -55,11 +53,7 @@ const DEFAULT_RECOGNIZERS = [
   'PERSON',
   'US_DRIVER_LICENSE',
   'CREDIT_CARD',
-  'MEDICAL_LICENSE',
   'IP_ADDRESS',
-  // Custom recognizers registered with the sidecar:
-  'MRN',
-  'HEALTH_PLAN_ID',
 ];
 
 interface AnalyzeRequest {
@@ -89,9 +83,17 @@ interface AnonymizeResponse {
  * Run a single redaction pass on `input`. Returns the original text alongside
  * a redacted version where every detected entity has been replaced.
  *
+ * `recognizers` is the per-pack PII recognizer list; omitted = use the
+ * conservative default set. Each vertical pack defines its own recognizers
+ * so finance gets credit-card + ITIN, healthcare gets MRN + HEALTH_PLAN_ID,
+ * and government gets passport + bank account.
+ *
  * Throws if the Presidio sidecar is unreachable. Fail-closed.
  */
-export async function redact(input: string): Promise<RedactionResult> {
+export async function redact(
+  input: string,
+  recognizers?: string[],
+): Promise<RedactionResult> {
   if (input.length === 0) {
     return { original: input, redacted: input, entities: [], hadPii: false, latencyMs: 0 };
   }
@@ -103,7 +105,7 @@ export async function redact(input: string): Promise<RedactionResult> {
   const analyzeReq: AnalyzeRequest = {
     text: input,
     language: 'en',
-    entities: DEFAULT_RECOGNIZERS,
+    entities: recognizers && recognizers.length > 0 ? recognizers : DEFAULT_RECOGNIZERS,
   };
   const entities = await postJson<PresidioEntity[]>(config.PRESIDIO_ANALYZER_URL, analyzeReq);
 

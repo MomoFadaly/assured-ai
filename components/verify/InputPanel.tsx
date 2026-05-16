@@ -10,7 +10,7 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
-import { SampleChips, PASTE_SAMPLES, DRAFT_SAMPLES } from './SampleChips';
+import { SampleChips, getPasteSamples, getDraftSamples } from './SampleChips';
 
 const MAX_PASTE_CHARS = 50_000;
 const MAX_BRIEF_CHARS = 2_000;
@@ -53,6 +53,8 @@ export interface InputPanelProps {
   onFormatChange: (f: DraftFormat) => void;
   submitting: boolean;
   onSubmit: () => void;
+  /** Vertical-pack slug — filters which sample chips render. */
+  packSlug?: string;
 }
 
 export function InputPanel({
@@ -66,7 +68,10 @@ export function InputPanel({
   onFormatChange,
   submitting,
   onSubmit,
+  packSlug = 'healthcare',
 }: InputPanelProps) {
+  const pasteSamples = React.useMemo(() => getPasteSamples(packSlug), [packSlug]);
+  const draftSamples = React.useMemo(() => getDraftSamples(packSlug), [packSlug]);
   const minPaste = 20;
   const minBrief = 5;
   const canSubmit =
@@ -117,7 +122,7 @@ export function InputPanel({
                 don't have to think about what to paste. */}
             <div className="mb-3">
               <SampleChips
-                samples={PASTE_SAMPLES}
+                samples={pasteSamples}
                 disabled={submitting}
                 onSelect={(s) => onArticleChange(s.text)}
               />
@@ -165,7 +170,7 @@ export function InputPanel({
                 so reviewers see the full draft workflow without configuring. */}
             <div className="mb-3">
               <SampleChips
-                samples={DRAFT_SAMPLES}
+                samples={draftSamples}
                 disabled={submitting}
                 onSelect={(s) => {
                   onBriefChange(s.brief);

@@ -30,7 +30,7 @@ export function ActionBar({
 }: {
   article: string;
   auditLogId: number;
-  scenario?: 'healthcare' | 'government';
+  scenario?: string;
   onReset: () => void;
   onRegenerate?: () => void;
 }) {

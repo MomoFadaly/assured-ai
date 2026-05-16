@@ -1,7 +1,6 @@
 'use client';
 
 import * as React from 'react';
-import type { Scenario } from '@/lib/db/types';
 import { Header } from './Header';
 
 /**
@@ -25,7 +24,7 @@ export function PageShell({
   children: React.ReactNode;
 }) {
   // We don't actually use scenario on these pages but the Header still needs the prop.
-  const [scenario, setScenario] = React.useState<Scenario>('healthcare');
+  const [scenario, setScenario] = React.useState<string>('healthcare');
 
   return (
     <div className="relative min-h-screen bg-background">

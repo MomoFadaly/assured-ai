@@ -2,7 +2,7 @@
 #
 # Deploys ONLY the PHI redaction service. The main Next.js app runs on
 # Vercel and reaches this service over the public URL that App Platform
-# assigns (or a custom domain like presidio.assured-ai.com).
+# assigns (or a custom domain like presidio.assuredai.online).
 #
 # Cost: $12/month for the basic-xs instance (1 GB RAM, needed for spaCy
 # en_core_web_lg). Cheaper $5 plan only gives 512 MB and Presidio crashes

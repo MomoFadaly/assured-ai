@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import Link from 'next/link';
-import { BookOpen, Activity, Bell, ShieldCheck } from 'lucide-react';
+import { BookOpen, Activity, Bell, ShieldCheck, Layers, ChevronDown } from 'lucide-react';
 import { BrandLockup } from './Brand';
 import {
   Tooltip,
@@ -15,14 +15,21 @@ import { cn } from '@/lib/utils';
 
 type SystemHealth = 'healthy' | 'degraded' | 'down' | 'unknown';
 
+interface PackSummary {
+  id: string;
+  slug: string;
+  name: string;
+  compliance_framework: string | null;
+}
+
 export function Header({
   scenario,
   onScenarioChange,
   activePath = '/chat',
   showScenarioSwitcher = true,
 }: {
-  scenario: Scenario;
-  onScenarioChange: (s: Scenario) => void;
+  scenario: Scenario | string;
+  onScenarioChange: (s: Scenario | string) => void;
   activePath?: '/chat' | '/library' | '/audit' | '/escalations';
   showScenarioSwitcher?: boolean;
 }) {
@@ -135,33 +142,87 @@ function ScenarioSwitcher({
   value,
   onChange,
 }: {
-  value: Scenario;
-  onChange: (s: Scenario) => void;
+  value: Scenario | string;
+  onChange: (s: Scenario | string) => void;
 }) {
-  const options: Array<{ key: Scenario; label: string }> = [
-    { key: 'healthcare', label: 'Healthcare' },
-    { key: 'government', label: 'Government' },
-  ];
+  const [packs, setPacks] = React.useState<PackSummary[] | null>(null);
+  const [open, setOpen] = React.useState(false);
+  const ref = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    let cancelled = false;
+    fetch('/api/packs', { cache: 'no-store' })
+      .then((r) => r.json())
+      .then((data: { packs: PackSummary[] }) => {
+        if (!cancelled) setPacks(data.packs);
+      })
+      .catch(() => {
+        if (!cancelled) setPacks([]);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  React.useEffect(() => {
+    function onClick(e: MouseEvent) {
+      if (!ref.current?.contains(e.target as Node)) setOpen(false);
+    }
+    document.addEventListener('mousedown', onClick);
+    return () => document.removeEventListener('mousedown', onClick);
+  }, []);
+
+  const current = packs?.find((p) => p.slug === value);
+  const label = current?.name ?? (typeof value === 'string' ? value : 'Pack');
+
   return (
-    <div className="flex h-8 rounded-md border border-border bg-card p-0.5 text-[12px] font-medium">
-      {options.map((opt) => {
-        const active = opt.key === value;
-        return (
-          <button
-            key={opt.key}
-            type="button"
-            onClick={() => onChange(opt.key)}
-            className={cn(
-              'rounded-[5px] px-2.5 transition-all',
-              active
-                ? 'bg-primary text-primary-foreground shadow-sm'
-                : 'text-muted-foreground hover:text-foreground',
-            )}
-          >
-            {opt.label}
-          </button>
-        );
-      })}
+    <div ref={ref} className="relative">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        disabled={packs === null}
+        className="inline-flex h-8 items-center gap-1.5 rounded-md border border-border bg-card px-2.5 text-[12px] font-medium text-foreground transition-colors hover:bg-accent disabled:opacity-60"
+      >
+        <Layers className="h-3 w-3" />
+        <span className="truncate max-w-[180px]">{label}</span>
+        <ChevronDown className="h-3 w-3 text-muted-foreground" />
+      </button>
+      {open && packs && packs.length > 0 && (
+        <div className="absolute right-0 top-full z-40 mt-1 w-72 rounded-md border border-border bg-card p-1 shadow-lg">
+          <div className="px-2 py-1.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+            Vertical pack
+          </div>
+          {packs.map((p) => {
+            const active = p.slug === value;
+            return (
+              <button
+                key={p.id}
+                type="button"
+                onClick={() => {
+                  onChange(p.slug);
+                  setOpen(false);
+                }}
+                className={cn(
+                  'flex w-full items-start gap-2 rounded-md px-2 py-2 text-left text-[12.5px] transition-colors',
+                  active ? 'bg-accent text-foreground' : 'hover:bg-accent/60',
+                )}
+              >
+                <div className="flex-1 min-w-0">
+                  <div className="font-medium truncate">{p.name}</div>
+                  {p.compliance_framework && (
+                    <div className="text-[10.5px] text-muted-foreground truncate">
+                      {p.compliance_framework}
+                    </div>
+                  )}
+                </div>
+                {active && (
+                  <span className="mt-1 inline-block size-1.5 rounded-full bg-primary" />
+                )}
+              </button>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }

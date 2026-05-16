@@ -33,7 +33,7 @@ export function ProofSection({ proofExampleId }: { proofExampleId: number }) {
                 </div>
                 <div className="ml-2 inline-flex items-center gap-1 rounded-md border border-border/60 bg-background/60 px-2 py-0.5 text-[10px] text-muted-foreground">
                   <Lock className="h-2.5 w-2.5" />
-                  assured-ai.com/v/{proofExampleId}
+                  assuredai.online/v/{proofExampleId}
                 </div>
               </div>
               <div className="space-y-4 p-6">

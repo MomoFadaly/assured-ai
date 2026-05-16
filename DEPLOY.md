@@ -68,7 +68,7 @@ Save the URL — you'll put it in Vercel env in step 3.
 ### Optional: custom domain
 
 In App Platform → your app → **Settings** → **Domains** → add e.g.
-`presidio.assured-ai.com`. Point a CNAME at the DO-provided hostname. Update
+`presidio.assuredai.online`. Point a CNAME at the DO-provided hostname. Update
 the env values to use the custom domain (cleaner for client demos).
 
 ### Cheaper alternative: bare Droplet
@@ -105,7 +105,7 @@ ANTHROPIC_API_KEY           = <sk-ant-...>
 VOYAGE_API_KEY              = <pa-...>
 PRESIDIO_ANALYZER_URL       = https://<your-do-presidio-host>/analyze
 PRESIDIO_ANONYMIZER_URL     = https://<your-do-presidio-host>/anonymize
-NEXT_PUBLIC_APP_URL         = https://assured-ai.com
+NEXT_PUBLIC_APP_URL         = https://assuredai.online
 NODE_ENV                    = production
 ```
 
@@ -128,7 +128,7 @@ For each variable, set it on all three environments (Production, Preview, Develo
 
 ### Custom domain
 
-Vercel project → **Domains** → add `assured-ai.com` (or whatever you registered). Vercel auto-provisions Let's Encrypt cert.
+Vercel project → **Domains** → add `assuredai.online` (or whatever you registered). Vercel auto-provisions Let's Encrypt cert.
 
 ---
 
@@ -138,19 +138,19 @@ After everything's up:
 
 ```bash
 # Health
-curl https://assured-ai.com/api/health
+curl https://assuredai.online/api/health
 # → {"status":"ok","ts":"..."}
 
 # Marketing page
-curl -s -o /dev/null -w "%{http_code}" https://assured-ai.com/
+curl -s -o /dev/null -w "%{http_code}" https://assuredai.online/
 # → 200
 
 # Verifier UI
-curl -s -o /dev/null -w "%{http_code}" https://assured-ai.com/chat
+curl -s -o /dev/null -w "%{http_code}" https://assuredai.online/chat
 # → 200
 
 # Hit the actual pipeline (costs ~$0.20)
-curl -X POST https://assured-ai.com/api/verify \
+curl -X POST https://assuredai.online/api/verify \
   -H "Content-Type: application/json" \
   -d '{
     "scenario": "healthcare",
@@ -165,7 +165,7 @@ curl -X POST https://assured-ai.com/api/verify \
 
 The marketing-page hero CTA "See an example proof" links to `/v/<latest-audit-id>`. On a fresh deploy with no audit entries yet, the CTA is auto-hidden. To make it appear:
 
-1. Visit `https://assured-ai.com/chat`.
+1. Visit `https://assuredai.online/chat`.
 2. Paste this article and click Verify:
    ```
    The DASH eating plan is a flexible, balanced approach to eating that helps treat or

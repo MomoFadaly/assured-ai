@@ -66,7 +66,7 @@ If you're touching the verification pipeline (`lib/verification/*`):
 
 If you find a security issue — particularly anything affecting PHI
 redaction, audit-log integrity, or the proof URL's hash chain —
-**please do not open a public issue.** Email `security@assured-ai.com`
+**please do not open a public issue.** Email `security@assuredai.online`
 (or open a private security advisory on GitHub if the repo is hosted
 there). We'll respond within 48 hours.
 

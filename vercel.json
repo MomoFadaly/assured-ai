@@ -1,14 +1,21 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": "nextjs",
-  "buildCommand": "pnpm build",
+  "buildCommand": "pnpm vercel-build",
   "installCommand": "pnpm install --frozen-lockfile",
   "regions": ["iad1"],
   "functions": {
     "app/api/verify/route.ts": { "maxDuration": 60 },
     "app/api/suggest-fix/route.ts": { "maxDuration": 30 },
     "app/api/audit/[id]/pdf/route.ts": { "maxDuration": 30 },
-    "app/api/voice-profiles/[id]/score/route.ts": { "maxDuration": 30 }
+    "app/api/voice-profiles/[id]/score/route.ts": { "maxDuration": 30 },
+    "app/api/admin/monitor/sites/[id]/scan/route.ts": { "maxDuration": 60 },
+    "app/api/cron/monitor/route.ts": { "maxDuration": 60 }
   },
-  "crons": []
+  "crons": [
+    {
+      "path": "/api/cron/monitor",
+      "schedule": "0 * * * *"
+    }
+  ]
 }

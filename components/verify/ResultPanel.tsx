@@ -56,7 +56,7 @@ export function ResultPanel({
   result: VerifyResponse;
   onReset: () => void;
   onRegenerate?: () => void;
-  scenario?: 'healthcare' | 'government';
+  scenario?: string;
 }) {
   if (result.kind === 'red_flag_blocked') {
     return <RedFlagPanel result={result} />;
@@ -92,7 +92,7 @@ function VerifiedPanel({
   result: VerifySuccess;
   onReset: () => void;
   onRegenerate?: () => void;
-  scenario?: 'healthcare' | 'government';
+  scenario?: string;
 }) {
   const [highlight, setHighlight] = React.useState<HighlightSelection | null>(null);
 

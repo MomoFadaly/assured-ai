@@ -194,7 +194,7 @@ function HeroMock() {
           </div>
           <div className="ml-2 inline-flex items-center gap-1.5 rounded-md border border-border/60 bg-background px-2 py-0.5 text-[10.5px] text-muted-foreground">
             <Lock className="h-2.5 w-2.5" />
-            assured-ai.com/chat
+            assuredai.online/chat
           </div>
           <div className="ml-auto inline-flex items-center gap-1.5 text-[10.5px] text-muted-foreground">
             <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse-soft" />

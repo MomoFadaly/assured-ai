@@ -107,7 +107,7 @@ export default async function OpenGraphImage() {
           <span style={{ color: '#cbd5e1' }}>·</span>
           <span>Open source</span>
           <span style={{ marginLeft: 'auto', color: '#0c1422', fontWeight: 600 }}>
-            assured-ai.com
+            assuredai.online
           </span>
         </div>
       </div>
