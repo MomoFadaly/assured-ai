@@ -677,7 +677,13 @@ function RunningPane({
       exit={{ opacity: 0, transition: { duration: 0.18 } }}
       role="status"
       aria-live="polite"
-      className="absolute inset-0 flex flex-col px-5 pt-4 pb-4"
+      // In-flow (not absolute). The previous `absolute inset-0` created a
+      // stacking context that interacted with framer's opacity animation
+      // and the parent's transform context, producing a stuck-at-low-
+      // opacity bug where the streaming log rendered at ~13% visibility
+      // through the whole run. The parent's min-h-[488px] keeps the
+      // container stable across the compose/running/result transitions.
+      className="flex h-[488px] flex-col px-5 pt-4 pb-4"
     >
       <div className="mb-2 flex items-baseline justify-between">
         <div className="inline-flex items-center gap-2 text-[10.5px] font-semibold uppercase tracking-[0.18em] text-foreground/65">
