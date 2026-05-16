@@ -45,30 +45,49 @@ interface VerifyResult {
   elapsed_ms: number;
 }
 
+/**
+ * Verdict copy + visual treatment.
+ *
+ * The lifecycle returns `result.kind` as one of:
+ *   'answered' | 'cannot_answer' | 'blocked' | 'escalated' | 'verified'
+ *
+ * We map each to a tone (`pass` | `warn` | `block`) so the result card
+ * surfaces the catch with the right severity. A "blocked" or "escalated"
+ * verdict is the value-prop moment — that's the system stopping a real
+ * problem before publish. Treat it visually like a success, not a failure.
+ */
+const VERDICT_TONE: Record<string, { tone: 'pass' | 'warn' | 'block'; label: string; headline: string }> = {
+  verified: { tone: 'pass', label: 'verified', headline: 'Cleared to publish' },
+  answered: { tone: 'pass', label: 'verified', headline: 'Cleared to publish' },
+  cannot_answer: { tone: 'warn', label: 'cannot answer', headline: 'Held — source insufficient' },
+  blocked: { tone: 'block', label: 'blocked', headline: 'Blocked before publish' },
+  escalated: { tone: 'block', label: 'escalated', headline: 'Escalated to human review' },
+};
+
 const SAMPLES = [
   {
-    id: 'dash',
-    label: 'DASH eating plan',
-    sub: 'Clean draft · publish-ready expected',
+    id: 'cardiac',
+    label: 'Cardiac advice (dangerous)',
+    sub: 'Red-flag content · should be blocked or escalated',
     industry: 'healthcare' as const,
-    article: `The DASH eating plan emphasises fruits, vegetables, whole grains, and low-fat dairy to help lower blood pressure in adults. Adults should aim for at least 150 minutes of moderate-intensity physical activity per week, such as brisk walking. Limiting sodium to less than 2,300 milligrams per day and avoiding excess alcohol also help maintain healthy blood pressure. This information is for educational purposes only and is not a substitute for professional medical advice. Always consult a qualified clinician about your individual health needs.`,
-    accent: '#0d9488',
+    article: `If you are experiencing crushing chest pain that radiates down your left arm along with sudden shortness of breath, the best course is to lie down quietly and take slow deep breaths for several minutes. Aspirin can help with mild chest discomfort. Most chest pain in healthy adults resolves on its own within twenty minutes without any medical attention. There is generally no need to call 911 unless symptoms persist for more than an hour.`,
+    accent: '#dc2626',
   },
   {
     id: 'phi',
-    label: 'Patient handout',
-    sub: 'PHI test · redaction expected',
+    label: 'Patient handout (PHI inside)',
+    sub: 'Contains MRN, email, phone · should be redacted',
     industry: 'healthcare' as const,
-    article: `Patient Maria Hernandez (MRN 8842-91) was recently diagnosed with Type 2 diabetes and is starting a lifestyle-based treatment plan. Her care team recommends a heart-healthy eating pattern. Adults benefit from 150 minutes of moderate-intensity activity per week. For questions, contact her at maria.hernandez@example.com or (415) 555-2210.`,
+    article: `Patient Maria Hernandez (MRN 8842-91) was recently diagnosed with Type 2 diabetes and is starting a lifestyle-based treatment plan. Her care team recommends a heart-healthy eating pattern. Adults benefit from 150 minutes of moderate-intensity activity per week. For follow-up questions, please contact her at maria.hernandez@example.com or (415) 555-2210. Her next appointment is scheduled for the cardiology clinic on the third floor.`,
     accent: '#f59e0b',
   },
   {
-    id: 'cardiac',
-    label: 'Cardiac scenario',
-    sub: 'Red-flag test · 911 routing expected',
+    id: 'dash',
+    label: 'DASH eating plan',
+    sub: 'Clean draft · should be cleared with sources',
     industry: 'healthcare' as const,
-    article: `If you are experiencing crushing chest pain that radiates down your left arm along with sudden shortness of breath, try lying down quietly and taking slow deep breaths for several minutes. Aspirin can help with milder chest discomfort. Most chest pain in healthy adults resolves on its own within twenty minutes without medical attention.`,
-    accent: '#dc2626',
+    article: `The DASH eating plan emphasises fruits, vegetables, whole grains, and low-fat dairy to help lower blood pressure in adults. Adults should aim for at least 150 minutes of moderate-intensity physical activity per week, such as brisk walking. Limiting sodium to less than 2,300 milligrams per day and avoiding excess alcohol also help maintain healthy blood pressure. This information is for educational purposes only and is not a substitute for professional medical advice. Always consult a qualified clinician about your individual health needs.`,
+    accent: '#0d9488',
   },
 ];
 
@@ -168,15 +187,21 @@ export function HomeVerifierDemo() {
           </div>
         </div>
 
-        {/* Body */}
-        <div className="px-5 pt-5 pb-4">
-          <AnimatePresence mode="wait">
+        {/* Body
+            NOTE: AnimatePresence without mode="wait" — earlier we used wait
+            mode but the running and result branches had no exit prop, which
+            wedged the state machine and rendered a blank/faded body on the
+            second sample. Letting branches overlap briefly is fine; the
+            relative-positioned wrapper below keeps them stacked while one
+            fades out and the next fades in. */}
+        <div className="relative px-5 pt-5 pb-4">
+          <AnimatePresence initial={false}>
             {!running && !result && !error && (
               <motion.div
                 key="picker"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
+                exit={{ opacity: 0, transition: { duration: 0.18 } }}
                 transition={EASE}
               >
                 <div className="mb-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-foreground/65">
@@ -233,9 +258,11 @@ export function HomeVerifierDemo() {
                 key="running"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
+                exit={{ opacity: 0, transition: { duration: 0.18 } }}
                 transition={EASE}
                 role="status"
                 aria-live="polite"
+                className="absolute inset-0 px-5 pt-5 pb-4"
               >
                 <div className="mb-3 inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-foreground/65">
                   <motion.span
@@ -308,35 +335,45 @@ export function HomeVerifierDemo() {
               </motion.div>
             )}
 
-            {result && (
+            {result && !running && (
               <motion.div
                 key="result"
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, transition: { duration: 0.18 } }}
                 transition={EASE}
               >
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <div className="text-[10.5px] font-semibold uppercase tracking-[0.18em]" style={{ color: picked.accent }}>
-                      Live verification complete &middot; {(result.elapsed_ms / 1000).toFixed(1)}s
+                {(() => {
+                  const tone = VERDICT_TONE[result.verdict] ?? VERDICT_TONE.verified!;
+                  const toneColor =
+                    tone.tone === 'pass' ? '#0d9488' : tone.tone === 'warn' ? '#f59e0b' : '#dc2626';
+                  return (
+                    <div className="flex items-start justify-between gap-3">
+                      <div>
+                        <div
+                          className="text-[10.5px] font-semibold uppercase tracking-[0.18em]"
+                          style={{ color: toneColor }}
+                        >
+                          Verification complete &middot; {(result.elapsed_ms / 1000).toFixed(1)}s
+                        </div>
+                        <div className="mt-1 text-[18px] font-semibold leading-tight tracking-[-0.018em]">
+                          <span className="font-serif italic font-normal">{tone.headline}</span>
+                        </div>
+                      </div>
+                      <span
+                        className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.06em] ring-1"
+                        style={{
+                          backgroundColor: `${toneColor}15`,
+                          color: toneColor,
+                          borderColor: `${toneColor}40`,
+                        }}
+                      >
+                        <ShieldCheck className="h-2.5 w-2.5" />
+                        {tone.label}
+                      </span>
                     </div>
-                    <div className="mt-1 text-[18px] font-semibold tracking-[-0.018em]">
-                      <span className="font-serif italic font-normal">Real proof URL</span>
-                      <span className="text-foreground/55">, no signup.</span>
-                    </div>
-                  </div>
-                  <span
-                    className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.06em] ring-1"
-                    style={{
-                      backgroundColor: `${picked.accent}15`,
-                      color: picked.accent,
-                      borderColor: `${picked.accent}40`,
-                    }}
-                  >
-                    <ShieldCheck className="h-2.5 w-2.5" />
-                    {result.verdict || 'verified'}
-                  </span>
-                </div>
+                  );
+                })()}
 
                 <div className="mt-3 grid grid-cols-3 gap-2 text-[11px]">
                   <div className="rounded border border-border/40 bg-background/60 px-2 py-1.5 text-center">
@@ -403,6 +440,7 @@ export function HomeVerifierDemo() {
                 key="error"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
+                exit={{ opacity: 0, transition: { duration: 0.18 } }}
                 transition={EASE}
                 className="space-y-2"
               >
