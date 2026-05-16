@@ -63,7 +63,60 @@ export interface VerifyRequest {
   brief?: string;
   /** Required when input_mode === 'draft'. Defaults to 'qa'. */
   format?: DraftFormat;
+  /**
+   * Optional structured progress callback. Fired at each natural
+   * checkpoint in the lifecycle (kill-switch, red-flag scan, input
+   * redaction, fact-check, disclaimer, output redaction, audit write).
+   * Used by the SSE-streaming `/api/wizard/sample` endpoint to expose
+   * the actual work to the home-page demo in real time.
+   *
+   * Implementations MUST be best-effort and non-throwing — the lifecycle
+   * wraps each call in a try/catch so a callback bug can never break
+   * the verification itself. Implementations SHOULD be cheap (synchronous
+   * push to a queue / writable stream); they are awaited per-checkpoint.
+   */
+  onProgress?: (event: VerifyProgressEvent) => void | Promise<void>;
 }
+
+export type VerifyProgressEvent =
+  | { phase: 'start'; pack_slug: string; input_chars: number }
+  | { phase: 'kill_switch'; engaged: boolean }
+  | { phase: 'redact_input_begin'; recognizers: string[] }
+  | {
+      phase: 'redact_input_complete';
+      entities_found: number;
+      entity_types: string[];
+    }
+  | { phase: 'red_flag_begin'; rule_categories: string[] }
+  | {
+      phase: 'red_flag_complete';
+      triggered: boolean;
+      category?: string;
+      severity?: string;
+      triggering_phrase?: string;
+    }
+  | { phase: 'fact_check_begin'; paragraphs: number; sources_in_pack?: number }
+  | {
+      phase: 'fact_check_complete';
+      supported: number;
+      unsourced: number;
+      unique_sources: number;
+      cited_titles: string[];
+    }
+  | { phase: 'disclaimer_begin' }
+  | { phase: 'disclaimer_complete'; present: boolean; injected: boolean }
+  | { phase: 'redact_output_begin' }
+  | { phase: 'redact_output_complete'; entities_found: number }
+  | {
+      phase: 'audit_write_begin';
+      outcome: string;
+    }
+  | {
+      phase: 'audit_write_complete';
+      audit_log_id: number;
+      hash: string;
+      prev_hash: string | null;
+    };
 
 export interface ParagraphIssue {
   paragraph_index: number;
@@ -136,8 +189,26 @@ export async function runVerifyLifecycle(req: VerifyRequest): Promise<VerifyResp
   const scenarioAlias: Scenario =
     pack.slug === 'government' ? 'government' : 'healthcare';
 
+  // Wrap onProgress so a callback bug can never break verification.
+  const emit = async (event: VerifyProgressEvent): Promise<void> => {
+    if (!req.onProgress) return;
+    try {
+      await req.onProgress(event);
+    } catch (err) {
+      logger.warn({ err, phase: event.phase }, 'onProgress callback threw — ignored');
+    }
+  };
+
+  await emit({
+    phase: 'start',
+    pack_slug: pack.slug,
+    input_chars:
+      req.input_mode === 'paste' ? (req.article?.length ?? 0) : (req.brief?.length ?? 0),
+  });
+
   // ---------- Step 1: Kill switch ----------
   const ks = await getKillSwitchState();
+  await emit({ phase: 'kill_switch', engaged: ks.is_engaged });
   if (ks.is_engaged) {
     const audit = await writeAudit({
       scenario: scenarioAlias,
@@ -207,12 +278,25 @@ export async function runVerifyLifecycle(req: VerifyRequest): Promise<VerifyResp
   }
 
   // ---------- Step 3: Red-flag scan ----------
+  await emit({
+    phase: 'red_flag_begin',
+    rule_categories: pack.config.red_flag_rules.map((r) => r.category),
+  });
   let redFlag;
   try {
     redFlag = await detectRedFlag(article, pack);
   } catch (err) {
     return failError(req, ms(), 'red_flag_detector_failed', err, scenarioAlias);
   }
+  await emit({
+    phase: 'red_flag_complete',
+    triggered: redFlag.triggered,
+    ...(redFlag.triggered && redFlag.category ? { category: redFlag.category } : {}),
+    ...(redFlag.triggered && redFlag.severity ? { severity: redFlag.severity } : {}),
+    ...(redFlag.triggered && redFlag.triggeringPhrase
+      ? { triggering_phrase: redFlag.triggeringPhrase }
+      : {}),
+  });
 
   if (redFlag.triggered && redFlag.category && redFlag.severity) {
     let auditQuery: string;
@@ -271,6 +355,10 @@ export async function runVerifyLifecycle(req: VerifyRequest): Promise<VerifyResp
   }
 
   // ---------- Step 4: Input redaction ----------
+  await emit({
+    phase: 'redact_input_begin',
+    recognizers: pack.config.recognizers,
+  });
   let inputRedacted;
   try {
     inputRedacted = await redact(article, pack.config.recognizers);
@@ -283,6 +371,13 @@ export async function runVerifyLifecycle(req: VerifyRequest): Promise<VerifyResp
 
   let workingArticle = inputRedacted.redacted;
   const piiInputCount = inputRedacted.entities.length;
+  await emit({
+    phase: 'redact_input_complete',
+    entities_found: piiInputCount,
+    entity_types: Array.from(
+      new Set(inputRedacted.entities.map((e: { entity_type: string }) => e.entity_type)),
+    ),
+  });
 
   // ---------- Step 5: Paragraph split ----------
   const paragraphs = splitParagraphs(workingArticle);
@@ -290,12 +385,31 @@ export async function runVerifyLifecycle(req: VerifyRequest): Promise<VerifyResp
   // ---------- Step 6: Fact-check ----------
   // Sources are scoped to the same vertical pack — the legacy scenario_t
   // column on `sources` is in sync via the backfill in migration 004.
+  await emit({
+    phase: 'fact_check_begin',
+    paragraphs: paragraphs.length,
+  });
   const factCheck = await factCheckParagraphs(paragraphs, scenarioAlias, {
     minSimilarity: pack.config.default_min_similarity,
     topK: pack.config.default_top_k,
   });
+  const citedTitlesPreview = Array.from(
+    new Set(
+      factCheck.paragraphs.flatMap((p) =>
+        p.support.kind === 'supported' ? p.support.citations.map((c) => c.title) : [],
+      ),
+    ),
+  ).slice(0, 6);
+  await emit({
+    phase: 'fact_check_complete',
+    supported: factCheck.supported_count,
+    unsourced: factCheck.unsourced_count,
+    unique_sources: factCheck.unique_sources_used,
+    cited_titles: citedTitlesPreview,
+  });
 
   // ---------- Step 7: Disclaimer ----------
+  await emit({ phase: 'disclaimer_begin' });
   const disclaimerCheck = checkDisclaimer(workingArticle, pack);
   let disclaimerInjected = false;
   if (!disclaimerCheck.present && disclaimerCheck.required) {
@@ -303,8 +417,14 @@ export async function runVerifyLifecycle(req: VerifyRequest): Promise<VerifyResp
     workingArticle = result.article;
     disclaimerInjected = result.injected;
   }
+  await emit({
+    phase: 'disclaimer_complete',
+    present: disclaimerCheck.present,
+    injected: disclaimerInjected,
+  });
 
   // ---------- Step 8: Output redaction (second pass) ----------
+  await emit({ phase: 'redact_output_begin' });
   let outputPiiCount = 0;
   try {
     const out = await redact(workingArticle, pack.config.recognizers);
@@ -315,6 +435,7 @@ export async function runVerifyLifecycle(req: VerifyRequest): Promise<VerifyResp
   } catch (err) {
     return failError(req, ms(), 'output_redaction_failed', err, scenarioAlias);
   }
+  await emit({ phase: 'redact_output_complete', entities_found: outputPiiCount });
 
   // ---------- Per-paragraph issue list ----------
   const issues: ParagraphIssue[] = factCheck.paragraphs.map((pc) => {
@@ -407,6 +528,7 @@ export async function runVerifyLifecycle(req: VerifyRequest): Promise<VerifyResp
 
   // ---------- Step 9: Audit write ----------
   const auditOutcome = factCheck.unsourced_count > 0 ? 'i_dont_know' : 'answered';
+  await emit({ phase: 'audit_write_begin', outcome: auditOutcome });
   const audit = await writeAudit({
     scenario: scenarioAlias,
     vertical_pack_id: pack.id,
@@ -449,6 +571,13 @@ export async function runVerifyLifecycle(req: VerifyRequest): Promise<VerifyResp
     red_flag_category: null,
     latency_ms: ms(),
     model_used: draftMeta?.model ?? null,
+  });
+
+  await emit({
+    phase: 'audit_write_complete',
+    audit_log_id: audit.audit_log_id,
+    hash: audit.hash,
+    prev_hash: audit.prev_hash,
   });
 
   logger.info(
