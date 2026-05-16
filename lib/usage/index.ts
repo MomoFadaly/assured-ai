@@ -7,7 +7,7 @@
  * write failure can't break a verification request.
  */
 
-import 'server-only';
+import '@/lib/server-only';
 import { query } from '@/lib/db/client';
 import { logger } from '@/lib/logger';
 import { estimateCostMicroUsd } from './pricing';

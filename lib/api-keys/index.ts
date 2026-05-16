@@ -19,7 +19,7 @@
  * for sub-ms validation latency.
  */
 
-import 'server-only';
+import '@/lib/server-only';
 import { createHash, randomBytes, timingSafeEqual } from 'node:crypto';
 import { query } from '@/lib/db/client';
 import { logger } from '@/lib/logger';

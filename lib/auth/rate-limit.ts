@@ -12,7 +12,7 @@
  * 5 wrong passwords on the same account.
  */
 
-import 'server-only';
+import '@/lib/server-only';
 import { query } from '@/lib/db/client';
 
 const MAX_ATTEMPTS = 5;

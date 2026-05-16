@@ -12,7 +12,7 @@
  * every verify call doesn't hit the DB.
  */
 
-import 'server-only';
+import '@/lib/server-only';
 import { query } from '@/lib/db/client';
 import { logger } from '@/lib/logger';
 import {

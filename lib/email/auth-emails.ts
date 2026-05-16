@@ -11,7 +11,7 @@
  * is generated automatically by sendEmail().
  */
 
-import 'server-only';
+import '@/lib/server-only';
 import { sendEmail, type SendEmailResult } from './index';
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://assuredai.online';

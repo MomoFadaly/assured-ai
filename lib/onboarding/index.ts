@@ -5,7 +5,7 @@
  * "is this user onboarded?" and "what pack did they pick?".
  */
 
-import 'server-only';
+import '@/lib/server-only';
 import { randomBytes, createHash } from 'node:crypto';
 import { query } from '@/lib/db/client';
 import { logger } from '@/lib/logger';

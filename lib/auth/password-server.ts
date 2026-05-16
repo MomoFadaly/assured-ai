@@ -11,7 +11,7 @@
  * lazily on next successful sign-in via `needsRehash()`.
  */
 
-import 'server-only';
+import '@/lib/server-only';
 import bcrypt from 'bcryptjs';
 
 const BCRYPT_COST = 12;

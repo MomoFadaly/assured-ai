@@ -13,7 +13,7 @@
  * in the deliveries log + the runtime logger.
  */
 
-import 'server-only';
+import '@/lib/server-only';
 import { query } from '@/lib/db/client';
 import { logger } from '@/lib/logger';
 import { sendEmail } from '@/lib/email';

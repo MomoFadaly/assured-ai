@@ -12,7 +12,7 @@
  * still complete the flow with the link from the logs.
  */
 
-import 'server-only';
+import '@/lib/server-only';
 import { Resend } from 'resend';
 import { logger } from '@/lib/logger';
 

@@ -8,7 +8,7 @@
  * fire-and-forget the notification.
  */
 
-import 'server-only';
+import '@/lib/server-only';
 import { z } from 'zod';
 import { query } from '@/lib/db/client';
 import { logger } from '@/lib/logger';

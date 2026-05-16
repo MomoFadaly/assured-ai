@@ -6,7 +6,7 @@
  * read is parameter-safe.
  */
 
-import 'server-only';
+import '@/lib/server-only';
 import { query } from '@/lib/db/client';
 import { getKillSwitchState } from '@/lib/orchestration/kill-switch';
 import type { UserRole } from '@/lib/db/types';

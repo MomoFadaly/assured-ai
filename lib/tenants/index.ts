@@ -13,10 +13,13 @@
  * if no tenant can be resolved.
  */
 
-import 'server-only';
+import '@/lib/server-only';
 import { query } from '@/lib/db/client';
 import { logger } from '@/lib/logger';
-import { auth } from '@/lib/auth/auth';
+// `auth` is imported lazily inside `requireTenantContext` so that
+// utility paths (e.g. `getDefaultTenant`, `tenantForServiceCall`) used
+// by seed scripts + cron don't pull the @auth/pg-adapter module tree
+// through tsx's CJS resolver, which chokes on its "exports" map.
 
 export interface TenantRow {
   id: string;
@@ -73,6 +76,7 @@ export async function requireTenantContext(): Promise<
   | { ok: true; tenant: { id: string; slug: string } }
   | { ok: false; reason: 'unauthenticated' | 'no_tenant' }
 > {
+  const { auth } = await import('@/lib/auth/auth');
   const session = await auth();
   if (!session?.user?.id) return { ok: false, reason: 'unauthenticated' };
   try {

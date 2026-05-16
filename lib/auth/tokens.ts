@@ -15,7 +15,7 @@
  * success, so a token genuinely is one-use.
  */
 
-import 'server-only';
+import '@/lib/server-only';
 import { query } from '@/lib/db/client';
 import { randomBytes, createHash } from 'node:crypto';
 

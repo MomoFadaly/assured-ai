@@ -1,4 +1,4 @@
-import 'server-only';
+import '@/lib/server-only';
 
 /**
  * Shared auth helpers for server actions + API routes.

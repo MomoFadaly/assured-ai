@@ -7,7 +7,7 @@
  * admin API route.
  */
 
-import 'server-only';
+import '@/lib/server-only';
 import { query } from '@/lib/db/client';
 import { logger } from '@/lib/logger';
 import type { ScopedActor } from '@/lib/auth/scoped-actor';

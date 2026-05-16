@@ -5,7 +5,7 @@
  *   - the /demo page's curated examples list
  */
 
-import 'server-only';
+import '@/lib/server-only';
 import { query } from '@/lib/db/client';
 
 export interface ShowcaseRow {
