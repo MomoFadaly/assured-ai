@@ -36,6 +36,7 @@ import {
   Eye,
   EyeOff,
 } from 'lucide-react';
+import { signInAfterProvisionAction, redirectToSandbox } from './actions';
 import {
   INDUSTRY_META,
   ROLES_BY_INDUSTRY,
@@ -633,33 +634,30 @@ define('ASSUREDAI_DEFAULT_PACK', '${state.industry}');`;
             </pre>
           </div>
 
-          {/* Next steps */}
-          <div className="grid gap-3 sm:grid-cols-3">
-            <NextStep
-              icon={LogIn}
-              title="Sign in"
-              body="Land in your sandbox admin"
-              href={result.sign_in_url}
-              primary
-              accent={meta.accent}
-            />
-            {result.first_audit_log_id && (
-              <NextStep
-                icon={ShieldCheck}
-                title="Open your proof"
-                body={`Audit row #${result.first_audit_log_id} from Step 5`}
-                href={`/v/${result.first_audit_log_id}`}
-                accent={meta.accent}
-              />
-            )}
-            <NextStep
-              icon={ExternalLink}
-              title="Talk production"
-              body="Book a working session for BAA + SSO"
-              href="/book-a-demo"
-              accent={meta.accent}
-            />
-          </div>
+          {/* Next steps — primary is auto-signin, gated by 'key copied'
+              confirmation so visitors don't accidentally lose the key. */}
+          <AutoSignInBlock
+            email={state.account.email}
+            password={state.account.password}
+            keyCopiedHint={keyCopied}
+            accent={meta.accent}
+            extras={[
+              ...(result.first_audit_log_id
+                ? [{
+                    icon: ShieldCheck,
+                    title: 'Open your proof',
+                    body: `Audit row #${result.first_audit_log_id} from Step 5`,
+                    href: `/v/${result.first_audit_log_id}`,
+                  }]
+                : []),
+              {
+                icon: ExternalLink,
+                title: 'Talk production',
+                body: 'Book a working session for BAA + SSO',
+                href: '/book-a-demo',
+              },
+            ]}
+          />
         </div>
       </div>
 
@@ -668,6 +666,148 @@ define('ASSUREDAI_DEFAULT_PACK', '${state.industry}');`;
         audit chain, all yours to explore. When you&rsquo;re ready to roll AssuredAI into your
         production CMS with BAA / SOC 2 evidence / SSO wired up, we move to a working session.
       </div>
+    </div>
+  );
+}
+
+// =============================================================
+// AutoSignInBlock — gated auto sign-in after provision
+// =============================================================
+//
+// The cleanest possible landing: visitor confirms they've saved the
+// API key, clicks ONE button, server-side signs them in with their
+// just-set credentials, redirects them to /chat already authenticated.
+// No re-typing the password they set 4 seconds ago.
+
+function AutoSignInBlock({
+  email,
+  password,
+  keyCopiedHint,
+  accent,
+  extras,
+}: {
+  email: string;
+  password: string;
+  /** Hint that they've already clicked "Copy key" — pre-checks the confirm box. */
+  keyCopiedHint: boolean;
+  accent: string;
+  extras: Array<{
+    icon: React.ComponentType<{ className?: string }>;
+    title: string;
+    body: string;
+    href: string;
+  }>;
+}) {
+  const [confirmed, setConfirmed] = useState(keyCopiedHint);
+  const [signingIn, setSigningIn] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // Keep `confirmed` in sync if the user clicks the COPY button on the
+  // amber card above after first arriving here.
+  if (keyCopiedHint && !confirmed) {
+    // Defer to next tick to avoid React render-cycle warning.
+    setTimeout(() => setConfirmed(true), 0);
+  }
+
+  const handleSignIn = useCallback(async () => {
+    setError(null);
+    setSigningIn(true);
+    try {
+      const res = await signInAfterProvisionAction({ email, password });
+      if (!res.ok) {
+        setError(res.error);
+        setSigningIn(false);
+        return;
+      }
+      // Server action redirect via a follow-up server call — needed because
+      // the cookie set by signIn doesn't reach the client router until the
+      // next request boundary.
+      await redirectToSandbox(res.redirectTo);
+    } catch (err) {
+      // redirectToSandbox throws a Next.js redirect signal — that's the
+      // expected control-flow exit, not an error. Anything else is real.
+      const message = err instanceof Error ? err.message : String(err);
+      if (!/NEXT_REDIRECT/i.test(message)) {
+        setError(message);
+        setSigningIn(false);
+      }
+    }
+  }, [email, password]);
+
+  return (
+    <div>
+      {/* Confirmation gate */}
+      <label
+        className="mb-4 flex cursor-pointer items-start gap-2.5 rounded-lg border border-border bg-card p-3 text-[12.5px]"
+        style={{ borderColor: confirmed ? `${accent}40` : undefined }}
+      >
+        <input
+          type="checkbox"
+          checked={confirmed}
+          onChange={(e) => setConfirmed(e.target.checked)}
+          className="mt-0.5"
+          style={{ accentColor: accent }}
+        />
+        <span className="text-foreground/85">
+          I&rsquo;ve saved my API key somewhere I&rsquo;ll find it again.{' '}
+          <span className="text-muted-foreground">
+            (We hash + discard it server-side. If you lose it you&rsquo;ll have to issue a new
+            one from <code className="font-mono text-[11px]">/admin/api-keys</code>.)
+          </span>
+        </span>
+      </label>
+
+      <div className="grid gap-3 sm:grid-cols-3">
+        <motion.button
+          type="button"
+          onClick={handleSignIn}
+          disabled={!confirmed || signingIn}
+          whileHover={confirmed && !signingIn ? { y: -2 } : undefined}
+          whileTap={confirmed && !signingIn ? { scale: 0.985 } : undefined}
+          className="group flex flex-col rounded-xl border p-4 text-left shadow-sm transition-all hover:shadow-md disabled:opacity-50 disabled:hover:shadow-sm"
+          style={{
+            backgroundColor: confirmed && !signingIn ? accent : 'rgba(10,10,11,0.18)',
+            borderColor: confirmed && !signingIn ? accent : 'hsl(var(--border))',
+            color: '#ffffff',
+          }}
+        >
+          {signingIn ? (
+            <Loader2 className="h-4 w-4 animate-spin text-white" />
+          ) : (
+            <LogIn className="h-4 w-4 text-white" />
+          )}
+          <div className="mt-2 text-[13.5px] font-semibold tracking-tight">
+            {signingIn ? 'Signing you in…' : 'Open my sandbox'}
+          </div>
+          <div className="mt-0.5 text-[11.5px] text-white/85">
+            {signingIn ? 'Setting your session' : 'One-click sign-in → /chat'}
+          </div>
+        </motion.button>
+
+        {extras.map((extra) => {
+          const Icon = extra.icon;
+          return (
+            <Link
+              key={extra.href}
+              href={extra.href}
+              target={extra.href.startsWith('http') ? '_blank' : undefined}
+              className="group flex flex-col rounded-xl border border-border bg-card p-4 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md"
+            >
+              <span style={{ color: accent }}>
+                <Icon className="h-4 w-4" />
+              </span>
+              <div className="mt-2 text-[13.5px] font-semibold tracking-tight">{extra.title}</div>
+              <div className="mt-0.5 text-[11.5px] text-muted-foreground">{extra.body}</div>
+            </Link>
+          );
+        })}
+      </div>
+
+      {error && (
+        <div className="mt-3 rounded-md border border-red-500/40 bg-red-500/[0.06] px-3 py-2 text-[12.5px] text-red-700">
+          {error}
+        </div>
+      )}
     </div>
   );
 }
