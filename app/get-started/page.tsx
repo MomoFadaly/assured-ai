@@ -21,8 +21,9 @@ import { Suspense } from 'react';
 import { ArrowLeft, Calendar, Mail, ArrowUpRight, ShieldCheck } from 'lucide-react';
 import { BrandLockup } from '@/components/verify/Brand';
 import { GetStartedFlow } from './GetStartedFlow';
+import { getPackMetrics } from '@/lib/marketing/pack-metrics';
 
-export const dynamic = 'force-static';
+export const dynamic = 'force-dynamic';
 
 export const metadata = {
   title: 'Get started · AssuredAI',
@@ -31,7 +32,8 @@ export const metadata = {
   robots: { index: true, follow: true },
 };
 
-export default function GetStartedPage() {
+export default async function GetStartedPage() {
+  const packMetrics = await getPackMetrics();
   return (
     <div className="relative min-h-screen bg-background">
       {/* Minimal header — logo + back-to-home. The wizard owns the viewport. */}
@@ -42,7 +44,7 @@ export default function GetStartedPage() {
             className="inline-flex items-center gap-3 rounded-md transition-opacity hover:opacity-80"
           >
             <ArrowLeft className="h-3.5 w-3.5 text-muted-foreground" />
-            <BrandLockup />
+            <BrandLockup showBadge={false} />
           </Link>
           <div className="hidden items-center gap-4 text-[12.5px] text-muted-foreground sm:flex">
             <Link href="/pricing" className="hover:text-foreground">
@@ -86,7 +88,7 @@ export default function GetStartedPage() {
           required because GetStartedFlow reads URL params via
           useSearchParams (which suspends until they hydrate). */}
       <Suspense fallback={<div className="min-h-[680px] bg-background" />}>
-        <GetStartedFlow />
+        <GetStartedFlow packMetrics={packMetrics} />
       </Suspense>
 
       {/* Below the wizard — the honest path to production */}

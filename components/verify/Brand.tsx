@@ -42,15 +42,32 @@ export function BrandMark({ className, size = 24 }: { className?: string; size?:
   );
 }
 
-export function BrandLockup({ className }: { className?: string }) {
+/**
+ * BrandLockup — AssuredAI logo + wordmark.
+ *
+ * The 'Verifier' sub-badge signals "this is the AssuredAI Verifier
+ * product" inside the app surface. On marketing pages (home, /get-
+ * started, /pricing) it reads as an admin-role badge and confuses
+ * the brand, so those surfaces pass `showBadge={false}` to render
+ * just the clean wordmark.
+ */
+export function BrandLockup({
+  className,
+  showBadge = true,
+}: {
+  className?: string;
+  showBadge?: boolean;
+}) {
   return (
     <div className={cn('flex items-center gap-2', className)}>
       <BrandMark size={26} />
       <div className="flex items-baseline gap-1">
         <span className="text-[15px] font-semibold tracking-tight">AssuredAI</span>
-        <span className="rounded-md border border-border bg-muted px-1.5 py-px text-[9px] font-medium uppercase tracking-[0.08em] text-muted-foreground">
-          Verifier
-        </span>
+        {showBadge && (
+          <span className="rounded-md border border-border bg-muted px-1.5 py-px text-[9px] font-medium uppercase tracking-[0.08em] text-muted-foreground">
+            Verifier
+          </span>
+        )}
       </div>
     </div>
   );

@@ -67,6 +67,8 @@ export const ROLES_BY_INDUSTRY: Record<
   Array<{ id: string; label: string; sub: string }>
 > = {
   healthcare: [
+    { id: 'head_digital', label: 'Head of Digital', sub: 'Owns the web + content channels end-to-end' },
+    { id: 'ai_lead', label: 'AI Transformation Lead', sub: 'Rolling out generative AI safely across the org' },
     { id: 'ciso', label: 'CISO / Security', sub: 'Risk owner, OCR letters land on your desk' },
     { id: 'compliance', label: 'Compliance / Privacy', sub: 'HIPAA, BAA, OCR correspondence' },
     { id: 'editorial', label: 'Editorial / Content', sub: 'Patient-education, marketing, web' },
@@ -74,6 +76,8 @@ export const ROLES_BY_INDUSTRY: Record<
     { id: 'marketing', label: 'Marketing / Comms', sub: 'Brand, growth, social' },
   ],
   finance: [
+    { id: 'head_digital', label: 'Head of Digital', sub: 'Public-facing web + comms platforms' },
+    { id: 'ai_lead', label: 'AI Transformation Lead', sub: 'Generative AI program owner, safety-first' },
     { id: 'cco', label: 'CCO / Compliance', sub: 'FINRA, SEC marketing rule, supervision' },
     { id: 'ciso', label: 'CISO / Security', sub: 'Risk owner, vendor reviews, SOX' },
     { id: 'marketing', label: 'Marketing / CMO', sub: 'Fund factsheets, social, retirement comms' },
@@ -81,6 +85,8 @@ export const ROLES_BY_INDUSTRY: Record<
     { id: 'engineering', label: 'Engineering / Platform', sub: 'CMS integration, dev review' },
   ],
   government: [
+    { id: 'head_digital', label: 'Head of Digital', sub: 'Agency digital service or web team lead' },
+    { id: 'ai_lead', label: 'AI Transformation Lead', sub: 'Responsible-AI program, EO 14110 posture' },
     { id: 'public_affairs', label: 'Public Affairs', sub: 'Agency communications, press, plain-language' },
     { id: 'compliance', label: 'Compliance / Records', sub: 'FOIA, § 508, transparency mandates' },
     { id: 'ciso', label: 'CISO / Security', sub: 'FedRAMP, FISMA, ATO posture' },
@@ -88,6 +94,8 @@ export const ROLES_BY_INDUSTRY: Record<
     { id: 'engineering', label: 'Engineering / Web', sub: 'Web team, CMS, accessibility' },
   ],
   legal: [
+    { id: 'head_digital', label: 'Head of Digital', sub: 'Firm web + insights distribution' },
+    { id: 'ai_lead', label: 'AI Transformation Lead', sub: 'Generative AI rollout, ethics screen owner' },
     { id: 'legal_counsel', label: 'GC / Legal Counsel', sub: 'ABA Model Rules, privilege, Rule 1.6' },
     { id: 'compliance', label: 'Compliance / Ethics', sub: 'Bar compliance, ethics screen' },
     { id: 'marketing', label: 'Marketing / BD', sub: 'Case studies, web, social, thought leadership' },

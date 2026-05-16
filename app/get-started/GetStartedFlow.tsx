@@ -83,7 +83,19 @@ const INDUSTRY_ICONS: Record<Industry, React.ComponentType<{ className?: string 
 
 const EASE: Transition = { duration: 0.32, ease: [0.22, 1, 0.36, 1] };
 
-export function GetStartedFlow() {
+export interface PackMetric {
+  slug: string;
+  verified_7d: number;
+  verified_total: number;
+  latest_audit_id: number | null;
+}
+
+export function GetStartedFlow({
+  packMetrics = {},
+}: {
+  /** Live per-pack verification counts from the audit_log, fetched server-side. */
+  packMetrics?: Record<string, PackMetric>;
+}) {
   const [state, dispatch] = useReducer(wizardReducer, INITIAL_WIZARD_STATE);
   const reduceMotion = useReducedMotion();
   const searchParams = useSearchParams();
@@ -136,7 +148,7 @@ export function GetStartedFlow() {
                   exit={reduceMotion ? undefined : { opacity: 0, y: -8 }}
                   transition={EASE}
                 >
-                  {state.step === 1 && <Step1Industry state={state} dispatch={dispatch} />}
+                  {state.step === 1 && <Step1Industry state={state} dispatch={dispatch} packMetrics={packMetrics} />}
                   {state.step === 2 && <Step2Role state={state} dispatch={dispatch} />}
                   {state.step === 3 && <Step3Publishing state={state} dispatch={dispatch} />}
                   {state.step === 4 && <Step4Compliance state={state} dispatch={dispatch} />}
@@ -272,7 +284,15 @@ function StepHeader({ state }: { state: WizardState }) {
 // Step 1 — Industry
 // =============================================================
 
-function Step1Industry({ state, dispatch }: { state: WizardState; dispatch: WizardDispatch }) {
+function Step1Industry({
+  state,
+  dispatch,
+  packMetrics,
+}: {
+  state: WizardState;
+  dispatch: WizardDispatch;
+  packMetrics: Record<string, PackMetric>;
+}) {
   return (
     <div className="grid gap-3 sm:grid-cols-2">
       {INDUSTRIES.map((id, i) => {
@@ -329,8 +349,16 @@ function Step1Industry({ state, dispatch }: { state: WizardState; dispatch: Wiza
             <div className="mt-1 text-[12.5px] text-muted-foreground">{meta.compliance}</div>
             <div className="mt-5 flex items-center justify-between text-[11.5px]">
               <span className="text-muted-foreground">
-                <span className="font-semibold tabular-nums text-foreground/70">{meta.recent}</span>{' '}
-                verified · last 7 days
+                {packMetrics[id]?.verified_7d ? (
+                  <>
+                    <span className="font-semibold tabular-nums text-foreground/70">
+                      {packMetrics[id]!.verified_7d}
+                    </span>{' '}
+                    verified · last 7 days
+                  </>
+                ) : (
+                  <span className="italic">Ready to verify</span>
+                )}
               </span>
               <span
                 className="inline-flex items-center gap-1 font-semibold"
@@ -829,39 +857,76 @@ function WorkspacePreview({
         </div>
 
         <div className="px-5 py-5">
-          <PreviewSection label="Identity">
-            <PreviewRow
-              icon={Database}
-              label="Tenant"
-              value={meta ? <span className="font-mono">sandbox-{meta.name.toLowerCase()}</span> : '—'}
-            />
-            <PreviewRow
-              icon={ShieldCheck}
-              label="Pack"
-              value={meta ? `${meta.name} · ${meta.compliance}` : 'pick an industry'}
-              valueAccent={meta ? accent : undefined}
-            />
-            <AnimatePresence>
-              {state.role && state.industry && (
-                <motion.div
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: 'auto' }}
-                  exit={{ opacity: 0, height: 0 }}
-                  transition={EASE}
-                  className="overflow-hidden"
-                >
-                  <PreviewRow
-                    icon={KeyRound}
-                    label="Role"
-                    value={
-                      ROLES_BY_INDUSTRY[state.industry].find((r) => r.id === state.role)?.label ??
-                      state.role
-                    }
-                  />
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </PreviewSection>
+          {meta ? (
+            <PreviewSection label="Identity">
+              <PreviewRow
+                icon={Database}
+                label="Tenant"
+                value={<span className="font-mono">sandbox-{meta.name.toLowerCase()}</span>}
+              />
+              <PreviewRow
+                icon={ShieldCheck}
+                label="Pack"
+                value={`${meta.name} · ${meta.compliance}`}
+                valueAccent={accent}
+              />
+              <AnimatePresence>
+                {state.role && state.industry && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    exit={{ opacity: 0, height: 0 }}
+                    transition={EASE}
+                    className="overflow-hidden"
+                  >
+                    <PreviewRow
+                      icon={KeyRound}
+                      label="Role"
+                      value={
+                        ROLES_BY_INDUSTRY[state.industry].find((r) => r.id === state.role)?.label ??
+                        state.role
+                      }
+                    />
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </PreviewSection>
+          ) : (
+            // Pre-pick state — designed callout so the right rail doesn't read
+            // as a half-filled wireframe. Shows what's about to materialise.
+            <PreviewSection label="Pre-flight">
+              <div className="space-y-3">
+                <p className="text-[12.5px] leading-relaxed text-muted-foreground">
+                  Pick an industry on the left and watch your sandbox materialize here in real
+                  time &mdash; pack installed, 8 canonical sources loaded, region pinned,
+                  retention set, audit channel drafted.
+                </p>
+                <div className="grid grid-cols-2 gap-2">
+                  {(['Healthcare', 'Finance', 'Government', 'Legal'] as const).map((label, i) => (
+                    <div
+                      key={label}
+                      className="rounded border border-dashed border-border/60 bg-background/40 px-2 py-2 text-center"
+                    >
+                      <div className="text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+                        Pack {i + 1}
+                      </div>
+                      <div className="mt-0.5 text-[12px] font-medium text-foreground/70">
+                        {label}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <div className="rounded border border-border/40 bg-background/40 px-3 py-2 text-[11px] text-muted-foreground">
+                  <div className="font-mono text-[10px] uppercase tracking-[0.12em] text-foreground/55">
+                    Your URL will be
+                  </div>
+                  <div className="mt-0.5 font-mono text-[11.5px] text-foreground/75">
+                    sandbox-<span className="italic opacity-60">[industry]</span>
+                  </div>
+                </div>
+              </div>
+            </PreviewSection>
+          )}
 
           {/* Seed sources stagger in once industry is picked */}
           {meta && (

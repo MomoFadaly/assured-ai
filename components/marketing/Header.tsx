@@ -39,7 +39,7 @@ export function MarketingHeader({ authChip }: { authChip?: ReactNode }) {
           aria-label="AssuredAI home"
           className="rounded-md transition-opacity hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-ring/30"
         >
-          <BrandLockup />
+          <BrandLockup showBadge={false} />
         </Link>
 
         <nav

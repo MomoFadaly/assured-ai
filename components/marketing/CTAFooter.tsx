@@ -71,7 +71,7 @@ export function CTAFooter({ proofExampleId }: { proofExampleId: number | null })
         <div className="mx-auto max-w-[1240px] px-5 py-12">
           <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-5">
             <div className="lg:col-span-2">
-              <BrandLockup />
+              <BrandLockup showBadge={false} />
               <p className="mt-3 max-w-[300px] text-[12.5px] leading-relaxed text-muted-foreground">
                 The proof layer for regulated publishing. Healthcare, finance, government,
                 legal. Hash-chained audit log + public proof URL on every piece &mdash; whether
