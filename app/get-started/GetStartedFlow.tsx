@@ -69,6 +69,7 @@ import {
 import { SEED_SOURCES } from '@/lib/wizard/seed-sources';
 import { MeshBackground } from './MeshBackground';
 import { Step5Verify as Step5VerifyLive } from './Step5Verify';
+import { Step6Provision as Step6ProvisionLive } from './Step6Provision';
 
 type WizardDispatch = React.Dispatch<WizardAction>;
 
@@ -111,7 +112,7 @@ export function GetStartedFlow() {
                   {state.step === 3 && <Step3Publishing state={state} dispatch={dispatch} />}
                   {state.step === 4 && <Step4Compliance state={state} dispatch={dispatch} />}
                   {state.step === 5 && <Step5VerifyLive state={state} dispatch={dispatch} />}
-                  {state.step === 6 && <Step6Provision state={state} />}
+                  {state.step === 6 && <Step6ProvisionLive state={state} dispatch={dispatch} />}
                 </motion.div>
               </AnimatePresence>
             </div>
@@ -651,26 +652,8 @@ function Step4Compliance({ state, dispatch }: { state: WizardState; dispatch: Wi
 // Step 5 lives in its own file (./Step5Verify.tsx) — real backend call,
 // real pipeline visualization, real /v/<id> result card.
 
-// =============================================================
-// Step 6 — Provision (stub for backend pass)
-// =============================================================
-
-function Step6Provision({ state }: { state: WizardState }) {
-  if (!state.industry) return <PlaceholderBackToStep1 />;
-  return (
-    <BackendPending
-      title="Sandbox provisioning · wiring up"
-      message="Transactional creation of your sandbox: tenant + pack + seed sources + API key + draft channel + first audit row from Step 5, all in one shot."
-      steps={[
-        'Tenant created · pack installed · seed sources loaded (8 per vertical)',
-        'Region pinned · retention set · audit channel drafted',
-        'API key minted (shown once) · WordPress plugin snippet pre-filled',
-        'First verification from Step 5 already in your audit log',
-      ]}
-      cta={{ href: '/book-a-demo', label: 'Skip ahead — book a working session', icon: Calendar }}
-    />
-  );
-}
+// Step 6 lives in its own file (./Step6Provision.tsx) — real form,
+// real /api/wizard/provision call, real API key reveal screen.
 
 // =============================================================
 // Step nav footer
@@ -732,7 +715,7 @@ function StepNav({
           Skip and read the case
         </Link>
       </div>
-      {state.step < 6 ? (
+      {state.step < 6 && (
         <motion.button
           type="button"
           onClick={handleNext}
@@ -745,16 +728,8 @@ function StepNav({
           Continue
           <ArrowRight className="h-4 w-4" />
         </motion.button>
-      ) : (
-        <button
-          type="button"
-          disabled
-          className="inline-flex h-11 items-center gap-2 rounded-md bg-foreground/40 px-5 text-[13.5px] font-semibold text-white"
-        >
-          Create my sandbox · provisioning wiring up
-          <Sparkles className="h-4 w-4" />
-        </button>
       )}
+      {/* Step 6 owns its own submit button; no need to render Continue. */}
     </div>
   );
 }
@@ -1107,46 +1082,15 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
   );
 }
 
-function BackendPending({
-  title,
-  message,
-  steps,
+// (BackendPending was used by Step 5 + Step 6 stubs while their backend
+//  was wiring up. Both are now real, so this helper is intentionally
+//  retired.)
+function BackendPending_RETIRED({
   cta,
 }: {
-  title: string;
-  message: string;
-  steps: string[];
   cta: { href: string; label: string; icon: React.ComponentType<{ className?: string }> };
 }) {
-  const Icon = cta.icon;
-  return (
-    <div className="space-y-5">
-      <div className="rounded-2xl border border-dashed border-border bg-muted/20 p-6">
-        <div className="flex items-center gap-2 text-[11.5px] font-semibold uppercase tracking-[0.18em] text-foreground/65">
-          <Sparkles className="h-4 w-4" />
-          {title}
-        </div>
-        <p className="mt-3 text-[14px] leading-relaxed text-foreground/80">{message}</p>
-        <ul className="mt-4 space-y-2 text-[12.5px] text-muted-foreground">
-          {steps.map((s, i) => (
-            <li key={i} className="flex items-baseline gap-2">
-              <span className="text-foreground/30">·</span>
-              <span>{s}</span>
-            </li>
-          ))}
-        </ul>
-      </div>
-      <Link
-        href={cta.href}
-        target={cta.href.startsWith('http') ? '_blank' : undefined}
-        className="inline-flex h-11 items-center gap-2 rounded-md border border-border bg-card px-4 text-[13px] font-semibold text-foreground hover:bg-accent"
-      >
-        <Icon className="h-4 w-4" />
-        {cta.label}
-        <ArrowRight className="h-3.5 w-3.5" />
-      </Link>
-    </div>
-  );
+  return null;
 }
 
 function PlaceholderBackToStep1() {
