@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { ParallaxLayer } from './Parallax';
 import { SectionBackdrop } from './SectionBackdrop';
+import { MeshBackground } from '@/components/ui/MeshBackground';
 
 export function Hero({ proofExampleId }: { proofExampleId: number | null }) {
   return (
@@ -28,16 +29,12 @@ export function Hero({ proofExampleId }: { proofExampleId: number | null }) {
         priority
       />
 
-      <div className="pointer-events-none absolute inset-0 grid-dot opacity-30 mask-fade-b" aria-hidden />
+      {/* Signature cursor-tracking gradient mesh — same component as /get-started so the
+          brand's craft inherits across surfaces. Brand primary + emerald accents (no industry
+          context on the home page yet). */}
+      <MeshBackground accent="hsl(221 83% 53%)" accentSoft="hsl(152 76% 80%)" />
 
-      <div
-        className="pointer-events-none absolute -top-32 -left-32 size-[520px] rounded-full bg-primary/15 blur-[110px] float-1"
-        aria-hidden
-      />
-      <div
-        className="pointer-events-none absolute top-24 -right-24 size-[420px] rounded-full bg-emerald-400/12 blur-[110px] float-2"
-        aria-hidden
-      />
+      <div className="pointer-events-none absolute inset-0 grid-dot opacity-30 mask-fade-b" aria-hidden />
 
       <div className="relative mx-auto max-w-[1320px] px-5 pb-16 pt-16 sm:pt-24">
         {/* Premium kicker */}

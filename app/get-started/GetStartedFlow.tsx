@@ -67,7 +67,7 @@ import {
   type WizardState,
 } from '@/lib/wizard/types';
 import { SEED_SOURCES } from '@/lib/wizard/seed-sources';
-import { MeshBackground } from './MeshBackground';
+import { MeshBackground } from '@/components/ui/MeshBackground';
 import { Step5Verify as Step5VerifyLive } from './Step5Verify';
 import { Step6Provision as Step6ProvisionLive } from './Step6Provision';
 

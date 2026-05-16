@@ -12,6 +12,9 @@
     "app/api/admin/monitor/sites/[id]/scan/route.ts": { "maxDuration": 60 },
     "app/api/cron/monitor/route.ts": { "maxDuration": 60 },
     "app/api/cron/anomaly/route.ts": { "maxDuration": 60 },
+    "app/api/cron/gc-sandboxes/route.ts": { "maxDuration": 30 },
+    "app/api/wizard/sample/route.ts": { "maxDuration": 60 },
+    "app/api/wizard/provision/route.ts": { "maxDuration": 30 },
     "app/api/admin/evidence/route.ts": { "maxDuration": 60 }
   },
   "crons": [
@@ -22,6 +25,10 @@
     {
       "path": "/api/cron/anomaly",
       "schedule": "15 * * * *"
+    },
+    {
+      "path": "/api/cron/gc-sandboxes",
+      "schedule": "30 * * * *"
     }
   ]
 }
