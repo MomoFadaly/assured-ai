@@ -68,6 +68,7 @@ import {
 } from '@/lib/wizard/types';
 import { SEED_SOURCES } from '@/lib/wizard/seed-sources';
 import { MeshBackground } from './MeshBackground';
+import { Step5Verify as Step5VerifyLive } from './Step5Verify';
 
 type WizardDispatch = React.Dispatch<WizardAction>;
 
@@ -109,7 +110,7 @@ export function GetStartedFlow() {
                   {state.step === 2 && <Step2Role state={state} dispatch={dispatch} />}
                   {state.step === 3 && <Step3Publishing state={state} dispatch={dispatch} />}
                   {state.step === 4 && <Step4Compliance state={state} dispatch={dispatch} />}
-                  {state.step === 5 && <Step5Verify state={state} />}
+                  {state.step === 5 && <Step5VerifyLive state={state} dispatch={dispatch} />}
                   {state.step === 6 && <Step6Provision state={state} />}
                 </motion.div>
               </AnimatePresence>
@@ -647,25 +648,8 @@ function Step4Compliance({ state, dispatch }: { state: WizardState; dispatch: Wi
   );
 }
 
-// =============================================================
-// Step 5 — Verify (stub for backend pass)
-// =============================================================
-
-function Step5Verify({ state }: { state: WizardState }) {
-  if (!state.industry) return <PlaceholderBackToStep1 />;
-  return (
-    <BackendPending
-      title="Live verification · wiring up"
-      message="The pipeline runs against the real AssuredAI verifier and streams node activations into your workspace preview. Real hash-chained /v/<id> proof URL produced before signup."
-      steps={[
-        'Sample tailored to your industry, or paste your own',
-        'PHI/PII redact → source retrieval → draft → red-flag → disclaimer → audit',
-        'Real /v/<id> proof URL · copy + share before you commit',
-      ]}
-      cta={{ href: '/chat', label: 'Open the live verifier in a new tab', icon: PlayCircle }}
-    />
-  );
-}
+// Step 5 lives in its own file (./Step5Verify.tsx) — real backend call,
+// real pipeline visualization, real /v/<id> result card.
 
 // =============================================================
 // Step 6 — Provision (stub for backend pass)
