@@ -45,12 +45,12 @@ export function CTAFooter({ proofExampleId }: { proofExampleId: number | null })
           </p>
           <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
             <Link
-              href="/chat"
+              href="/get-started"
               className="group relative inline-flex h-12 items-center gap-2 overflow-hidden rounded-md bg-primary px-6 text-[14.5px] font-medium text-primary-foreground glow-primary transition-all hover:shadow-2xl hover:shadow-primary/40 active:scale-[0.98]"
             >
               <span className="beam" />
               <span className="relative z-10 inline-flex items-center gap-2">
-                Configure your AssuredAI
+                Get started
                 <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
               </span>
             </Link>

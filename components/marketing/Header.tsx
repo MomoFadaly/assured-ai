@@ -56,10 +56,10 @@ export function MarketingHeader({ authChip }: { authChip?: ReactNode }) {
         <div className="flex items-center gap-2">
           {authChip}
           <Link
-            href="/chat"
+            href="/get-started"
             className="hidden h-9 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-md bg-primary px-4 text-[13px] font-medium text-primary-foreground shadow-sm transition-opacity hover:opacity-90 lg:inline-flex"
           >
-            Configure your AssuredAI
+            Get started
             <ArrowRight className="h-3 w-3" />
           </Link>
 
@@ -104,11 +104,11 @@ export function MarketingHeader({ authChip }: { authChip?: ReactNode }) {
               ))}
             </nav>
             <Link
-              href="/chat"
+              href="/get-started"
               onClick={() => setMobileOpen(false)}
               className="mt-4 inline-flex h-11 w-full items-center justify-center gap-2 rounded-md bg-primary px-4 text-[14px] font-medium text-primary-foreground shadow-sm"
             >
-              Configure your AssuredAI
+              Get started
               <ArrowRight className="h-3.5 w-3.5" />
             </Link>
           </div>

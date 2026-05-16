@@ -86,12 +86,12 @@ export function Hero({ proofExampleId }: { proofExampleId: number | null }) {
 
             <div className="mt-8 flex flex-wrap items-center gap-3">
               <Link
-                href="/chat"
+                href="/get-started"
                 className="group relative inline-flex h-12 items-center gap-2 overflow-hidden rounded-md bg-foreground px-6 text-[14.5px] font-medium text-background transition-all hover:opacity-90 active:scale-[0.98]"
               >
                 <span className="beam" />
                 <span className="relative z-10 inline-flex items-center gap-2">
-                  Configure your AssuredAI
+                  Get started
                   <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
                 </span>
               </Link>
