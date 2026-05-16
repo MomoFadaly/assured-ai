@@ -1,4 +1,6 @@
+import Link from 'next/link';
 import { formatDistanceToNow } from 'date-fns';
+import { ChevronRight } from 'lucide-react';
 import { listTenants } from '@/lib/tenants';
 import { query } from '@/lib/db/client';
 import { Card, StatTile } from '../_components/Card';
@@ -77,12 +79,13 @@ export default async function TenantsIndex() {
                 <th className="px-3 py-2.5 text-right">Verifications · 7d</th>
                 <th className="px-3 py-2.5">Status</th>
                 <th className="px-5 py-2.5">Created</th>
+                <th className="px-3 py-2.5" />
               </tr>
             </thead>
             <tbody className="divide-y divide-border/60">
               {counts.length === 0 && (
                 <tr>
-                  <td colSpan={8} className="px-5 py-10 text-center text-muted-foreground">
+                  <td colSpan={9} className="px-5 py-10 text-center text-muted-foreground">
                     No tenants — migration 008 didn&rsquo;t run?
                   </td>
                 </tr>
@@ -125,6 +128,15 @@ export default async function TenantsIndex() {
                   </td>
                   <td className="px-5 py-2.5 text-[11.5px] text-muted-foreground">
                     {formatDistanceToNow(new Date(t.created_at), { addSuffix: true })}
+                  </td>
+                  <td className="px-3 py-2.5 text-right">
+                    <Link
+                      href={`/admin/tenants/${t.id}`}
+                      className="inline-flex items-center gap-1 text-[12px] font-medium text-foreground/70 hover:text-foreground"
+                    >
+                      Settings
+                      <ChevronRight className="h-3 w-3" />
+                    </Link>
                   </td>
                 </tr>
               ))}

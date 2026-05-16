@@ -35,6 +35,7 @@ const Body = z
           'kill_switch_disengaged',
           'scan_failed',
           'inbound_lead',
+          'anomaly_detected',
         ]),
       )
       .default([]),

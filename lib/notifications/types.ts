@@ -11,7 +11,8 @@ export type NotificationEventKind =
   | 'kill_switch_engaged'
   | 'kill_switch_disengaged'
   | 'scan_failed'
-  | 'inbound_lead';
+  | 'inbound_lead'
+  | 'anomaly_detected';
 
 export type FindingSeverity = 'low' | 'medium' | 'high' | 'critical';
 
@@ -108,9 +109,20 @@ export interface InboundLeadEvent {
   message_excerpt: string | null;
 }
 
+export interface AnomalyDetectedEvent {
+  kind: 'anomaly_detected';
+  event_key: string; // 'anomaly:<uuid>'
+  anomaly_id: string;
+  anomaly_kind: string;
+  severity: 'info' | 'warning' | 'critical';
+  summary: string;
+  tenant_id: string | null;
+}
+
 export type NotificationEvent =
   | FindingEvent
   | RedFlagEvent
   | KillSwitchEvent
   | ScanFailedEvent
-  | InboundLeadEvent;
+  | InboundLeadEvent
+  | AnomalyDetectedEvent;

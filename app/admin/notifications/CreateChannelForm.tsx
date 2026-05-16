@@ -11,6 +11,7 @@ const EVENTS = [
   { id: 'kill_switch_disengaged', label: 'kill_switch_disengaged' },
   { id: 'scan_failed', label: 'scan_failed (monitor run errored)' },
   { id: 'inbound_lead', label: 'inbound_lead (new demo / sales request from marketing site)' },
+  { id: 'anomaly_detected', label: 'anomaly_detected (red-flag spike, volume drop, PHI storm)' },
 ] as const;
 
 const SEVERITIES = [

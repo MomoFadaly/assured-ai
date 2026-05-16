@@ -19,6 +19,8 @@ import {
   TrendingUp,
   Building2,
   Inbox,
+  ShieldAlert,
+  FileArchive,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -38,6 +40,8 @@ const SECTIONS: Array<{
       { href: '/admin/monitor', label: 'Site monitor', icon: Radar },
       { href: '/admin/notifications', label: 'Notifications', icon: BellRing },
       { href: '/admin/usage', label: 'Usage & cost', icon: TrendingUp },
+      { href: '/admin/anomalies', label: 'Anomalies', icon: ShieldAlert },
+      { href: '/admin/evidence', label: 'SOC 2 evidence', icon: FileArchive },
       { href: '/admin/system', label: 'System', icon: HeartPulse },
       { href: '/admin/activity', label: 'Activity log', icon: History },
       { href: '/admin/settings', label: 'Settings', icon: Settings },

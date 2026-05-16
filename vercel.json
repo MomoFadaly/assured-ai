@@ -10,12 +10,18 @@
     "app/api/audit/[id]/pdf/route.ts": { "maxDuration": 30 },
     "app/api/voice-profiles/[id]/score/route.ts": { "maxDuration": 30 },
     "app/api/admin/monitor/sites/[id]/scan/route.ts": { "maxDuration": 60 },
-    "app/api/cron/monitor/route.ts": { "maxDuration": 60 }
+    "app/api/cron/monitor/route.ts": { "maxDuration": 60 },
+    "app/api/cron/anomaly/route.ts": { "maxDuration": 60 },
+    "app/api/admin/evidence/route.ts": { "maxDuration": 60 }
   },
   "crons": [
     {
       "path": "/api/cron/monitor",
       "schedule": "0 * * * *"
+    },
+    {
+      "path": "/api/cron/anomaly",
+      "schedule": "15 * * * *"
     }
   ]
 }

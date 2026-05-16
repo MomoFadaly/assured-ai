@@ -166,6 +166,10 @@ function headline(e: NotificationEvent): string {
             : '✉ New lead';
       return `${kindLabel}: ${e.name}${e.org ? ' · ' + e.org : ''}`;
     }
+    case 'anomaly_detected': {
+      const icon = e.severity === 'critical' ? '🚨' : e.severity === 'warning' ? '⚠' : 'ℹ';
+      return `${icon} Anomaly detected: ${e.anomaly_kind}`;
+    }
   }
 }
 
@@ -213,6 +217,13 @@ function facts(e: NotificationEvent): Array<{ label: string; value: string }> {
       if (e.message_excerpt) out.push({ label: 'Message', value: e.message_excerpt });
       return out;
     }
+    case 'anomaly_detected':
+      return [
+        { label: 'Kind', value: e.anomaly_kind },
+        { label: 'Severity', value: e.severity },
+        { label: 'Summary', value: e.summary },
+        ...(e.tenant_id ? [{ label: 'Tenant', value: e.tenant_id }] : []),
+      ];
   }
 }
 
@@ -229,6 +240,8 @@ function primaryUrl(e: NotificationEvent): string | null {
       return `${APP_URL}/admin/monitor/${e.site_id}?tab=runs`;
     case 'inbound_lead':
       return `${APP_URL}/admin/leads?focus=${e.lead_id}`;
+    case 'anomaly_detected':
+      return `${APP_URL}/admin/anomalies?focus=${e.anomaly_id}`;
   }
 }
 
