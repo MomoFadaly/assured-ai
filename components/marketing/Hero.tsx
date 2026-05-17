@@ -1,32 +1,28 @@
 import Link from 'next/link';
 import { ArrowRight, Lock, Shield, FileLock2, Scale, FileCheck2, Landmark } from 'lucide-react';
 import { LiveHashChainHero } from './LiveHashChainHero';
-import { HomeVerifierDemo } from './HomeVerifierDemo';
-import { GlowCard } from './GlowCard';
 
 /**
- * Hero — the home-page hero section.
+ * Hero — option B layout, the redesigned home-page hero.
  *
- * Designed as a single composed system:
+ *   The hero contains the headline, the sub-line, and the two CTAs.
+ *   Nothing else. No verifier card, no chips, no chrome — those move
+ *   to their own dedicated section (HomeVerifierSection) below.
  *
- *   1. LiveHashChainHero background: animated pastel mesh gradient +
- *      interactive triangular hash-chain canvas + sonar-pulse layer
- *      (fires on `assured:verify-complete` window event).
+ *   Headline + sub were workshopped through several rounds against
+ *   Halbert / Sugarman / Ogilvy / Schwartz principles. The chosen
+ *   copy is the stakes-ladder voice — Halbert-pure curiosity gap
+ *   in the headline, Sugarman three-beat slippery slide in the sub.
  *
- *   2. Foreground composition:
- *      - Left:  headline ("Audit-grade content. By default."),
- *               one-line sub, two CTAs.
- *      - Right: HomeVerifierDemo wrapped in GlowCard for the pen-#4
- *               glowing-edge effect — dark glass artifact sitting on
- *               the pastel mesh, Apple Vision Pro / Stripe Atlas energy.
+ *   Background is the LiveHashChainHero — pastel mesh gradient PLUS
+ *   the interactive safety-net canvas (rebuilt to actually feel like
+ *   a net: parabolic drape, cursor catches/dips not pushes, woven
+ *   fiber treatment). Performance optimized via 30fps throttle,
+ *   intersection-observer pause, devicePixelRatio cap.
  *
- *   3. Below: white-on-dark trust strip with serif accent, then the
- *      marquee, then the rest of the page in light mode.
- *
- * No editorial "00" line index, no small-caps category labels, no
- * decorative serif italic — those were the tropes that made the prior
- * version read as childish/portfolio-craft. This version is built to
- * read as Stripe/Apple-tier: commanding, professional, clean.
+ *   The trust strip moves OUT of the hero into its own white-on-dark
+ *   section below — so the hero is just type on light, and the
+ *   trust strip becomes its own dramatic dark moment.
  */
 
 export function Hero({ proofExampleId }: { proofExampleId: number | null }) {
@@ -36,62 +32,51 @@ export function Hero({ proofExampleId }: { proofExampleId: number | null }) {
         id="hero"
         className="relative isolate overflow-hidden"
       >
-        {/* Background system — three composited layers */}
+        {/* Pastel mesh + safety-net canvas. No verifier card on top. */}
         <LiveHashChainHero />
 
-        <div className="relative mx-auto max-w-[1320px] px-5 pb-20 pt-20 sm:pt-28">
-          <div className="grid items-center gap-16 lg:grid-cols-[1.05fr_1fr] lg:gap-12">
-            {/* LEFT: headline + sub + CTAs */}
-            <div>
-              <h1
-                className="reveal-up text-balance font-semibold tracking-[-0.035em] leading-[0.96] text-[60px] sm:text-[80px] md:text-[92px] lg:text-[104px]"
-              >
-                Audit-grade content.{' '}
-                <span className="text-foreground/55">By default.</span>
-              </h1>
+        <div className="relative mx-auto max-w-[1100px] px-5 pt-24 pb-28 sm:pt-32 sm:pb-36">
+          {/* The headline lives by itself. No kicker, no superhead, no
+              eyebrow. The point IS the headline.
+              "One bad sentence is all it takes." */}
+          <h1 className="reveal-up text-balance font-semibold leading-[0.94] tracking-[-0.038em] text-[56px] sm:text-[80px] md:text-[100px] lg:text-[116px]">
+            One bad sentence is all it takes.
+          </h1>
 
-              <p
-                className="reveal-up mt-7 max-w-[560px] text-[19px] leading-[1.5] tracking-tight text-foreground/75 sm:text-[20px]"
-                style={{ animationDelay: '80ms' }}
-              >
-                Fact-checked. Redacted. Hash-chained. Public proof on every piece your team
-                ships.
-              </p>
+          {/* Sub uses Halbert's stakes ladder: three short beats
+              (asyndeton) building dread, then the solution arrives
+              with mechanism. The em-dash + verb list at the end is
+              the Sugarman slippery-slide rhythm. */}
+          <p
+            className="reveal-up mt-8 max-w-[820px] text-[19px] leading-[1.55] tracking-tight text-foreground/75 sm:text-[22px] sm:leading-[1.5]"
+            style={{ animationDelay: '80ms' }}
+          >
+            A lawsuit. A regulator letter. A CNN headline that follows your brand for ten years.
+            AssuredAI catches the sentence before it ships — verified, redacted,
+            disclaimer-injected, hash-chained. Public proof URL on every piece your team
+            publishes.
+          </p>
 
-              <div
-                className="reveal-up mt-10 flex flex-wrap items-center gap-3"
-                style={{ animationDelay: '160ms' }}
+          <div
+            className="reveal-up mt-12 flex flex-wrap items-center gap-3"
+            style={{ animationDelay: '160ms' }}
+          >
+            <Link
+              href="/get-started"
+              className="group inline-flex h-12 items-center gap-2 rounded-full bg-foreground px-7 text-[14.5px] font-medium text-background transition-all hover:opacity-90 active:scale-[0.98]"
+            >
+              Verify your content
+              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+            </Link>
+            {proofExampleId !== null ? (
+              <Link
+                href={`/v/${proofExampleId}`}
+                className="inline-flex h-12 items-center gap-2 rounded-full border border-foreground/15 bg-background/60 px-6 text-[14.5px] font-medium backdrop-blur transition-colors hover:bg-background"
               >
-                <Link
-                  href="/get-started"
-                  className="group inline-flex h-12 items-center gap-2 rounded-full bg-foreground px-6 text-[14.5px] font-medium text-background transition-all hover:opacity-90 active:scale-[0.98]"
-                >
-                  Verify your content
-                  <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
-                </Link>
-                {proofExampleId !== null ? (
-                  <Link
-                    href={`/v/${proofExampleId}`}
-                    className="inline-flex h-12 items-center gap-2 rounded-full border border-foreground/20 bg-background/60 px-6 text-[14.5px] font-medium backdrop-blur hover:bg-background"
-                  >
-                    <Lock className="h-4 w-4" />
-                    See a live proof
-                  </Link>
-                ) : null}
-              </div>
-            </div>
-
-            {/* RIGHT: verifier card on the pastel mesh, wrapped with the
-                pen-#4 glowing-edge effect. Sits at full opacity on top
-                of the background — premium artifact. */}
-            <div className="reveal-up" style={{ animationDelay: '220ms' }}>
-              <GlowCard
-                className="rounded-2xl"
-                glowColor="220deg 95% 78%"
-              >
-                <HomeVerifierDemo />
-              </GlowCard>
-            </div>
+                <Lock className="h-4 w-4" />
+                See a live proof
+              </Link>
+            ) : null}
           </div>
         </div>
       </section>
@@ -116,8 +101,7 @@ export function Hero({ proofExampleId }: { proofExampleId: number | null }) {
         </div>
       </section>
 
-      {/* Marquee — kept from the prior version, complements the
-          new hero structure. */}
+      {/* Marquee */}
       <div className="relative border-b border-foreground/10 bg-foreground py-6 text-background overflow-hidden">
         <div className="flex whitespace-nowrap animate-marquee gap-12 will-change-transform">
           {Array.from({ length: 2 }).map((_, k) => (
