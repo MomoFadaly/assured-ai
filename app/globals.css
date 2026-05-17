@@ -205,6 +205,146 @@
     animation: aurora 22s ease-in-out infinite;
   }
 
+  /* mesh-aurora-bg — the new home-hero pastel mesh.
+     Multi-radial-gradient with soft peach/pink/lilac/blue/mint hues,
+     200%×200% so it can drift slowly via background-position animation.
+     Designed to read as "Apple keynote / Stripe homepage / Yuujin mesh
+     gradient codepen" — sophisticated, premium, never childish. */
+  @keyframes mesh-aurora-drift {
+    0%   { background-position:  0%  0%, 100% 100%,  50%  50%, 100%   0%,  0% 100%; }
+    50%  { background-position:100% 50%,   0%  50%,   0%   0%,  50% 100%, 50%   0%; }
+    100% { background-position:  0%  0%, 100% 100%,  50%  50%, 100%   0%,  0% 100%; }
+  }
+  .mesh-aurora-bg {
+    background-color: #f7f4ff;
+    background-image:
+      radial-gradient(circle at 18% 28%, hsla(282, 92%, 88%, 0.72) 0, transparent 48%),
+      radial-gradient(circle at 78% 22%, hsla(32, 100%, 86%, 0.66) 0, transparent 50%),
+      radial-gradient(circle at 88% 72%, hsla(195, 92%, 86%, 0.62) 0, transparent 50%),
+      radial-gradient(circle at 12% 80%, hsla(150, 84%, 88%, 0.55) 0, transparent 48%),
+      radial-gradient(circle at 52% 48%, hsla(335, 100%, 91%, 0.50) 0, transparent 55%);
+    background-size: 200% 200%, 220% 220%, 180% 180%, 240% 240%, 200% 200%;
+    background-repeat: no-repeat;
+    animation: mesh-aurora-drift 40s ease-in-out infinite;
+    will-change: background-position;
+  }
+
+  /* glow-card — pen #4 (simeydotme "Colored, Glowing Edge Card") technique.
+     A dark glass card whose border + edge-glow brightens as the cursor
+     approaches the perimeter, and concentrates around the angle from
+     center to pointer via a conic-gradient mask. Used on the home-page
+     verifier so it reads as a premium artifact sitting on the pastel
+     hero background — Apple Vision Pro / Stripe Atlas energy.
+
+     CSS custom properties (set by GlowCard wrapper component on
+     pointermove): --pointer-x, --pointer-y, --pointer-° (angle 0-360),
+     --pointer-d (distance to edge 0-100). All four default to safe
+     idle values so the card renders before the first pointermove. */
+  .glow-card {
+    --glow-sens: 30;
+    --color-sens: 50;
+    --glow-color: 220deg 95% 78%;
+    --glow-boost: 5%;
+    --pointer-x: 50%;
+    --pointer-y: 50%;
+    --pointer-\°: 45deg;
+    --pointer-d: 0;
+    --glow-blend: plus-lighter;
+    --edge-blend: soft-light;
+    position: relative;
+    isolation: isolate;
+    transform: translate3d(0, 0, 0.01px);
+  }
+  .glow-card::before,
+  .glow-card::after,
+  .glow-card > .glow-card-edge {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    transition: opacity 0.3s ease-out;
+    z-index: -1;
+    pointer-events: none;
+  }
+  .glow-card:not(:hover):not(.glow-card-active) {
+    &::before,
+    &::after,
+    & > .glow-card-edge {
+      opacity: 0;
+      transition: opacity 0.75s ease-in-out;
+    }
+  }
+  .glow-card::before {
+    /* Mesh-gradient BORDER masked to a conic arc from pointer angle. */
+    border: 1px solid transparent;
+    background:
+      linear-gradient(rgb(255 255 255 / 0%) 0% 100%) border-box,
+      radial-gradient(at 80% 55%, hsla(268, 100%, 76%, 1) 0px, transparent 50%) border-box,
+      radial-gradient(at 69% 34%, hsla(349, 100%, 74%, 1) 0px, transparent 50%) border-box,
+      radial-gradient(at 8% 6%, hsla(136, 100%, 78%, 1) 0px, transparent 50%) border-box,
+      radial-gradient(at 41% 38%, hsla(192, 100%, 64%, 1) 0px, transparent 50%) border-box,
+      radial-gradient(at 86% 85%, hsla(186, 100%, 74%, 1) 0px, transparent 50%) border-box,
+      radial-gradient(at 82% 18%, hsla(52, 100%, 65%, 1) 0px, transparent 50%) border-box,
+      radial-gradient(at 51% 4%, hsla(12, 100%, 72%, 1) 0px, transparent 50%) border-box,
+      linear-gradient(#c299ff 0 100%) border-box;
+    opacity: calc((var(--pointer-d) - var(--color-sens)) / (100 - var(--color-sens)));
+    -webkit-mask-image: conic-gradient(
+      from var(--pointer-\°) at center,
+      black 25%,
+      transparent 40%,
+      transparent 60%,
+      black 75%
+    );
+    mask-image: conic-gradient(
+      from var(--pointer-\°) at center,
+      black 25%,
+      transparent 40%,
+      transparent 60%,
+      black 75%
+    );
+  }
+  .glow-card > .glow-card-edge {
+    --outset: 32px;
+    inset: calc(var(--outset) * -1);
+    z-index: 1;
+    mix-blend-mode: var(--glow-blend);
+    -webkit-mask-image: conic-gradient(
+      from var(--pointer-\°) at center,
+      black 2.5%,
+      transparent 10%,
+      transparent 90%,
+      black 97.5%
+    );
+    mask-image: conic-gradient(
+      from var(--pointer-\°) at center,
+      black 2.5%,
+      transparent 10%,
+      transparent 90%,
+      black 97.5%
+    );
+    opacity: calc((var(--pointer-d) - var(--glow-sens)) / (100 - var(--glow-sens)));
+  }
+  .glow-card > .glow-card-edge::before {
+    content: '';
+    position: absolute;
+    inset: var(--outset);
+    border-radius: inherit;
+    box-shadow:
+      inset 0 0 0 1px hsl(var(--glow-color) / 100%),
+      inset 0 0 1px 0 hsl(var(--glow-color) / calc(var(--glow-boost) + 60%)),
+      inset 0 0 3px 0 hsl(var(--glow-color) / calc(var(--glow-boost) + 50%)),
+      inset 0 0 6px 0 hsl(var(--glow-color) / calc(var(--glow-boost) + 40%)),
+      inset 0 0 15px 0 hsl(var(--glow-color) / calc(var(--glow-boost) + 30%)),
+      inset 0 0 25px 2px hsl(var(--glow-color) / calc(var(--glow-boost) + 20%)),
+      inset 0 0 50px 2px hsl(var(--glow-color) / calc(var(--glow-boost) + 10%)),
+      0 0 1px 0 hsl(var(--glow-color) / calc(var(--glow-boost) + 60%)),
+      0 0 3px 0 hsl(var(--glow-color) / calc(var(--glow-boost) + 50%)),
+      0 0 6px 0 hsl(var(--glow-color) / calc(var(--glow-boost) + 40%)),
+      0 0 15px 0 hsl(var(--glow-color) / calc(var(--glow-boost) + 30%)),
+      0 0 25px 2px hsl(var(--glow-color) / calc(var(--glow-boost) + 20%)),
+      0 0 50px 2px hsl(var(--glow-color) / calc(var(--glow-boost) + 10%));
+  }
+
   /* Frosted glass surface (Stripe-style) */
   .glass {
     background: hsl(var(--card) / 0.55);

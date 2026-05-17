@@ -358,6 +358,26 @@ export function HomeVerifierDemo() {
       // immediately when verification completes.
       setResult(r);
       setIsStreaming(false);
+      // Fire a sonar pulse from the card's center on the hero background
+      // — LiveHashChainHero listens for this and emanates an expanding
+      // ring through the chain mesh. Coordinates are in viewport space.
+      try {
+        const cardRect = document
+          .querySelector('.glow-card')
+          ?.getBoundingClientRect();
+        if (cardRect) {
+          window.dispatchEvent(
+            new CustomEvent('assured:verify-complete', {
+              detail: {
+                x: cardRect.left + cardRect.width / 2,
+                y: cardRect.top + cardRect.height / 2,
+              },
+            }),
+          );
+        }
+      } catch {
+        /* dispatch failure is non-fatal — verify still completes */
+      }
       return;
     }
 
@@ -396,39 +416,31 @@ export function HomeVerifierDemo() {
 
   return (
     <div className="relative">
-      {/* Halo glow */}
-      <div
-        className="pointer-events-none absolute -inset-6 -z-10 rounded-[32px] bg-gradient-to-br from-primary/18 to-emerald-500/8 blur-2xl"
-        aria-hidden
-      />
-      <div className="relative overflow-hidden rounded-2xl border border-border bg-card shadow-2xl shadow-foreground/15 ring-1 ring-foreground/5">
-        {/* Window chrome */}
-        <div className="flex items-center gap-2 border-b border-border bg-muted/30 px-3 py-2.5">
-          <div className="flex gap-1.5">
-            <span className="size-2.5 rounded-full bg-red-400/80" />
-            <span className="size-2.5 rounded-full bg-amber-400/80" />
-            <span className="size-2.5 rounded-full bg-emerald-400/80" />
-          </div>
-          <div className="ml-2 inline-flex items-center gap-1.5 rounded-md border border-border/60 bg-background px-2 py-0.5 text-[10.5px] text-muted-foreground">
-            <Lock className="h-2.5 w-2.5" />
+      <div className="relative overflow-hidden rounded-2xl border border-white/[0.08] bg-[#06101c] text-white shadow-[0_30px_80px_-20px_rgba(0,0,0,0.45)]">
+        {/* Top strip — no more Mac browser dots. Just the proof URL
+            preview + a live status pip. Reads as an audit terminal
+            window rather than a "look here's a demo" mockup. */}
+        <div className="flex items-center justify-between gap-3 border-b border-white/[0.06] px-5 py-3">
+          <div className="inline-flex items-center gap-2 font-mono text-[10.5px] text-white/55">
+            <Lock className="h-3 w-3" />
             assuredai.online/v/
-            <span className="font-mono">{result?.audit_log_id ?? '<id>'}</span>
+            <span className="text-white/85">{result?.audit_log_id ?? '<id>'}</span>
           </div>
-          <div className="ml-auto inline-flex items-center gap-1.5 text-[10.5px] text-muted-foreground">
+          <div className="inline-flex items-center gap-1.5 text-[10.5px] uppercase tracking-[0.16em] text-white/55">
             <span
               className={`size-1.5 rounded-full ${
                 phase === 'running'
-                  ? 'bg-amber-500 animate-pulse'
+                  ? 'bg-amber-400 animate-pulse'
                   : phase === 'result'
                     ? verdictTone?.tone === 'block'
-                      ? 'bg-red-500'
-                      : 'bg-emerald-500'
-                    : 'bg-emerald-500 animate-pulse-soft'
+                      ? 'bg-red-400'
+                      : 'bg-emerald-400'
+                    : 'bg-emerald-400'
               }`}
             />
             <span>
               {phase === 'running'
-                ? 'Streaming verification…'
+                ? 'Streaming'
                 : phase === 'result'
                   ? verdictTone?.label ?? 'Verified'
                   : 'Live'}
@@ -489,7 +501,7 @@ export function HomeVerifierDemo() {
                 <button
                   type="button"
                   onClick={handleReset}
-                  className="mt-3 inline-flex w-full items-center justify-center gap-1.5 rounded-md border border-border bg-card px-3 py-2 text-[12.5px] font-medium hover:bg-accent"
+                  className="mt-3 inline-flex w-full items-center justify-center gap-1.5 rounded-md border border-white/10 bg-white/[0.04] px-3 py-2 text-[12.5px] font-medium hover:bg-white/[0.08]"
                 >
                   Try again
                 </button>
@@ -498,15 +510,15 @@ export function HomeVerifierDemo() {
           </div>
         </div>
 
-        {/* Footer link to full wizard */}
-        <div className="flex items-center justify-between gap-2 border-t border-border bg-muted/15 px-4 py-2.5 text-[11px]">
-          <div className="inline-flex items-center gap-1.5 text-muted-foreground">
+        {/* Footer link to full wizard — dark-glass treatment */}
+        <div className="flex items-center justify-between gap-2 border-t border-white/[0.06] bg-white/[0.02] px-4 py-2.5 text-[11px]">
+          <div className="inline-flex items-center gap-1.5 text-white/55">
             <Sparkles className="h-3 w-3" />
             Same pipeline · real audit chain
           </div>
           <Link
             href="/get-started"
-            className="inline-flex items-center gap-1 font-semibold text-foreground/80 hover:text-foreground"
+            className="inline-flex items-center gap-1 font-semibold text-white/75 hover:text-white"
           >
             Configure your own sandbox
             <ArrowRight className="h-3 w-3" />
@@ -546,45 +558,41 @@ function ComposePane({
 }) {
   const tooShort = text.trim().length > 0 && text.trim().length < 80;
   return (
-    <div className="px-5 pt-5 pb-4">
-      <div className="mb-2.5 flex items-center justify-between">
-        <div className="text-[10.5px] font-semibold uppercase tracking-[0.18em] text-foreground/65">
-          Paste or pick a sample · verify in 6 seconds
-        </div>
-        <IndustryPill
-          industry={industry}
-          setIndustry={setIndustry}
-          detected={industryDetected}
+    <div className="px-5 pt-5 pb-5">
+      {/* Code-editor-like textarea: monospace, minimum chrome, sits on
+          the dark card surface. No tracking-caps header above — the
+          placeholder explains what to do. Detected industry shows as
+          a small inline tag at top-right, not a dropdown that looks
+          like a form field. */}
+      <div className="relative">
+        <textarea
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          placeholder="Paste any draft — patient handout, fund factsheet, citizen guidance, case summary, press release — or pick a sample below."
+          className="block h-[140px] w-full resize-y rounded-lg border border-white/[0.08] bg-white/[0.03] px-4 py-3 font-mono text-[12.5px] leading-[1.55] text-white placeholder:text-white/35 focus:border-white/20 focus:outline-none focus:ring-2 focus:ring-white/10 sm:h-[180px]"
+          spellCheck={false}
         />
+        <div className="pointer-events-none absolute right-3 top-3">
+          <IndustryPill
+            industry={industry}
+            setIndustry={setIndustry}
+            detected={industryDetected}
+          />
+        </div>
+      </div>
+      <div className="mt-2 flex items-center justify-between text-[10.5px] text-white/45 font-mono">
+        <span className={tooShort || text.length > 7600 ? 'text-amber-300' : ''}>
+          {text.length.toLocaleString()} / 8,000
+          {tooShort ? ' · need 80+' : ''}
+        </span>
+        <span>{picked ? `Loaded: ${picked.label}` : 'Or paste your own'}</span>
       </div>
 
-      <textarea
-        value={text}
-        onChange={(e) => setText(e.target.value)}
-        placeholder="Paste an article, patient handout, fund factsheet, citizen guidance, case summary — anything you'd publish externally. Or pick a sample below to start fast."
-        className="block h-[120px] w-full resize-y rounded-md border border-border bg-background px-3 py-2.5 text-[12.5px] leading-relaxed text-foreground placeholder:text-muted-foreground/70 focus:outline-none focus:ring-2 focus:ring-primary/30 sm:h-[160px]"
-        spellCheck={false}
-      />
-      <div className="mt-1 flex items-center justify-between text-[10.5px] text-muted-foreground">
-        <span
-          className={
-            tooShort
-              ? 'text-amber-600'
-              : text.length > 7600
-                ? 'text-amber-600'
-                : 'text-muted-foreground'
-          }
-        >
-          {text.length.toLocaleString()} / 8,000 chars
-          {tooShort ? ' · need at least 80' : ''}
-        </span>
-        <span className="text-muted-foreground/70">
-          {picked ? `Sample loaded: ${picked.label}` : 'Or paste your own'}
-        </span>
-      </div>
-
-      {/* Sample chips — one per vertical. */}
-      <div className="mt-3 grid grid-cols-1 gap-1.5 sm:grid-cols-2">
+      {/* Sample chips — compact single-line horizontal row directly
+          under the textarea. No card-grid, no sub-labels, no large
+          icon-backgrounds. Each chip is a tight pill with icon + label
+          only — visitors see what's available at a glance. */}
+      <div className="mt-3 flex flex-wrap gap-1.5">
         {samples.map((s) => {
           const Icon = ICON_BY_NAME[s.icon];
           const selected = picked?.id === s.id;
@@ -593,29 +601,20 @@ function ComposePane({
               type="button"
               key={s.id}
               onClick={() => onPickSample(s)}
-              className="group flex items-start gap-2.5 rounded-md border bg-card px-2.5 py-2 text-left transition-all hover:bg-accent/30"
+              className="group inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-medium transition-all"
               style={{
-                borderColor: selected ? s.accent : 'hsl(var(--border))',
-                backgroundColor: selected ? `${s.accent}10` : undefined,
+                borderColor: selected ? s.accent : 'rgba(255,255,255,0.10)',
+                backgroundColor: selected ? `${s.accent}1f` : 'rgba(255,255,255,0.03)',
+                color: selected ? '#fff' : 'rgba(255,255,255,0.75)',
               }}
+              title={s.sub}
             >
-              <span
-                className="mt-0.5 flex size-7 shrink-0 items-center justify-center rounded text-foreground/70 ring-1 ring-foreground/10 transition-colors"
-                style={{
-                  backgroundColor: selected ? `${s.accent}20` : 'hsl(var(--foreground) / 0.04)',
-                  color: selected ? s.accent : undefined,
-                }}
-              >
-                <Icon className="h-3.5 w-3.5" strokeWidth={1.75} />
-              </span>
-              <span className="min-w-0">
-                <span className="block truncate text-[12px] font-semibold tracking-tight">
-                  {s.label}
-                </span>
-                <span className="mt-0.5 block truncate text-[10.5px] text-muted-foreground">
-                  {s.sub}
-                </span>
-              </span>
+              <Icon
+                className="h-3 w-3"
+                strokeWidth={1.75}
+                style={{ color: selected ? s.accent : 'rgba(255,255,255,0.55)' }}
+              />
+              {s.label}
             </button>
           );
         })}
@@ -625,14 +624,14 @@ function ComposePane({
         type="button"
         onClick={onVerify}
         disabled={text.trim().length < 80}
-        className="group mt-4 inline-flex h-11 w-full items-center justify-center gap-2 rounded-md text-[13.5px] font-semibold text-white transition-opacity disabled:cursor-not-allowed disabled:opacity-50"
+        className="group mt-5 inline-flex h-11 w-full items-center justify-center gap-2 rounded-lg text-[13.5px] font-semibold text-white shadow-[0_8px_24px_-8px_rgba(13,148,136,0.55)] transition-all hover:brightness-110 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-40 disabled:shadow-none"
         style={{ backgroundColor: accent }}
       >
         <PlayCircle className="h-4 w-4" />
-        Verify content · live pipeline
+        Verify content
       </button>
-      <p className="mt-2 text-center text-[10.5px] text-muted-foreground">
-        Real pipeline · real audit row · real public /v/&lt;id&gt; URL · no signup
+      <p className="mt-2.5 text-center text-[10.5px] text-white/45">
+        Real pipeline · real audit row · real /v/&lt;id&gt; URL · no signup
       </p>
     </div>
   );
@@ -668,22 +667,20 @@ function IndustryPill({
   if (detected?.primary && detected.confidence === 'low' && detected.alternate && detected.scores) {
     const top2 = detected.scores.filter((s) => s.percent > 0).slice(0, 2);
     return (
-      <div className="inline-flex items-center gap-1">
-        <span className="hidden text-[9.5px] uppercase tracking-[0.14em] text-amber-600 sm:inline">
-          ambiguous · pick
-        </span>
+      <div className="pointer-events-auto inline-flex items-center gap-1">
         {top2.map((s) => (
           <button
             key={s.industry}
             type="button"
             onClick={() => setIndustry(s.industry)}
-            className="inline-flex items-center gap-1 rounded-md border px-1.5 py-1 text-[10.5px] font-medium"
+            className="inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-medium font-mono"
             style={{
-              borderColor: s.industry === industry ? '#0d9488' : 'hsl(var(--border))',
-              backgroundColor: s.industry === industry ? 'rgba(13,148,136,0.08)' : 'transparent',
+              borderColor: s.industry === industry ? '#7dd3fc' : 'rgba(255,255,255,0.10)',
+              backgroundColor: s.industry === industry ? 'rgba(125,211,252,0.10)' : 'rgba(255,255,255,0.04)',
+              color: s.industry === industry ? '#bae6fd' : 'rgba(255,255,255,0.7)',
             }}
           >
-            {INDUSTRY_LABEL[s.industry]} · {s.percent}%
+            {INDUSTRY_LABEL[s.industry]} {s.percent}%
           </button>
         ))}
       </div>
@@ -691,22 +688,22 @@ function IndustryPill({
   }
 
   return (
-    <div className="inline-flex items-center gap-1.5">
+    <div className="pointer-events-auto inline-flex items-center gap-1.5">
       {detected?.primary && detected.confidence !== 'low' && detected.primary === industry && (
-        <span className="text-[9.5px] uppercase tracking-[0.14em] text-emerald-600">
-          auto-detected
+        <span className="rounded-full bg-emerald-400/15 px-1.5 py-px text-[8.5px] font-medium uppercase tracking-[0.12em] text-emerald-300 ring-1 ring-emerald-400/30">
+          auto
         </span>
       )}
-      <label className="inline-flex items-center gap-1.5 rounded-md border border-border bg-background px-2 py-1 text-[10.5px] font-medium text-foreground/85">
+      <label className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.04] px-2 py-0.5 text-[10.5px] font-medium font-mono text-white/80">
         <Icon className="h-3 w-3" strokeWidth={1.75} />
         <select
           value={industry}
           onChange={(e) => setIndustry(e.target.value as IndustrySlug)}
-          className="border-none bg-transparent text-[10.5px] font-medium focus:outline-none"
+          className="border-none bg-transparent text-[10.5px] font-medium font-mono text-white/80 focus:outline-none [&>option]:bg-[#06101c] [&>option]:text-white"
           aria-label="Pack"
         >
           <option value="healthcare">Healthcare</option>
-          <option value="finance">Financial services</option>
+          <option value="finance">Finance</option>
           <option value="government">Government</option>
           <option value="legal">Legal</option>
         </select>
@@ -747,7 +744,7 @@ function RunningPane({
           Live verification · streaming
         </div>
         {packContext && (
-          <div className="text-[10px] text-muted-foreground">
+          <div className="text-[10px] text-white/55">
             {packContext.compliance_framework}
           </div>
         )}
@@ -890,9 +887,9 @@ function ResultPane({
             {result.verified_paragraphs.map((p, idx) => (
               <div
                 key={idx}
-                className="rounded-md border border-border/60 bg-background/60 px-2.5 py-2"
+                className="rounded-md border border-white/[0.06] bg-white/[0.03] px-2.5 py-2"
               >
-                <div className="text-[11.5px] leading-relaxed text-foreground/85">
+                <div className="text-[11.5px] leading-relaxed text-white/85">
                   {renderParagraphWithRedactionChips(p.text)}
                 </div>
                 <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
@@ -938,12 +935,12 @@ function ResultPane({
                     href={c.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="font-medium text-foreground hover:underline"
+                    className="font-medium text-white hover:underline"
                   >
                     {c.title}
                   </a>
                   {c.organization && (
-                    <span className="ml-1 text-muted-foreground">· {c.organization}</span>
+                    <span className="ml-1 text-white/55">· {c.organization}</span>
                   )}
                 </div>
               </li>
@@ -958,7 +955,7 @@ function ResultPane({
           title={`Paragraph support · ${result.paragraphs.supported}/${result.paragraphs.total} sourced`}
           tone={result.paragraphs.unsourced > 0 ? 'warn' : 'pass'}
         >
-          <div className="text-[11.5px] text-muted-foreground">
+          <div className="text-[11.5px] text-white/55">
             {result.paragraphs.unsourced > 0
               ? `${result.paragraphs.unsourced} paragraph${result.paragraphs.unsourced === 1 ? '' : 's'} not matched to a seeded source — flagged for editor review.`
               : `Every paragraph was matched to at least one seeded source.`}
@@ -972,7 +969,7 @@ function ResultPane({
           title={`PII / PHI redacted · ${result.pii.input_count} input · ${result.pii.output_count} output`}
           tone="warn"
         >
-          <div className="text-[11.5px] text-muted-foreground">
+          <div className="text-[11.5px] text-white/55">
             {result.pii.input_count > 0
               ? `${result.pii.input_count} sensitive entit${result.pii.input_count === 1 ? 'y' : 'ies'} found in input and redacted before fact-checking. `
               : ''}
@@ -997,7 +994,7 @@ function ResultPane({
             result.disclaimer.injected ? 'warn' : result.disclaimer.was_present ? 'pass' : 'warn'
           }
         >
-          <div className="text-[11.5px] text-muted-foreground">
+          <div className="text-[11.5px] text-white/55">
             {packContext?.pack_name ?? 'This pack'} requires a disclaimer for publishable content.
             {result.disclaimer.injected
               ? ' The canonical disclaimer was added to the working draft.'
@@ -1011,7 +1008,7 @@ function ResultPane({
       {/* Warnings (if any) */}
       {result.warnings && result.warnings.length > 0 && (
         <Panel title="Editorial warnings" tone="warn">
-          <ul className="space-y-1 text-[11.5px] text-muted-foreground">
+          <ul className="space-y-1 text-[11.5px] text-white/55">
             {result.warnings.map((w) => (
               <li key={w}>· {w}</li>
             ))}
@@ -1021,7 +1018,7 @@ function ResultPane({
 
       {/* Proof URL + CTAs */}
       {result.proof_url && (
-        <div className="mt-3 rounded-md border border-border bg-muted/20 px-2.5 py-2 font-mono text-[10.5px] text-foreground/85 break-all">
+        <div className="mt-3 rounded-md border border-white/[0.08] bg-white/[0.03] px-2.5 py-2 font-mono text-[10.5px] text-white/85 break-all">
           {result.proof_url}
         </div>
       )}
@@ -1029,7 +1026,7 @@ function ResultPane({
         <button
           type="button"
           onClick={onCopy}
-          className="inline-flex h-9 items-center justify-center gap-1.5 rounded-md border border-border bg-card px-3 text-[11.5px] font-medium hover:bg-accent"
+          className="inline-flex h-9 items-center justify-center gap-1.5 rounded-md border border-white/10 bg-white/[0.04] px-3 text-[11.5px] font-medium hover:bg-white/[0.08]"
           disabled={!result.proof_url}
         >
           {copied ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
@@ -1050,7 +1047,7 @@ function ResultPane({
       <button
         type="button"
         onClick={onReset}
-        className="mt-2 inline-flex w-full items-center justify-center gap-1.5 text-[11px] text-muted-foreground hover:text-foreground"
+        className="mt-2 inline-flex w-full items-center justify-center gap-1.5 text-[11px] text-white/55 hover:text-foreground"
       >
         <RefreshCw className="h-3 w-3" />
         Verify another piece
@@ -1068,9 +1065,11 @@ function Panel({
   tone: 'pass' | 'warn' | 'block';
   children: React.ReactNode;
 }) {
-  const accent = tone === 'pass' ? '#0d9488' : tone === 'warn' ? '#b45309' : '#dc2626';
+  // Tones tuned for the dark-glass card surface — saturated chip
+  // backgrounds with proper contrast on #06101c.
+  const accent = tone === 'pass' ? '#5eead4' : tone === 'warn' ? '#fcd34d' : '#fca5a5';
   return (
-    <div className="mt-3 rounded-md border border-border bg-card/60 p-2.5">
+    <div className="mt-3 rounded-md border border-white/[0.06] bg-white/[0.02] p-2.5">
       <div
         className="mb-1.5 text-[10px] font-semibold uppercase tracking-[0.12em]"
         style={{ color: accent }}

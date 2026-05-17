@@ -8,6 +8,7 @@
 
 ## TABLE OF CONTENTS
 
+0. [**The Strategic Reframe — AI as Engine, Not Subject**](#part-0)
 1. [Executive Intelligence — The 10 Headlines](#part-1)
 2. [Market Structure & Consolidation Map](#part-2)
 3. [Per-Vendor Dossiers (by tier)](#part-3)
@@ -16,6 +17,75 @@
 6. [Wedges & Defensible Moats](#part-6)
 7. [Strategic Recommendations](#part-7)
 8. [Watchlist & Open Questions](#part-8)
+
+---
+
+<a id="part-0"></a>
+## PART 0 — THE STRATEGIC REFRAME: AI AS ENGINE, NOT SUBJECT
+
+> **The single most important lens through which every other section of this dossier should be read.**
+
+### The reframe in one sentence
+
+**AssuredAI uses AI to verify every paragraph you publish — your writing, your AI's, anyone's — against the sources you trust. With proof.**
+
+The AI is the **engine** (how verification happens). The content (any content) is the **subject**. Every named competitor in this dossier is locked into a narrower combination of those two axes.
+
+### The AI-verb matrix
+
+What each vendor's AI actually *does*:
+
+| Vendor | What their AI does (the verb) | What they verify (the subject) | Cryptographic public proof |
+|---|---|---|---|
+| Writer.com | **Generates** content | Their own Palmyra outputs | No |
+| Veeva PromoMats | **Reviews workflow** + recent AI Agents | Pharma promo materials only | No |
+| Patronus AI | **Evaluates** LLM behavior in dev/staging | Model outputs in test harnesses | No |
+| Galileo / Arize | **Observes** LLM traces in production | LLM agent runs | No |
+| Vectara | **Retrieves** grounded answers (RAG) | The agent's own retrieved context | No |
+| Lakera (Check Point) | **Filters** runtime input/output | Live prompt streams | No |
+| Prompt Security (SentinelOne) | **Blocks** PII exfiltration / shadow AI | Employee AI usage | No |
+| Grammarly / Superhuman | **Suggests** writing improvements | Anything typed in their editor | No |
+| Acrolinx / Markup AI | **Checks** brand/terminology drift | Enterprise marketing content | No |
+| AWS Bedrock Guardrails | **Filters** Bedrock model I/O | Bedrock model outputs | No |
+| John Snow Labs | **Extracts** medical entities + Pythia triplet contradictions | Clinical/pharma R&D documents | No |
+| Limina (ex-Private AI) | **Redacts** PII/PHI | Free-text data for ML pipelines | No |
+| Manual editorial review | Humans verify | Anything they publish | No |
+| **AssuredAI** | **Verifies published content** against trusted sources | **AI-generated, human-written, or mixed** | **YES — public `/p/[hash]` URLs** |
+
+That last row is the only sentence on the table that's actually true today. No competitor combines (a) AI-as-verification-engine + (b) source-agnostic input + (c) cryptographic public proof.
+
+### Why this reframe expands the addressable market 10×
+
+The old framing ("AI-content compliance verifier") was ambiguous and self-limiting:
+
+| Reading | Meaning | TAM |
+|---|---|---|
+| "**AI content** compliance" | We verify content that is AI-generated | ~$500M–$2B |
+| AI-powered "**content compliance**" | We use AI to verify any content | $20B+ |
+
+This dossier was written under the first reading. **All competitive comparisons below should be re-read through the second.** When you do, AssuredAI exits the AI-safety arms race (where Writer.com, Patronus, Galileo, Lakera, AWS, OpenAI all live) and enters a much weaker category — verification infrastructure — where the comparison set is largely manual editorial workflows and pre-GenAI compliance tools.
+
+### Why the AI engine *strengthens* the positioning vs. dropping it
+
+Three things AI does inside the AssuredAI engine that no manual workflow can match:
+
+1. **Deep contextual inspection** — LLM judges read each paragraph the way a clinical reviewer would, not the way a regex would. Context-sensitive judgment at machine scale.
+2. **RAG against references at vector-similarity granularity** — Voyage embeddings + pgvector cosine search find supporting and contradicting evidence across thousands of source chunks in milliseconds. A human reviewer reads 5–10 sources per article; AssuredAI reads thousands per paragraph.
+3. **Adaptive verification policy** — packs are AI-tunable. As source libraries grow and regulatory patterns shift, the AI re-weights, re-prompts, re-embeds without code changes.
+
+The AI is what makes "verify every paragraph against every relevant source in under 30 seconds with cryptographic proof" possible. **Drop the AI and you have Acrolinx — slow, brand-only, no factual ground truth. Keep the AI and you have a category no one else can ship.**
+
+### The verb reframe applied to every comparison in this dossier
+
+When reading any competitor section below, ask:
+
+1. **What verb does their AI perform?** (generate / evaluate / retrieve / filter / redact / suggest)
+2. **What subject does it act on?** (LLM outputs / pharma promo / enterprise marketing / employee chat / clinical R&D documents)
+3. **Does the output produce third-party-verifiable cryptographic proof?**
+
+If their answer to #1 is anything other than "verifies," or their answer to #2 is anything narrower than "any published content," or their answer to #3 is "no" — AssuredAI wins that comparison structurally, not feature-by-feature.
+
+**This is why the moat is real. Competitors can copy any single AssuredAI feature, but they cannot adopt the AI-verifies-any-content + cryptographic-proof combination without abandoning their current product premise.**
 
 ---
 
@@ -43,51 +113,75 @@ The standalone runtime-guardrails / eval / observability sub-category has been a
 
 **Strategic implication:** Standalone runtime guardrails as a venture-backable category is over. The remaining independent players (Guardrails AI, Pillar Security, Patronus, NeMo Guardrails OSS) are small relative to AssuredAI's adjacency. **AssuredAI does not compete in this space — it consumes it.** Position as the proof + audit + medical-taxonomy layer ON TOP of any runtime guardrail.
 
-### 2. The single most dangerous direct competitor is Writer.com.
+### 2. The single most dangerous direct competitor is Writer.com — but only on Writer.com's content.
 
-[Writer.com](https://writer.com) (San Francisco, founded 2020, $326M raised, **$1.9B valuation** at Series C Nov 2024, ~500 employees) already ships ~80% of AssuredAI's value proposition under one roof:
-- **Palmyra-Med-70B** (85.9% medical benchmark accuracy, beats Med-PaLM-2)
-- **Knowledge Graph** (proprietary graph-RAG, claims 86.31% on RobustQA — beats every competitor benchmark)
-- **AI Guardrails** (configurable pre/post-call filters, AWS Bedrock + Azure Content Safety integration)
-- **UnitedHealthcare, CirrusMD (13M members), Vizient, Medisolv, Aptitude Health** as named healthcare customers ([WRITER press](https://writer.com/blog/cirrusmd-customer-story/))
-- **ISO/IEC 42001** (Responsible AI Management System — rare) + SOC 2 Type II + ISO 27001/27701
-- **Pricing**: $29-$39/user/month standard, **$75K-$250K ACV enterprise** ([eesel](https://www.eesel.ai/blog/writer-com-pricing))
+**AI-verb reframe:** Writer.com's AI **generates**. AssuredAI's AI **verifies**. These are opposite jobs that look adjacent on a feature table.
 
-**Time-to-clone AssuredAI feature set: 1–2 sprints** using existing AI HQ + Palmyra-Med + Knowledge Graph + Guardrails primitives. The only thing stopping them is that AssuredAI's per-draft SMB workflow is too small for their $250K-ACV enterprise sales motion — **until it isn't.**
+[Writer.com](https://writer.com) (San Francisco, founded 2020, $326M raised, **$1.9B valuation** at Series C Nov 2024, ~500 employees) ships powerful generation infrastructure:
+- **Palmyra-Med-70B** (85.9% medical benchmark accuracy, beats Med-PaLM-2) — *generates* medical content
+- **Knowledge Graph** (proprietary graph-RAG, claims 86.31% on RobustQA) — *grounds* Palmyra's own outputs
+- **AI Guardrails** (configurable pre/post-call filters) — *blocks* Palmyra outputs that violate policy
+- **UnitedHealthcare, CirrusMD (13M members), Vizient, Medisolv, Aptitude Health** as named healthcare customers
+- **ISO/IEC 42001** + SOC 2 Type II + ISO 27001/27701
+- **Pricing**: $29-$39/user/month standard, **$75K-$250K ACV enterprise**
 
-### 3. The single most dangerous dark-horse competitor is John Snow Labs.
+**The structural asymmetry:** Writer.com's Knowledge Graph verifies content that Writer.com generated. AssuredAI verifies content from **any source** — including content Writer.com generated, content ChatGPT generated, content a human wrote, content republished from a legacy archive. Writer.com cannot verify content written outside Writer.com without abandoning their generation-platform business model.
 
-[John Snow Labs](https://www.johnsnowlabs.com) (Lewes, Delaware, founded 2016, **bootstrapped, no VC funding**) owns the medical NLP stack the entire healthcare AI industry quietly depends on:
+**Time-to-clone AssuredAI feature set (verification-against-trusted-sources-with-cryptographic-proof): 6+ months and a fundamental product repositioning.** Their architecture is generator-first, verification-as-byproduct. AssuredAI is verifier-first, source-agnostic. The only thing stopping them from competing seriously isn't engineering — it's that an "external content verifier" SKU would cannibalize their core platform.
+
+### 3. The single most dangerous dark-horse competitor is John Snow Labs — but only on clinical R&D documents.
+
+**AI-verb reframe:** JSL's AI **extracts clinical entities and detects medical hallucinations**. AssuredAI's AI **verifies any published content against trusted sources with cryptographic proof**. Same medical NLP foundation, opposite product surface.
+
+[John Snow Labs](https://www.johnsnowlabs.com) (Lewes, Delaware, founded 2016, **bootstrapped, no VC funding**) owns the medical NLP infrastructure the healthcare AI industry quietly depends on:
 - **Healthcare NLP**: 400+ clinical entity types, 1,200+ healthcare-specific models, F1 **96% PHI detection** (vs AWS 83%, Azure 91%, GPT-4o 79% — [their benchmark](https://www.johnsnowlabs.com/comparing-medical-text-de-identification-performance-john-snow-labs-openai-azure-health-data-services-and-amazon-comprehend-medical/))
-- **Medical LLM**: claims **#1 on 12 of 13 medical benchmarks**, beating GPT-5.4, Gemini-3.1-Pro, Claude-Opus-4.6 ([JSL](https://www.johnsnowlabs.com/healthcare-llm/))
-- **Acquired Wisecube/Pythia May 27, 2025** — knowledge-graph hallucination detection with subject-predicate-object triplet verification ([Globe Newswire](https://www.globenewswire.com/news-release/2025/05/27/3088734/0/en/John-Snow-Labs-Acquires-WiseCube-to-Refine-and-Safeguard-Medical-AI-Models-with-Knowledge-Graphs.html))
+- **Medical LLM**: claims **#1 on 12 of 13 medical benchmarks**, beating GPT-5.4, Gemini-3.1-Pro, Claude-Opus-4.6
+- **Acquired Wisecube/Pythia May 27, 2025** — knowledge-graph hallucination detection with subject-predicate-object triplet verification
 - **Customers**: Mayo Clinic, Cleveland Clinic, Kaiser Permanente + major pharma
 - **Pricing**: ~$7K/month per license
 
-**Time-to-launch a "Medical Content Verifier" SKU: 1 quarter.** They have the source library, the medical LLM, the hallucination detector, the clinician trust. The only gap is editorial UX, which they could acquire or build.
+**The structural asymmetry:** JSL sells to data scientists running ML pipelines on internal pharma R&D documents. AssuredAI sells to compliance officers reviewing pre-publish web/social/email content. JSL has no editorial workflow, no WordPress/browser extension distribution, no cryptographic public proof, no pack marketplace, no fix-and-finalize loop. Their PhD-level customer profile cannot consume an editor-grade product without rebuild.
 
-**Critical action:** Approach for partnership / model-provider integration before they ship a competing product.
+**Time-to-launch a "Medical Content Verifier" SKU competitive with AssuredAI: 2-3 quarters.** They have the engine. They lack everything that makes the verification a productized publisher gateway. **Critical action:** approach for model-provider integration (license Pythia inside AssuredAI's verification stack) before they ship a competing front-end.
 
-### 4. The single most dangerous distribution-channel competitor is Prompt Security.
+### 4. The single most dangerous distribution-channel competitor is Prompt Security (now SentinelOne) — but their AI does a different job.
 
-[Prompt Security](https://prompt.security) (Tel Aviv, founded Aug 2023, **$23M raised**, F5 strategic investor) is one product spike from competing directly with AssuredAI:
-- Already ships a **browser extension** (the same distribution channel AssuredAI uses)
-- Customers include **The New York Times** (publisher proof point), **St. Joseph's Healthcare** (healthcare proof point), HiBob, 10x Banking, Royal Caribbean ([prompt.security](https://prompt.security))
-- F5 as strategic investor = distribution into F5's enterprise install base
-- Already does input + output filtering, just needs to add per-paragraph fact-check + hash-chained audit
+**AI-verb reframe:** Prompt Security's AI **filters runtime input/output to block prompt injection and PII exfiltration**. AssuredAI's AI **verifies pre-publish content against trusted sources with proof**. Same channel (browser extension), opposite job (security gate vs. verification artifact).
+
+[Prompt Security](https://prompt.security) (Tel Aviv, founded Aug 2023, **$23M raised**, **acquired by SentinelOne $250M Aug 2025**, F5 strategic investor pre-acquisition) shares AssuredAI's distribution channel:
+- Browser extension (same channel as AssuredAI)
+- Customers include **The New York Times**, **St. Joseph's Healthcare**, HiBob, 10x Banking, Royal Caribbean
+- Now distributes through SentinelOne's enterprise install base
+- Input + output filtering, Shadow AI Detection, MCP Gateway
 - Gartner 2026 "Market Guide for Guardian Agents" Representative Vendor
 
-**Time-to-compete directly: 6–9 months.** Watch this vendor monthly.
+**The structural asymmetry:** Prompt Security's extension protects the **enterprise** (CISO buyer) from employees leaking PII into ChatGPT. AssuredAI's extension protects the **publisher** (editorial/compliance buyer) from publishing unverified claims. Their browser extension reads what employees *type into* AI tools. AssuredAI's extension reads what writers *prepare to publish*. Different unit of work; different buyer; different proof artifact.
 
-### 5. The Pharma MLR category just shipped AssuredAI's exact functional pattern. Veeva PromoMats AI Agents — but only for pharma.
+**Time-to-compete on verification specifically: 6-9 months** AND they'd have to choose between SentinelOne's CISO sales motion and a brand-new editorial/compliance buyer relationship. Their NYT-as-customer logo is for security usage, not publishing verification. **Watch monthly** — if SentinelOne ships a "pre-publish content verification" SKU, the channel collision becomes real.
+
+### 5. Veeva PromoMats AI Agents (Dec 2025) shipped a similar verb — but only against pharma promo materials.
+
+**AI-verb reframe:** Veeva's AI **scans pharma promo materials against pharma-specific editorial/brand/compliance guidelines**. AssuredAI's AI **verifies any published content against any vetted source library**. Same verb (verification-adjacent); radically different subject and scope.
 
 On **December 3, 2025**, Veeva (NYSE: VEEV, $25–31B market cap, $3.195B FY26 revenue) shipped:
-- **Quick Check Agent** — pre-MLR scan of AI-generated content against editorial/brand/market/channel/compliance guidelines
+- **Quick Check Agent** — pre-MLR scan of AI-generated content against pharma editorial/brand/market/channel/compliance guidelines
 - **Content Agent** — multimodal (text + image) reviewer Q&A
 - **Anchors** — automated reference linking, claims → source-document anchors
 - **Modular Content** — reusable content blocks with persistent MLR approval state
 
-Moderna is on early access ([Veeva](https://www.veeva.com/products/veeva-ai-for-promomats/)). **This is functionally identical to AssuredAI's pipeline.** But Veeva is locked to life-sciences (94% of $2.747B revenue from biopharma, 66% from large enterprises) and has no WordPress / browser-extension / mid-market motion. **AssuredAI's defensible wedge: position as "Veeva for the 75% of regulated publishers who aren't in pharma."**
+Moderna is on early access. **The verification verb is the same. Everything else is different:**
+
+| Dimension | Veeva PromoMats Quick Check | AssuredAI |
+|---|---|---|
+| Subject | Pharma promo materials only | Any published content (AI, human, mixed, URL, archive) |
+| Verticals | Life sciences (94% biopharma) | Healthcare + finance + gov + legal + journalism + science + 7+ marketplace packs |
+| Audience | Internal MLR reviewers | Editorial / compliance / writers / general public |
+| Channel | Veeva Vault closed enterprise UI | WordPress plugin + browser extension + public web + API |
+| Proof | Internal audit log | Cryptographic public proof URL anyone can audit |
+| Price | Six-figure ACV | Free / $29 / $99 / $999 / Enterprise |
+| Buyer | Pharma Chief Medical Officer | Anyone who publishes regulated content |
+
+**AssuredAI's defensible wedge: position as "the verification verb generalized — for the 75% of regulated publishers who aren't pharma, with cryptographic proof Veeva structurally cannot ship."**
 
 ### 6. AssuredAI's WordPress distribution moat is real and empirically empty.
 
@@ -121,7 +215,9 @@ Combined with **$100M+ in HHS OCR pixel-tracking settlements 2023–2025** (Kais
 
 **Urgent:** Wolters Kluwer's 70%+ AI adoption trajectory means the partnership window is closing.
 
-### 10. The AWS Bedrock Automated Reasoning Checks GA (Aug 2025) is the highest-risk 18-month threat.
+### 10. AWS Bedrock Automated Reasoning Checks (Aug 2025) is the highest-risk 18-month threat — but only for Bedrock outputs.
+
+**AI-verb reframe:** AWS's AI **verifies Bedrock model outputs against customer-defined policies, inside AWS**. AssuredAI's AI **verifies any published content against any source library, cloud-neutral, with public proof**. The verbs converge; the subjects and venues diverge.
 
 AWS Bedrock Guardrails pricing ([AWS](https://aws.amazon.com/bedrock/pricing/)):
 - Content filters: **$0.15 / 1K text units**
@@ -129,59 +225,105 @@ AWS Bedrock Guardrails pricing ([AWS](https://aws.amazon.com/bedrock/pricing/)):
 - Contextual grounding checks: $0.10 / 1K text units
 - **Automated Reasoning checks: $0.17 / 1K text units per policy** — claims **up to 99% verification accuracy** ([AWS announcement](https://aws.amazon.com/blogs/aws/minimize-ai-hallucinations-and-deliver-up-to-99-verification-accuracy-with-automated-reasoning-checks-now-available/))
 
-Bedrock is **HIPAA-eligible under AWS BAA**, and AWS publishes specific [healthcare guidance](https://aws.amazon.com/blogs/publicsector/how-to-safeguard-healthcare-data-privacy-using-amazon-bedrock-guardrails/). If AWS ships a "Healthcare Compliance Pack" preset with PHI + medical-red-flag templates, AssuredAI loses the AWS-native customer segment.
+Bedrock is **HIPAA-eligible under AWS BAA**, with specific [healthcare guidance](https://aws.amazon.com/blogs/publicsector/how-to-safeguard-healthcare-data-privacy-using-amazon-bedrock-guardrails/) published.
 
-**Counter:** Stay cloud-neutral. Position for the Azure / GCP / private-cloud customers who can't or won't switch to AWS. Build AWS Bedrock as a consumer (not competitor) — AssuredAI layers proof + audit on top.
+**The structural asymmetry:** AWS verifies content that *runs through Bedrock*. AssuredAI verifies content that *gets published anywhere*. AWS's verification stays inside AWS account boundaries (CloudWatch logs); AssuredAI's produces a public proof URL anyone can independently audit. AWS doesn't ship a CMS plugin, a browser extension, a public verification badge, or a marketplace of compliance packs that work across clouds.
+
+**Counter:** Stay cloud-neutral. Position for the Azure / GCP / private-cloud / on-prem / multi-cloud customers (the majority of regulated publishers) who can't or won't lock to AWS. Build AWS Bedrock as a **consumer** (not competitor) — AssuredAI consumes Bedrock's grounding check as one input signal, and layers the proof + audit + cross-cloud verification on top. **Partner, don't compete.**
 
 ---
 
 <a id="part-2"></a>
 ## PART 2 — MARKET STRUCTURE & CONSOLIDATION MAP
 
-### The 5 functional lanes (where AI content safety budget goes today)
+### The 5 functional lanes — sorted by what each lane's AI actually does
+
+Each lane below is named by the **verb its AI performs**. AssuredAI sits in a sixth lane that no incumbent occupies.
 
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
-│ LANE 1: AI EVAL / OBSERVABILITY (dev-time)                          │
+│ LANE 1: AI EVALUATES (dev-time observability)                       │
+│ Verb: AI watches LLM agents run, scores them on hallucination,      │
+│        groundedness, jailbreak resistance, etc.                     │
+│ Subject: LLM outputs in dev/staging/production traces               │
 │ Customers: ML engineers, AI teams                                   │
 │ Vendors: Arize, Galileo, Patronus, LangSmith, Comet, Deepchecks     │
-│ Status: ~$300M+ raised, ~80% of competitors here                    │
-│ AssuredAI overlap: LOW (different buyer, different time)            │
+│ Status: ~$300M+ raised; consolidating into data clouds (TruEra →    │
+│   Snowflake, Humanloop → Anthropic, WhyLabs → Apple)                │
+│ AssuredAI overlap: LOW — different verb, different subject          │
 ├─────────────────────────────────────────────────────────────────────┤
-│ LANE 2: RUNTIME GUARDRAILS (inference-time filter)                  │
+│ LANE 2: AI FILTERS (runtime inference firewall)                     │
+│ Verb: AI blocks prompt injection, jailbreak, PII exfil, hate        │
+│ Subject: Live prompt streams + LLM outputs in flight                │
 │ Customers: AppSec / CISO / AI eng                                   │
 │ Vendors: AWS Bedrock Guardrails, Azure Content Safety, Google Model │
-│   Armor, OpenAI Moderation, NeMo Guardrails, Guardrails AI, Pillar  │
-│ Status: CATEGORY COLLAPSE — $1.5B+ M&A, hyperscalers won            │
-│ AssuredAI overlap: MEDIUM (AssuredAI consumes these as plug-ins)    │
+│   Armor, OpenAI Moderation, NeMo Guardrails, Pillar, Lakera (Check  │
+│   Point), Prompt Security (SentinelOne), F5 (CalypsoAI), Cisco AI   │
+│   Defense (Robust Intelligence)                                     │
+│ Status: CATEGORY COLLAPSE — $1.5B+ M&A; hyperscalers + security     │
+│   vendors absorbed standalone players                               │
+│ AssuredAI overlap: NONE on verb; AssuredAI CONSUMES these as plug-  │
+│   in detectors upstream of its own verification                     │
 ├─────────────────────────────────────────────────────────────────────┤
-│ LANE 3: GOVERNANCE / POLICY / AUDIT (enterprise compliance)         │
+│ LANE 3: AI GOVERNS (policy registry + audit)                        │
+│ Verb: AI tracks AI assets, applies policies, monitors drift,        │
+│        produces governance factsheets                               │
+│ Subject: An enterprise's AI model inventory                         │
 │ Customers: Chief AI Officer, GRC, compliance committee              │
 │ Vendors: Credo AI, Holistic AI, Fiddler, IBM watsonx.governance,    │
-│   ModelOp, Monitaur, Cisco AI Defense (ex-Robust Intelligence)      │
-│ Status: Active venture funding; vertical pivots starting            │
-│ AssuredAI overlap: MEDIUM-HIGH (closest by buyer, but model-level)  │
+│   ModelOp, Monitaur                                                 │
+│ Status: Active venture funding; some vertical pivots starting       │
+│ AssuredAI overlap: MEDIUM on BUYER (Chief Compliance), LOW on verb  │
+│   (they govern models; AssuredAI verifies artifacts)                │
 ├─────────────────────────────────────────────────────────────────────┤
-│ LANE 4: CONTENT / EDITORIAL COMPLIANCE (publish-time)               │
-│ Customers: Compliance officer, editorial director, content head     │
-│ Vendors: Writer.com, Persado Comply, Markup AI (ex-Acrolinx),       │
-│   Veeva PromoMats (pharma), Vodori, Lithero, AssuredAI              │
-│ Status: Just emerging as standalone category                        │
-│ AssuredAI overlap: HIGH (this is the right lane)                    │
+│ LANE 4: AI GENERATES (content production with safety bolted on)     │
+│ Verb: AI writes/drafts/produces content; safety is post-hoc filter  │
+│ Subject: Their own LLM's outputs (Palmyra, Jasper Brand, etc.)      │
+│ Customers: Marketing, comms, agency, in-house writers               │
+│ Vendors: Writer.com, Persado, Jasper, Anyword, Markup AI (rebranded │
+│   Acrolinx), Yseop, Grammarly/Superhuman                            │
+│ Status: $1B+ category leaders; verification is an internal feature  │
+│   to make their own generation feel safe                            │
+│ AssuredAI overlap: LOW on verb (they generate; AssuredAI verifies); │
+│   HIGH on adjacent buyer attention                                  │
 ├─────────────────────────────────────────────────────────────────────┤
-│ LANE 5: PII/PHI DETECTION & REDACTION (data layer)                  │
+│ LANE 5: AI REDACTS (PII/PHI removal, data layer)                    │
+│ Verb: AI finds and masks/tokenizes/replaces sensitive identifiers   │
+│ Subject: Free-text data being prepared for AI training or analytics │
 │ Customers: Privacy / data protection / CISO                         │
 │ Vendors: Microsoft Presidio (AssuredAI uses), Limina (ex-Private AI)│
 │   Tonic Textual, Skyflow, Nightfall, AWS Comprehend Medical,        │
 │   Azure Language PII, Google DLP, BigID, Cyera, Securiti (→ Veeam)  │
 │ Status: Productizing rapidly; LLM-aware second-generation           │
-│ AssuredAI overlap: MEDIUM (AssuredAI uses Presidio + custom)        │
+│ AssuredAI overlap: AssuredAI USES Presidio + custom recognizers as  │
+│   ONE step inside its own verification pipeline; doesn't compete    │
+├─────────────────────────────────────────────────────────────────────┤
+│ LANE 6: AI VERIFIES (pre-publish verification with public proof)    │
+│ Verb: AI inspects every paragraph against trusted sources, redacts  │
+│        PII, catches red flags, injects disclaimers, fact-checks for │
+│        contradictions, generates cryptographic public proof URL     │
+│ Subject: ANY published content — AI-generated, human-written, mixed,│
+│        URL, archive, translation                                    │
+│ Customers: Editorial / compliance / writer / publisher / regulator  │
+│ Vendors: AssuredAI                                                  │
+│ Status: New category. No incumbent. Lithero is closest single-verb  │
+│   analog but pharma-only and undercapitalized.                      │
+│ AssuredAI: defines the lane                                         │
 └─────────────────────────────────────────────────────────────────────┘
 ```
 
 ### Where AssuredAI sits
 
-**AssuredAI lives at the intersection of Lane 4 (Content/Editorial Compliance) + Lane 5 (PII/PHI Redaction), with Lane 2 (Runtime Guardrails) as an upstream input and Lane 3 (Governance) as the policy framework it executes against.** No other vendor occupies this exact intersection — they're all anchored in one lane.
+**AssuredAI is the only product in Lane 6.** That lane didn't exist as a defined category before this dossier. The closest functional analog (Veeva PromoMats Quick Check Agent, GA Dec 2025) is a pharma-locked instance of the same verb without cryptographic public proof.
+
+AssuredAI's relationship to the other 5 lanes:
+- **Lane 1 (Evaluates):** AssuredAI uses LLM-as-judge eval techniques internally (similar to Patronus/Galileo) but as a sub-component of verification, not the product.
+- **Lane 2 (Filters):** AssuredAI consumes AWS Bedrock Guardrails, Azure Content Safety, Lakera Guard, or Llama Guard 4 as **input signals** to its verification — they detect; AssuredAI decides what to do about it.
+- **Lane 3 (Governs):** AssuredAI's packs ARE the policy framework executable layer that Credo AI / Holistic AI track at the registry level. Complementary, not competitive.
+- **Lane 4 (Generates):** AssuredAI optionally generates (draft mode using Claude Sonnet), but generation is one input mode among five. The product is verification-first.
+- **Lane 5 (Redacts):** AssuredAI uses Microsoft Presidio + custom recognizers as ONE step inside its 9-step lifecycle. Doesn't compete.
+
+This is the structural moat. AssuredAI is not a feature in Lanes 1-5. It's a new lane.
 
 ### Consolidation timeline (visualized)
 
@@ -254,10 +396,12 @@ Bedrock is **HIPAA-eligible under AWS BAA**, and AWS publishes specific [healthc
 
 ### TIER 1 — EXISTENTIAL THREATS (could displace AssuredAI in 6-12 months)
 
-#### 1.1 — Writer.com — **HIGHEST DIRECT THREAT**
+#### 1.1 — Writer.com — **HIGHEST DIRECT THREAT (different verb)**
 
 | Field | Detail |
 |---|---|
+| **What their AI does** | **GENERATES** content (Palmyra-Med/Fin), grounds its own generation against Knowledge Graph, filters its own output through Guardrails. Verification is a back-stop on Writer-generated text only. |
+| **What AssuredAI's AI does** | **VERIFIES** any content (Writer-generated, ChatGPT-generated, human-written, URL-fetched, archive) against the customer's chosen source library, with public cryptographic proof. |
 | **One-line** | Full-stack enterprise generative-AI platform with Palmyra LLMs (Med + Fin), graph-based RAG, AI guardrails, agent builder |
 | **Founded / HQ** | 2020 / San Francisco (May Habib CEO + Waseem AlShikh CTO) |
 | **Funding / Valuation** | **$326M raised**; Series C $200M Nov 2024 @ **$1.9B** (Premji Invest, Radical, ICONIQ, Adobe Ventures, IBM Ventures, Salesforce Ventures, Workday Ventures, Citi Ventures, Accenture) |
@@ -269,15 +413,17 @@ Bedrock is **HIPAA-eligible under AWS BAA**, and AWS publishes specific [healthc
 | **Key tech** | Palmyra-Med-70B (85.9% medical benchmark), Palmyra-Fin-70B, Palmyra X5 (1M context), Knowledge Graph claims 86.31% RobustQA |
 | **Latest products** | WRITER Agent + Playbooks/Routines/Connectors (Nov 2025), AI HQ (Apr 2025) |
 | **Public weaknesses** | "Steep learning curve," "agents only detect 5 items in 500-doc KG," "tests worse than alternatives while being more expensive" (Glassdoor) |
-| **Time-to-clone AssuredAI** | **1-2 sprints** using existing primitives |
-| **Why they haven't yet** | $250K-ACV enterprise sales motion incompatible with SMB per-draft pricing |
-| **AssuredAI counter** | (1) Standalone, no rip-and-replace; (2) per-draft pricing; (3) model-agnostic verification; (4) WordPress-native; (5) public proof URLs Writer wouldn't expose |
+| **Time-to-clone AssuredAI's verb** | **6+ months and a strategic pivot.** Writer.com's architecture is generator-first; verification is internal to their suite. Building "verify content from anywhere" would cannibalize their core Knowledge Graph value-prop ("we ground YOUR Palmyra outputs"). |
+| **Why they haven't yet** | Generator-first business model. An "external content verifier" SKU is structurally hostile to their $250K-ACV enterprise sales motion. |
+| **AssuredAI counter** | (1) Different verb — they generate, AssuredAI verifies; (2) source-agnostic input — AssuredAI verifies content they generated, AssuredAI can verify content competitors generated, AssuredAI verifies content humans wrote; (3) cryptographic public proof URLs — Writer.com would never expose verification publicly because it would prove when their generation is wrong; (4) WordPress + browser extension — Writer.com lives in Writer.com |
 | **Sources** | [writer.com](https://writer.com), [Series C](https://writer.com/blog/series-c-funding-writer-press-release/), [CirrusMD case](https://writer.com/blog/cirrusmd-customer-story/), [Palmyra-Med](https://writer.com/blog/palmyra-med-fin-models/), [pricing analysis](https://www.eesel.ai/blog/writer-com-pricing) |
 
-#### 1.2 — John Snow Labs — **DARK-HORSE HEALTHCARE THREAT**
+#### 1.2 — John Snow Labs — **DARK-HORSE HEALTHCARE THREAT (different surface)**
 
 | Field | Detail |
 |---|---|
+| **What their AI does** | **EXTRACTS** clinical entities (400+ types), runs medical-LLM diagnostics, and post-Pythia, DETECTS triplet-level hallucinations in pharma R&D documents and clinical notes. |
+| **What AssuredAI's AI does** | **VERIFIES** published web/social/email/CMS content against trusted sources, with editorial workflow + cryptographic proof. |
 | **One-line** | Healthcare-native AI infrastructure — Spark NLP + Healthcare NLP + Medical LLMs + post-Pythia hallucination detection |
 | **Founded / HQ** | 2016 / Lewes, Delaware |
 | **Funding** | **Bootstrapped — no public VC funding** |
@@ -287,64 +433,73 @@ Bedrock is **HIPAA-eligible under AWS BAA**, and AWS publishes specific [healthc
 | **Key tech** | Healthcare NLP (400+ clinical entity types), Medical LLM (#1 on 12 of 13 medical benchmarks per their own benchmark), Pythia knowledge-graph hallucination detection (acquired Wisecube May 27, 2025) |
 | **Accuracy** | **F1 96% PHI detection** (vs AWS 83%, Azure 91%, GPT-4o 79% — their published benchmark) |
 | **Distribution** | AWS Marketplace + Amazon Bedrock + Databricks |
-| **Time-to-launch publisher product** | 1 quarter |
-| **AssuredAI counter** | JSL sells to data scientists/ML teams; AssuredAI sells to editorial/compliance. JSL has no editorial UX, no WordPress, no audit log designed for HHS/OCR review |
-| **Recommended action** | **Approach as model provider / partner** — license Pythia or Healthcare NLP as one of AssuredAI's verification engines. Defensive moat. |
+| **Time-to-launch competitive publisher product** | 2-3 quarters (engine exists; everything else — editorial UX, WordPress plugin, browser extension, public proof URLs, pack marketplace, fix-and-finalize flow — does not) |
+| **AssuredAI counter** | Same verb axis: AssuredAI's AI verifies; JSL's AI extracts. JSL serves ML pipelines on internal pharma R&D; AssuredAI serves writers and compliance officers reviewing pre-publish content. JSL has no editorial UX, no public proof URL, no source-agnostic input (their corpus is curated medical literature only), no fix-and-finalize loop. |
+| **Recommended action** | **Approach as model provider / partner** — license Pythia or Healthcare NLP as one of AssuredAI's verification engines. JSL's medical entity extraction becomes an input signal to AssuredAI's verification verb, not a competing product. |
 | **Sources** | [johnsnowlabs.com](https://www.johnsnowlabs.com/), [Healthcare LLM](https://www.johnsnowlabs.com/healthcare-llm/), [Wisecube acquisition](https://www.globenewswire.com/news-release/2025/05/27/3088734/0/en/John-Snow-Labs-Acquires-WiseCube-to-Refine-and-Safeguard-Medical-AI-Models-with-Knowledge-Graphs.html), [PHI benchmark](https://www.johnsnowlabs.com/comparing-medical-text-de-identification-performance-john-snow-labs-openai-azure-health-data-services-and-amazon-comprehend-medical/) |
 
-#### 1.3 — Palantir Foundry for Federal Health — **HIGHEST FEDERAL THREAT**
+#### 1.3 — Palantir Foundry for Federal Health — **HIGHEST FEDERAL THREAT (different surface)**
 
 | Field | Detail |
 |---|---|
+| **What their AI does** | **ORCHESTRATES** data ontologies across federal health datasets; AIP layer runs LLMs over the ontology for analyst workflows. |
+| **What AssuredAI's AI does** | **VERIFIES** federal agency published content against authoritative sources, with public proof. (Different layer of the same federal health stack.) |
 | **One-line** | AI/data ontology platform deeply embedded in HHS, DoD, IC |
 | **Public** | NYSE: PLTR, ~$350B market cap, 2026 rev guidance $7.2B (+61% YoY) |
 | **Gov contracts (verified)** | **HHS SHARE BPA $90M** (all HHS agencies inc. NIH, CDC, FDA, CMS), **CDC five-year $443M** (HHS Protect, ASPR Engage, Tiberius, DCIPHER), US Army Vantage ($10B/10yr framework) — [USAspending](https://www.usaspending.gov/award/CONT_AWD_86615526F00002_8600_47QTCA24D004L_4732), [FedScoop](https://fedscoop.com/hhs-palantir-platform-bpa/) |
 | **Certifications** | FedRAMP High, IL4/5/6, ATO across DoD/IC |
 | **Q1 2026 growth** | Gov revenue +84% YoY to $687M; US commercial +133% to $595M |
-| **Threat vector** | Could ship an AIP-native "Compliance Guard" for HHS publishers using existing CDC ontology in 6-9 months |
-| **AssuredAI counter** | Palantir requires you to live inside Foundry (multi-year deploy). AssuredAI is a thin lateral tool deployable in days. Public proof URLs are anti-Palantir DNA (they are secretive by design) |
+| **Threat vector** | Could ship an AIP-native "Compliance Guard" for HHS publishers using existing CDC ontology in 6-9 months. The verb would still be different (ontology-orchestrate-then-LLM-summarize, not paragraph-verify-against-sources). |
+| **AssuredAI counter** | Palantir requires you to live inside Foundry (multi-year deploy). AssuredAI is a thin lateral tool deployable in days. **Public proof URLs are structurally anti-Palantir DNA** — Palantir's value-prop to government is secrecy of their data ontologies. Cryptographic public verification is the opposite of their cultural product. |
 | **Sources** | [palantir.com/federal-health](https://www.palantir.com/offerings/federal-health/), [FedScoop](https://fedscoop.com/hhs-palantir-platform-bpa/) |
 
-#### 1.4 — Veeva PromoMats AI Agents — **HIGHEST PHARMA THREAT (functional analog)**
+#### 1.4 — Veeva PromoMats AI Agents — **CLOSEST VERB-MATCH (pharma-locked subject)**
 
 | Field | Detail |
 |---|---|
-| **One-line** | Pharma MLR review software with AI agents shipped Dec 3, 2025 — functionally identical to AssuredAI pipeline but pharma-locked |
+| **What their AI does** | **REVIEWS** pharma promo materials against pharma-specific compliance guidelines (Quick Check Agent, Dec 2025); answers Q&A on text+image promo (Content Agent). Closest verb-match in the dossier. |
+| **What AssuredAI's AI does** | **VERIFIES** any published content (not just pharma promo) against any vetted source library, with public cryptographic proof. Same verb at the engine level; radically broader subject + venue + proof model. |
+| **One-line** | Pharma MLR review software with AI agents shipped Dec 3, 2025 — same verification verb as AssuredAI but pharma-locked |
 | **Public** | NYSE: VEEV, $25-31B market cap, FY26 rev $3.195B (+16% YoY) |
 | **Customers** | 1,477 total; 300+ biopharmas on PromoMats specifically; named: Bayer, Boehringer Ingelheim, Eli Lilly, Gilead, Merck, Novartis, Pfizer, AstraZeneca, **Moderna (early access on AI Agents)** |
 | **Revenue breakdown** | 94% biopharma; 66% large enterprise, 25% SMB, 4% emerging biotech, 5% CROs |
 | **AI Agents (Dec 3, 2025 GA)** | **Quick Check Agent** (pre-MLR scan), **Content Agent** (multimodal text+image), Anchors (claims→source linking), Modular Content |
 | **Pricing** | Mid-five-figure to seven-figure ACV |
-| **Threat vector** | Could ship a "publisher tier" outside pharma — but they have no muscle memory for it |
-| **AssuredAI counter** | Position as **"Veeva for the 75% of regulated publishers who aren't in pharma"** — hospital marketing, payer comms, gov publishers, mid-market law firms, financial advisors, regional health systems |
+| **Threat vector** | Could ship a "publisher tier" outside pharma — but Veeva is 94% biopharma revenue with deep CRM/eTMF integration. Expanding into hospital marketing / payer comms / journalism / gov publishing requires abandoning their life-sciences lock. |
+| **AssuredAI counter** | (1) **Same verb, generalized.** AssuredAI is what Veeva would be if it weren't pharma-locked. (2) **Cryptographic public proof.** Veeva audit logs are internal MLR records, not third-party-verifiable artifacts. (3) **Source-agnostic input.** Veeva verifies pharma promo against pharma claims library; AssuredAI verifies any content against any source library. (4) Position as **"Veeva for the 75% of regulated publishers who aren't in pharma"** — hospital marketing, payer comms, gov publishers, mid-market law firms, financial advisors, regional health systems, journalists, scientific publishers. |
 | **Sources** | [veeva.com/products/veeva-ai-for-promomats](https://www.veeva.com/products/veeva-ai-for-promomats/), [Dec 2025 GA](https://www.stocktitan.net/news/VEEV/veeva-ai-agents-now-available-to-increase-productivity-and-customer-l4hszwkn9o56.html), [Intrinsic Investing strategy](https://intrinsicinvesting.com/2024/07/23/veeva-a-winning-platform-strategy-in-life-sciences/) |
 
-#### 1.5 — Prompt Security — **HIGHEST DISTRIBUTION-CHANNEL THREAT**
+#### 1.5 — Prompt Security (SentinelOne) — **HIGHEST DISTRIBUTION-CHANNEL THREAT (different verb)**
 
 | Field | Detail |
 |---|---|
-| **One-line** | "Platform for AI Security" with browser extension shadow-AI control — same channel as AssuredAI |
+| **What their AI does** | **FILTERS** runtime input/output — blocks employees from leaking PII into ChatGPT, blocks prompt injection, detects shadow AI usage. CISO-protection verb. |
+| **What AssuredAI's AI does** | **VERIFIES** pre-publish content against trusted sources with proof URL. Editor/compliance verb. Same browser-extension channel, opposite job. |
+| **One-line** | "Platform for AI Security" with browser extension shadow-AI control — shares AssuredAI's distribution channel, performs the opposite verb |
 | **Founded / HQ / Funding** | Aug 2023 / Tel Aviv / **$23M raised** ($18M Series A by Jump Capital, with F5 as strategic investor) |
 | **Customers** | **The New York Times** (publisher), **St. Joseph's Healthcare** (healthcare), HiBob, Royal Caribbean, 10x Banking, Cymulate, Riskified |
 | **Product** | Browser extension + input/output filtering + Shadow AI Detection + Red Teaming + MCP Gateway |
 | **Gartner** | 2026 Market Guide for Guardian Agents Representative Vendor |
 | **Threat vector** | They are 6-9 months from competing directly — already have channel (browser extension), customers (NYT, healthcare), and capital (F5 investor for distribution leverage) |
 | **AssuredAI counter** | (1) Prompt Security's output filter is policy-based (toxicity, PII, data leak) NOT factuality-based vs vetted source library. (2) No per-paragraph fact-check, no hash-chained tamper-evident audit. (3) Their browser extension is for *employees using ChatGPT*, not for *publishers reviewing CMS content pre-publication*. (4) Different buyer (CISO vs Editorial Director) — but converging |
-| **Acquired** | **NO — wait, see Stream 4 conflicting data:** SentinelOne acquisition $250M Aug 5, 2025 [SentinelOne press](https://www.sentinelone.com/press/sentinelone-to-acquire-prompt-security-to-advance-genai-security/). **Reconcile:** Stream 2 reported pre-acquisition; Stream 4 reported acquisition. They were acquired. They are now bundled with SentinelOne Singularity. **Status: still active but with SentinelOne distribution leverage** — even more dangerous |
+| **Acquired** | SentinelOne $250M Aug 5, 2025 — now bundled with SentinelOne Singularity. Status: active with SentinelOne distribution leverage. |
+| **AssuredAI counter** | Different verb means different buyer means different sale. Prompt Security's NYT/St. Joseph's logos are for SECURITY usage (employee AI shadow control), not publishing verification. Even with shared channel (browser extension), the editorial/compliance buyer at NYT is a different person than the CISO who deployed Prompt. SentinelOne can ship a "pre-publish verification" SKU in 6-9 months, but the GTM motion (security sales) is wrong for the editorial buyer. AssuredAI keeps the verb + buyer alignment they can't easily match. |
 | **Sources** | [prompt.security](https://prompt.security), [SentinelOne acquisition](https://www.sentinelone.com/press/sentinelone-to-acquire-prompt-security-to-advance-genai-security/), [Series A Calcalist](https://www.calcalistech.com/ctechnews/article/hkx8pismkg) |
 
-#### 1.6 — AWS Bedrock Automated Reasoning Checks — **HIGHEST 18-MONTH HYPERSCALER THREAT**
+#### 1.6 — AWS Bedrock Automated Reasoning Checks — **HIGHEST 18-MONTH HYPERSCALER THREAT (AWS-scoped subject)**
 
 | Field | Detail |
 |---|---|
+| **What their AI does** | **VERIFIES** Bedrock model outputs against customer-uploaded policies, with formal-reasoning math, inside AWS. Verb is the same as AssuredAI. Subject is "Bedrock outputs," venue is "inside AWS," proof is "CloudWatch log." |
+| **What AssuredAI's AI does** | **VERIFIES** any content from any source, against any pack, cloud-neutral, with cryptographic public proof URL anyone can audit. |
 | **One-line** | AWS-native formal-verification hallucination check for any Bedrock model + ApplyGuardrail API for any LLM |
 | **GA** | Automated Reasoning Checks: Aug 2025 (Dec 2024 preview); Nov 2025 added NL test Q&A generation |
 | **Pricing** | $0.15-$0.17 per 1K text units; 80% price cut Dec 1, 2024 |
 | **Claim** | **Up to 99% verification accuracy** specifically targeting "regulated industries such as healthcare" |
 | **Healthcare-specific** | YES — HIPAA BAA, [healthcare RAG solution guidance](https://aws.amazon.com/blogs/publicsector/how-to-safeguard-healthcare-data-privacy-using-amazon-bedrock-guardrails/), [HIPAA gen-AI blog](https://aws.amazon.com/blogs/industries/hipaa-compliance-for-generative-ai-solutions-on-aws/) |
 | **Gap** | No medical-red-flag taxonomy (cardiac/suicidal-ideation/overdose/severe bleeding); user defines denied topics |
-| **Threat vector** | AWS ships "Healthcare Compliance Pack" with PHI + medical-red-flag templates + HIPAA-friendly logging |
-| **AssuredAI counter** | (1) Cloud-neutral position — Azure/GCP/private-cloud customers won't switch; (2) Public proof URL is the differentiator AWS won't ship; (3) Editorial-workflow integration (CMS, publisher tools, agencies) outside AWS's motion; (4) **AssuredAI consumes Bedrock Guardrails as a plugin — partner, don't compete** |
+| **Threat vector** | AWS ships "Healthcare Compliance Pack" with PHI + medical-red-flag templates + HIPAA-friendly logging — for Bedrock-routed content only. |
+| **AssuredAI counter** | (1) **Same verb, broader subject + venue.** AWS verifies Bedrock outputs in AWS; AssuredAI verifies any content anywhere. (2) **Cloud-neutral** — Azure/GCP/private-cloud customers (majority of regulated publishers) can't or won't lock to AWS. (3) **Public proof URL** — AWS's verification stays inside the customer's AWS account; AssuredAI's is publicly auditable by third parties (regulators, journalists, insurers, plaintiffs). (4) **Editorial workflow integration** outside AWS's motion. (5) **AssuredAI consumes Bedrock Guardrails as an upstream input signal** — partner, don't compete. |
 | **Sources** | [AWS Bedrock pricing](https://aws.amazon.com/bedrock/pricing/), [Automated Reasoning announcement](https://aws.amazon.com/blogs/aws/minimize-ai-hallucinations-and-deliver-up-to-99-verification-accuracy-with-automated-reasoning-checks-now-available/) |
 
 ### TIER 2 — DIRECT COMPETITORS (closest functional analogs by capability)
@@ -633,23 +788,29 @@ Bedrock is **HIPAA-eligible under AWS BAA**, and AWS publishes specific [healthc
 <a id="part-4"></a>
 ## PART 4 — ASSUREDAI vs THE FIELD: CAPABILITY MATRIX
 
-Comparing AssuredAI against the 10 most-credible direct/adjacent competitors on the 9 differentiation dimensions that matter:
+Comparing AssuredAI against the 10 most-credible direct/adjacent competitors. **The first three rows are the structural reframe** — what each vendor's AI actually does (verb), what content it acts on (subject), and whether the output produces public cryptographic proof. The rest are feature-by-feature.
 
 | Capability | Writer.com | John Snow Labs | Veeva PromoMats | Prompt Security | Limina | Tonic Textual | AWS Bedrock | Patronus | Arize | **AssuredAI** |
 |---|---|---|---|---|---|---|---|---|---|---|
-| Per-paragraph fact-check vs **external vetted source library** | partial (KG) | yes (PubMed/clinical) | yes (claims library — pharma only) | no | no | no | partial (grounding) | partial (Lynx) | no | **YES** |
+| **AI VERB (the structural dimension)** | generates | extracts | reviews workflow | filters runtime | redacts | redacts | filters guardrail | evaluates LLMs | observes traces | **verifies** |
+| **SUBJECT it acts on** | their own Palmyra outputs | clinical R&D docs | pharma promo only | live employee AI sessions | free-text for ML pipelines | unstructured data for ML | Bedrock model outputs | LLM agent runs | LLM agent runs | **any published content** |
+| **Public cryptographic proof** | no | no | no | no | expert-det. report (private) | no | CloudWatch log (private) | no | no | **YES** |
+| Per-paragraph fact-check vs **external vetted source library** | partial (KG, Palmyra-internal) | yes (curated medical only) | yes (claims library — pharma only) | no | no | no | partial (grounding, Bedrock only) | partial (Lynx eval) | no | **YES (any pack, any source)** |
 | **Pre-built medical red-flag clinical taxonomy** (cardiac/suicidal/overdose/anaphylaxis auto-block) | no | partial | no | no | no | no | DIY | no | no | **YES** |
 | **PHI/PII redaction at I/O boundary** (HIPAA Safe Harbor) | partial | yes (96% F1) | partial | yes (runtime) | yes (full Safe Harbor) | yes | yes | no | partial | **YES (Presidio + custom)** |
 | **Disclaimer auto-injection per vertical** | no | no | partial | no | no | no | no | no | no | **YES** |
 | **Hash-chained tamper-evident audit log** | log only | log only | log only | log only | expert-det. report | log only | CloudWatch log | log only | log only | **YES (SHA-256 chained)** |
 | **Public proof URL** (third-party verifiable) | no | no | no | no | no | no | no | no | no | **YES** |
-| **Editorial workflow / publisher CMS integration** (WordPress + browser extension) | partial (Word add-in) | no | no | YES (browser ext) | no | no | no | no | no | **YES** |
-| **Multi-vertical pack support** (healthcare + finance + gov + legal) | partial (vertical LLMs) | healthcare only | pharma only | horizontal | horizontal | horizontal | horizontal | horizontal | horizontal | **YES (pack-based)** |
+| **Editorial workflow / publisher CMS integration** (WordPress + browser extension) | partial (Word add-in) | no | no | YES (browser ext, but security verb) | no | no | no | no | no | **YES (editorial verb)** |
+| **Multi-vertical pack support** (healthcare + finance + gov + legal + journalism + scientific) | partial (vertical LLMs) | healthcare only | pharma only | horizontal | horizontal | horizontal | horizontal | horizontal | horizontal | **YES (pack-based, marketplace)** |
+| **Source-agnostic input** (AI-generated, human-written, mixed, URL, archive) | Palmyra only | curated medical only | pharma promo only | live AI chat only | data being prepared for ML | data being prepared for ML | Bedrock only | LLM test traces | LLM test traces | **YES (any input)** |
 | **Cloud-neutral / multi-LLM swappable** | Palmyra-locked | JSL-locked | Veeva-locked | yes | yes | yes | AWS-locked | yes | yes | **YES** |
 | HIPAA BAA | UNVERIFIED | yes (Mayo, Cleveland, Kaiser) | n/a (internal pharma) | UNVERIFIED | implied | yes (Enterprise) | yes | no | yes | **target** |
 | SOC 2 Type II | yes | yes | yes | yes | yes | yes | yes | UNVERIFIED | yes | **target** |
 | ISO/IEC 42001 | **yes (rare)** | UNVERIFIED | UNVERIFIED | UNVERIFIED | UNVERIFIED | UNVERIFIED | UNVERIFIED | UNVERIFIED | UNVERIFIED | UNVERIFIED |
 | FedRAMP | no | UNVERIFIED | no | UNVERIFIED | no | UNVERIFIED | yes (gov) | no | UNVERIFIED | **roadmap (12-18 mo)** |
+
+**Reading the matrix:** rows 1–3 are the structural moat. No competitor can change rows 1–3 without rebuilding their product. Rows 4–11 are features any well-funded competitor could match in 6–12 months. **AssuredAI wins by being the only product where all three top rows align: verifies + any-content + public-proof.**
 
 ### Where AssuredAI has a real, defensible moat
 1. **Hash-chained tamper-evident audit log + public proof URL** — Zero competitors ship third-party-verifiable cryptographic proof at the paragraph atom. This maps to EU AI Act Article 50 (Aug 2026 enforcement) and California SB 942 (Jan 2026 effective).
@@ -717,9 +878,31 @@ Comparing AssuredAI against the 10 most-credible direct/adjacent competitors on 
 <a id="part-6"></a>
 ## PART 6 — WEDGES & DEFENSIBLE MOATS
 
-### Wedge 1: "The Verification Layer for AI Content That Wasn't Written in Our Tool"
+### Wedge 0 (THE LEAD): "AI Engine, Any Subject, Cryptographic Proof"
 
-Writer.com, Persado, Markup AI all *lock the writer into their suite*. Half the AI content in regulated industries is written in ChatGPT, Claude, Copilot, internal LLMs, or by human writers using AI assistants. **No other vendor verifies content from ANY source.** This is AssuredAI's clean positioning.
+This is the structural moat that makes every other wedge defensible. AssuredAI is the only product where all three axes align:
+
+1. **AI as engine** — the verification work itself is done by AI (LLM judges, RAG over vetted source library, contextual reasoning, Pythia-style triplet contradiction detection). Not regex. Not human reviewers. Not template matching. **AI verifies.**
+2. **Any subject** — the content being verified can come from anywhere: AI-generated (any LLM), human-written, mixed (AI draft + human edits), URL-fetched, translated, OCR'd from PDF, republished from legacy archive, pasted from email, dictated and transcribed. **The product doesn't know or care where the text came from.**
+3. **Cryptographic public proof** — every verification produces a permanent `/p/[hash]` URL that any third party (regulator, journalist, insurer, plaintiff's attorney, board, customer) can open without credentials and independently verify against the hash chain.
+
+**No other vendor in the dossier has all three.** Most have one. A few have two. Zero have three.
+
+Why this is structurally defensible:
+- **Writer.com cannot adopt #2 (any subject)** without cannibalizing their generation-first business
+- **AWS Bedrock cannot adopt #2 (any cloud)** without abandoning their AWS-lock advantage
+- **Veeva cannot adopt #2 (any vertical)** without abandoning their pharma 94%-revenue gravity
+- **Lakera/Prompt Security cannot adopt #1 (verify, not filter)** without rebuilding from a CISO-buyer GTM into an editorial-buyer GTM
+- **Patronus/Galileo cannot adopt #2 (any input, including non-LLM)** without changing what their eval product actually does
+- **Palantir cannot adopt #3 (public proof)** without violating their cultural-product secrecy
+- **John Snow Labs cannot adopt #1's editorial verb + #3's public proof** without rebuilding for a non-PhD audience
+- **Manual editorial workflows cannot adopt #1 (AI engine)** by definition; they're humans
+
+The mechanical reason this matters: **competitors can copy any single AssuredAI feature in 1-2 sprints. They cannot adopt the engine+subject+proof combination without changing what their company IS.**
+
+### Wedge 1 (was lead, now sub-wedge): "Verification of Content That Wasn't Written in Our Tool"
+
+A specific instance of Wedge 0 #2 (any subject). Writer.com, Persado, Markup AI all *lock the writer into their suite*. Half the AI content in regulated industries is written in ChatGPT, Claude, Copilot, internal LLMs, or by human writers using AI assistants. **AssuredAI verifies content from any source.** This is the cleanest first conversation in every sales meeting against a generation-platform incumbent.
 
 ### Wedge 2: "The Compliance Layer for the 75% of Regulated Publishers Not in Pharma"
 
@@ -754,9 +937,9 @@ WordPress = 43% of all websites + 60% of CMS market. **No AI content compliance 
 
 WordPress VIP (the enterprise tier) explicitly does NOT sell AI content compliance — they sell the *governance container* (RBAC, audit, Parse.ly, Tollbit). **Partnership candidate, not competitor.**
 
-### Wedge 6: "The Browser Extension That Verifies Anywhere a Publisher Writes"
+### Wedge 6: "AI Verification, Wherever a Person Writes — Any Editor, Any Content"
 
-Most competitors are server-side APIs. Prompt Security (now SentinelOne) is the only competitor with a browser extension at scale, and theirs is for *employees using ChatGPT*, not for *publishers reviewing CMS content pre-publication*. The AssuredAI extension can sit on top of Google Docs, Notion, HubSpot, Webflow, WordPress, Salesforce Marketing Cloud Einstein — anywhere a publisher writes.
+Most competitors are server-side APIs. Prompt Security (now SentinelOne) is the only competitor with a browser extension at scale, and theirs filters live employee chat with ChatGPT — a security verb, not a verification verb. The AssuredAI extension performs the verification verb on top of Google Docs, Notion, HubSpot, Webflow, WordPress, Substack, Medium, LinkedIn, ChatGPT, Claude.ai, Gemini, any contenteditable text on the web. **Whether the content was typed by a human, generated by an AI assistant, or pasted from somewhere else, the verification engine is the same.** That generalization is what no competing extension can match without rebuilding for the editorial buyer.
 
 ---
 
@@ -764,6 +947,13 @@ Most competitors are server-side APIs. Prompt Security (now SentinelOne) is the 
 ## PART 7 — STRATEGIC RECOMMENDATIONS
 
 ### IMMEDIATE (THIS WEEK)
+
+0. **Rewrite the marketing site and product copy to reflect the AI-engine / any-subject / public-proof positioning.** This costs nothing in engineering (the product is already content-agnostic) and unlocks the broader TAM immediately. Specific rewrites:
+   - Home hero: "AI-grade verification for every paragraph you publish — yours, your AI's, anyone's." (no industry constraint in the lead)
+   - Sub-hero: "We use AI to inspect every paragraph against your trusted sources, then give you cryptographic proof a regulator can audit. In under 30 seconds."
+   - Verifier tabs: input-type based ("Article I wrote" / "Article my AI wrote" / "Article from a URL" / "Generate from a brief"), not industry-only
+   - FAQ addition: "Does AssuredAI only verify AI-generated content? No. We verify any content. We use AI internally to do the verification."
+   - One-liner everywhere: **"AssuredAI uses AI to verify every paragraph you publish — your writing, your AI's, anyone's — against the sources you trust. With proof."**
 
 1. **Approach John Snow Labs for model-provider partnership** — license Pythia (knowledge-graph hallucination detection) or Healthcare NLP (96% F1 PHI) as one of AssuredAI's verification engines. Pre-empts them shipping a competing product. Defensive moat.
 2. **Approach Healthwise / WebMD Ignite + Wolters Kluwer + Elsevier** for content-library citation partnership. Their 25K+ pre-validated health-ed pieces become AssuredAI's authority corpus; AssuredAI becomes their compliance verification add-on. **Wolters Kluwer is at 50%+ AI adoption already — window closing.**
@@ -783,7 +973,7 @@ Most competitors are server-side APIs. Prompt Security (now SentinelOne) is the 
 
 ### 12-MONTH POSTURE
 
-13. **Win 3-5 named anchor logos** across 3 verticals (hospital system, mid-market law firm, regional payer). Become category-defining for "AI content compliance for regulated publishers."
+13. **Win 3-5 named anchor logos** across 3 verticals (hospital system, mid-market law firm, regional payer, ideally also a journalism outlet or scientific publisher). Become category-defining for **"AI-grade verification infrastructure for regulated content"** — broader than "AI content compliance" and structurally hostile to every named competitor.
 14. **Submit to KLAS for AI Governance category** (KLAS launched AI-specific tracking in 2025–2026). First-mover advantage in the analyst influencing the hospital buyer.
 15. **Build the M&A acquirer relationship map**: WebMD Ignite, Wolters Kluwer, Veeva, Writer.com, Automattic (WordPress.com), Grammarly/Superhuman, IBM, ServiceNow. Multiple-bidder optionality matters more at exit than valuation in a single conversation.
 16. **Position as the Purview-compatible / Bedrock-compatible / SentinelOne-compatible verifier** — partner with the runtime/security layer rather than compete. AssuredAI consumes their PII/jailbreak/safety detection as input signals; AssuredAI ships the proof + audit + medical-taxonomy ON TOP.
