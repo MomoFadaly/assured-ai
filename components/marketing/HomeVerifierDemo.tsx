@@ -564,28 +564,27 @@ function ComposePane({
           placeholder explains what to do. Detected industry shows as
           a small inline tag at top-right, not a dropdown that looks
           like a form field. */}
-      <div className="relative">
-        <textarea
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-          placeholder="Paste any draft — patient handout, fund factsheet, citizen guidance, case summary, press release — or pick a sample below."
-          className="block h-[140px] w-full resize-y rounded-lg border border-white/[0.08] bg-white/[0.03] px-4 py-3 font-mono text-[12.5px] leading-[1.55] text-white placeholder:text-white/35 focus:border-white/20 focus:outline-none focus:ring-2 focus:ring-white/10 sm:h-[180px]"
-          spellCheck={false}
-        />
-        <div className="pointer-events-none absolute right-3 top-3">
-          <IndustryPill
-            industry={industry}
-            setIndustry={setIndustry}
-            detected={industryDetected}
-          />
-        </div>
-      </div>
-      <div className="mt-2 flex items-center justify-between text-[10.5px] text-white/45 font-mono">
+      {/* Pill moved BELOW the textarea — placing it absolutely inside
+          the textarea container overlapped the placeholder text. The
+          meta row beneath the input is the right spot: out of the
+          editing surface, still adjacent. */}
+      <textarea
+        value={text}
+        onChange={(e) => setText(e.target.value)}
+        placeholder="Paste any draft — patient handout, fund factsheet, citizen guidance, case summary, press release — or pick a sample below."
+        className="block h-[140px] w-full resize-y rounded-lg border border-white/[0.08] bg-white/[0.03] px-4 py-3 font-mono text-[12.5px] leading-[1.55] text-white placeholder:text-white/35 focus:border-white/20 focus:outline-none focus:ring-2 focus:ring-white/10 sm:h-[180px]"
+        spellCheck={false}
+      />
+      <div className="mt-2 flex items-center justify-between gap-3 text-[10.5px] font-mono text-white/45">
         <span className={tooShort || text.length > 7600 ? 'text-amber-300' : ''}>
           {text.length.toLocaleString()} / 8,000
           {tooShort ? ' · need 80+' : ''}
         </span>
-        <span>{picked ? `Loaded: ${picked.label}` : 'Or paste your own'}</span>
+        <IndustryPill
+          industry={industry}
+          setIndustry={setIndustry}
+          detected={industryDetected}
+        />
       </div>
 
       {/* Sample chips — compact single-line horizontal row directly
