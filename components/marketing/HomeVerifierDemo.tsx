@@ -144,7 +144,11 @@ interface VerifyResult {
 type Phase = 'compose' | 'running' | 'result' | 'error';
 
 export function HomeVerifierDemo() {
-  const [phase, setPhase] = useState<Phase>('compose');
+  // Phase is DERIVED from the underlying state (isStreaming / result / error)
+  // — never set imperatively. An earlier version had a separate `phase` state
+  // that got reset back to 'compose' under some race condition, leaving the
+  // chrome pip showing "verified" while the body showed the compose pane.
+  // Deriving phase from the truth-bearing state removes that bug class.
   const [text, setText] = useState('');
   const [picked, setPicked] = useState<HomeVerifierSample | null>(null);
   const [industry, setIndustry] = useState<IndustrySlug>('healthcare');
@@ -157,7 +161,16 @@ export function HomeVerifierDemo() {
   const [packContext, setPackContext] = useState<PackContext | null>(null);
   const [result, setResult] = useState<VerifyResult | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [isStreaming, setIsStreaming] = useState(false);
   const [copied, setCopied] = useState(false);
+
+  const phase: Phase = errorMessage
+    ? 'error'
+    : result
+      ? 'result'
+      : isStreaming
+        ? 'running'
+        : 'compose';
 
   const logEndRef = useRef<HTMLDivElement | null>(null);
   const classifyAbort = useRef<AbortController | null>(null);
@@ -214,10 +227,9 @@ export function HomeVerifierDemo() {
   const handleVerify = useCallback(async () => {
     if (text.trim().length < 80) {
       setErrorMessage('Paste at least a few sentences (80 characters minimum).');
-      setPhase('error');
       return;
     }
-    setPhase('running');
+    setIsStreaming(true);
     setLog([]);
     setResult(null);
     setErrorMessage(null);
@@ -272,7 +284,8 @@ export function HomeVerifierDemo() {
       }
     } catch (err) {
       setErrorMessage(err instanceof Error ? err.message : 'Network error');
-      setPhase('error');
+    } finally {
+      setIsStreaming(false);
     }
   }, [industry, text]);
 
@@ -313,26 +326,26 @@ export function HomeVerifierDemo() {
 
     if (event === 'result') {
       const r = data as VerifyResult;
-      setResult(r);
       const tone = VERDICT_TONE[r.verdict] ?? VERDICT_TONE.verified!;
       appendLog({
         id: 'done',
         tone: tone.tone === 'pass' ? 'pass' : tone.tone === 'block' ? 'block' : 'warn',
         text: `${tone.headline} · ${(r.elapsed_ms / 1000).toFixed(1)}s · audit #${r.audit_log_id ?? '—'}`,
       });
-      // Transition to result phase immediately — earlier setTimeout-based
-      // dramatic pause silently dropped some result transitions in prod
-      // (phase stayed 'running' even after audit#X log line appeared).
-      // The brief enter animation on the result pane provides enough
-      // dramatic beat by itself.
-      setPhase('result');
+      // Setting result alone is enough — phase derives from (errorMessage,
+      // result, isStreaming). When result becomes truthy, phase flips to
+      // 'result' on the next render. We also setIsStreaming(false) here
+      // rather than waiting for the SSE end event so the transition fires
+      // immediately when verification completes.
+      setResult(r);
+      setIsStreaming(false);
       return;
     }
 
     if (event === 'error') {
       const e = data as { message?: string; error?: string };
       setErrorMessage(e.message ?? e.error ?? 'Verification failed');
-      setPhase('error');
+      setIsStreaming(false);
       return;
     }
   }, []);
@@ -345,11 +358,11 @@ export function HomeVerifierDemo() {
   }, []);
 
   const handleReset = useCallback(() => {
-    setPhase('compose');
     setLog([]);
     setResult(null);
     setErrorMessage(null);
     setPackContext(null);
+    setIsStreaming(false);
   }, []);
 
   const handleCopy = useCallback(() => {
