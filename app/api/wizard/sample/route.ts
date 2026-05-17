@@ -221,6 +221,32 @@ function buildResultPayload(result: VerifyResponse, elapsed_ms: number) {
     : null;
 
   if (result.kind === 'verified') {
+    // Build per-paragraph view: each paragraph with its text, support state,
+    // and the (per-paragraph) citations that backed it. This powers the
+    // result panel's "verified content with inline citations + redaction
+    // marks" view — the world-class differentiator over count-tile mirrors.
+    const verifiedParagraphs = result.paragraphs.map((p) => {
+      if (p.support.kind === 'supported') {
+        return {
+          text: p.text,
+          supported: true,
+          citations: p.support.citations.map((c) => ({
+            title: c.title,
+            url: c.url,
+            organization: c.organization,
+          })),
+          best_match_similarity: p.support.top_similarity,
+        };
+      }
+      return {
+        text: p.text,
+        supported: false,
+        citations: [],
+        best_match_similarity: p.support.top_similarity,
+        best_match_url: p.support.best_match?.url ?? null,
+      };
+    });
+
     return {
       ok: true,
       kind: result.kind,
@@ -236,6 +262,12 @@ function buildResultPayload(result: VerifyResponse, elapsed_ms: number) {
         url: c.url,
         organization: c.organization,
       })),
+      // The actual working article AFTER redactions + disclaimer injection.
+      // This is what gets shown in the result panel as "your verified
+      // content", with redacted spans appearing as <PERSON>, <EMAIL>, etc.
+      verified_article: result.verified_article,
+      // Per-paragraph: text + supported flag + matched citations.
+      verified_paragraphs: verifiedParagraphs,
       paragraphs: {
         total: result.paragraphs.length,
         supported: result.report.supported_paragraph_count,

@@ -133,6 +133,16 @@ interface VerifyResult {
   elapsed_ms: number;
   citations?: Array<{ title: string; url: string; organization: string | null }>;
   paragraphs?: { total: number; supported: number; unsourced: number };
+  /** Working article AFTER input/output redaction + disclaimer injection. */
+  verified_article?: string;
+  /** Per-paragraph: text + supported flag + matched citations. */
+  verified_paragraphs?: Array<{
+    text: string;
+    supported: boolean;
+    citations: Array<{ title: string; url: string; organization: string | null }>;
+    best_match_similarity: number;
+    best_match_url?: string | null;
+  }>;
   pii?: { input_count: number; output_count: number };
   disclaimer?: { required: boolean; was_present: boolean; injected: boolean };
   red_flag?: { triggered: boolean; category?: string; message?: string };
@@ -155,6 +165,8 @@ export function HomeVerifierDemo() {
   const [industryDetected, setIndustryDetected] = useState<{
     primary: IndustrySlug | null;
     confidence: 'high' | 'medium' | 'low';
+    alternate?: IndustrySlug | null;
+    scores?: Array<{ industry: IndustrySlug; percent: number }>;
   } | null>(null);
 
   const [log, setLog] = useState<LogLine[]>([]);
@@ -197,10 +209,17 @@ export function HomeVerifierDemo() {
         .then(
           (j: {
             primary: IndustrySlug | null;
+            alternate?: IndustrySlug | null;
             confidence: 'high' | 'medium' | 'low';
+            scores?: Array<{ industry: IndustrySlug; percent: number }>;
           } | null) => {
             if (!j) return;
-            setIndustryDetected({ primary: j.primary, confidence: j.confidence });
+            setIndustryDetected({
+              primary: j.primary,
+              confidence: j.confidence,
+              alternate: j.alternate ?? null,
+              scores: j.scores,
+            });
             if (j.primary && j.confidence !== 'low') {
               setIndustry(j.primary);
             }
@@ -543,7 +562,7 @@ function ComposePane({
         value={text}
         onChange={(e) => setText(e.target.value)}
         placeholder="Paste an article, patient handout, fund factsheet, citizen guidance, case summary — anything you'd publish externally. Or pick a sample below to start fast."
-        className="block h-[160px] w-full resize-y rounded-md border border-border bg-background px-3 py-2.5 text-[12.5px] leading-relaxed text-foreground placeholder:text-muted-foreground/70 focus:outline-none focus:ring-2 focus:ring-primary/30"
+        className="block h-[120px] w-full resize-y rounded-md border border-border bg-background px-3 py-2.5 text-[12.5px] leading-relaxed text-foreground placeholder:text-muted-foreground/70 focus:outline-none focus:ring-2 focus:ring-primary/30 sm:h-[160px]"
         spellCheck={false}
       />
       <div className="mt-1 flex items-center justify-between text-[10.5px] text-muted-foreground">
@@ -565,7 +584,7 @@ function ComposePane({
       </div>
 
       {/* Sample chips — one per vertical. */}
-      <div className="mt-3 grid grid-cols-2 gap-1.5">
+      <div className="mt-3 grid grid-cols-1 gap-1.5 sm:grid-cols-2">
         {samples.map((s) => {
           const Icon = ICON_BY_NAME[s.icon];
           const selected = picked?.id === s.id;
@@ -626,7 +645,12 @@ function IndustryPill({
 }: {
   industry: IndustrySlug;
   setIndustry: (i: IndustrySlug) => void;
-  detected: { primary: IndustrySlug | null; confidence: 'high' | 'medium' | 'low' } | null;
+  detected: {
+    primary: IndustrySlug | null;
+    confidence: 'high' | 'medium' | 'low';
+    alternate?: IndustrySlug | null;
+    scores?: Array<{ industry: IndustrySlug; percent: number }>;
+  } | null;
 }) {
   const Icon =
     industry === 'healthcare'
@@ -636,6 +660,36 @@ function IndustryPill({
         : industry === 'government'
           ? Landmark
           : Scale;
+
+  // Low-confidence cross-vertical content (e.g. "financial planning for
+  // diabetics") gets a disambiguation chip-group so the user picks the
+  // right pack in one tap, with the actual percentage scores from the
+  // classifier visible. Same data is available from /api/wizard/classify.
+  if (detected?.primary && detected.confidence === 'low' && detected.alternate && detected.scores) {
+    const top2 = detected.scores.filter((s) => s.percent > 0).slice(0, 2);
+    return (
+      <div className="inline-flex items-center gap-1">
+        <span className="hidden text-[9.5px] uppercase tracking-[0.14em] text-amber-600 sm:inline">
+          ambiguous · pick
+        </span>
+        {top2.map((s) => (
+          <button
+            key={s.industry}
+            type="button"
+            onClick={() => setIndustry(s.industry)}
+            className="inline-flex items-center gap-1 rounded-md border px-1.5 py-1 text-[10.5px] font-medium"
+            style={{
+              borderColor: s.industry === industry ? '#0d9488' : 'hsl(var(--border))',
+              backgroundColor: s.industry === industry ? 'rgba(13,148,136,0.08)' : 'transparent',
+            }}
+          >
+            {INDUSTRY_LABEL[s.industry]} · {s.percent}%
+          </button>
+        ))}
+      </div>
+    );
+  }
+
   return (
     <div className="inline-flex items-center gap-1.5">
       {detected?.primary && detected.confidence !== 'low' && detected.primary === industry && (
@@ -826,6 +880,49 @@ function ResultPane({
         </Panel>
       )}
 
+      {/* VERIFIED CONTENT — paragraph by paragraph, with redaction tokens
+          rendered as styled chips and per-paragraph citation badges. This
+          is the world-class differentiator: visitors see the actual work
+          done on their content, not a summary of counts. */}
+      {result.verified_paragraphs && result.verified_paragraphs.length > 0 && (
+        <Panel title="Your verified content" tone="pass">
+          <div className="space-y-2.5">
+            {result.verified_paragraphs.map((p, idx) => (
+              <div
+                key={idx}
+                className="rounded-md border border-border/60 bg-background/60 px-2.5 py-2"
+              >
+                <div className="text-[11.5px] leading-relaxed text-foreground/85">
+                  {renderParagraphWithRedactionChips(p.text)}
+                </div>
+                <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
+                  {p.supported ? (
+                    p.citations.map((c) => (
+                      <a
+                        key={c.url}
+                        href={c.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 rounded-full border border-emerald-500/30 bg-emerald-500/[0.06] px-1.5 py-0.5 text-[10px] font-medium text-emerald-700 hover:bg-emerald-500/[0.12]"
+                        title={c.organization ?? undefined}
+                      >
+                        <CheckCircle2 className="h-2.5 w-2.5" />
+                        {c.title}
+                      </a>
+                    ))
+                  ) : (
+                    <span className="inline-flex items-center gap-1 rounded-full border border-amber-500/30 bg-amber-500/[0.06] px-1.5 py-0.5 text-[10px] font-medium text-amber-700">
+                      <AlertTriangle className="h-2.5 w-2.5" />
+                      Unsourced — review recommended
+                    </span>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </Panel>
+      )}
+
       {/* Citations */}
       {result.citations && result.citations.length > 0 && (
         <Panel
@@ -983,6 +1080,44 @@ function Panel({
       {children}
     </div>
   );
+}
+
+/**
+ * Render a paragraph whose Presidio output may contain `<TOKEN>` placeholders
+ * (e.g. <PERSON>, <EMAIL_ADDRESS>, <PHONE_NUMBER>, <MEDICAL_RECORD_NUMBER>) as
+ * styled redaction chips inline with the normal text. This makes the
+ * verification VISIBLE — the user can see exactly which spans the system
+ * caught and replaced, not just a count.
+ *
+ * The regex matches all-caps tokens inside angle brackets — that's the
+ * Presidio default format. Unrelated angle-bracketed content (rare in
+ * regulated copy) will be treated as a chip too, which is an acceptable
+ * false-positive for the demo surface.
+ */
+function renderParagraphWithRedactionChips(text: string): React.ReactNode {
+  const pattern = /<([A-Z][A-Z_0-9]*)>/g;
+  const parts: React.ReactNode[] = [];
+  let lastIdx = 0;
+  let match: RegExpExecArray | null;
+  let chipIdx = 0;
+  while ((match = pattern.exec(text)) !== null) {
+    if (match.index > lastIdx) {
+      parts.push(text.slice(lastIdx, match.index));
+    }
+    const token = match[1] ?? 'REDACTED';
+    parts.push(
+      <span
+        key={`chip-${chipIdx++}`}
+        className="inline-flex items-center rounded bg-amber-500/[0.18] px-1 py-px font-mono text-[10px] font-semibold uppercase tracking-[0.04em] text-amber-700"
+        title={`Redacted: ${token}`}
+      >
+        {token}
+      </span>,
+    );
+    lastIdx = match.index + match[0].length;
+  }
+  if (lastIdx < text.length) parts.push(text.slice(lastIdx));
+  return parts.length > 0 ? parts : text;
 }
 
 // =============================================================
