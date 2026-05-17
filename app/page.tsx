@@ -16,6 +16,7 @@ import { ShowcaseStrip } from '@/components/marketing/ShowcaseStrip';
 import { HashChainCanvas } from '@/components/marketing/HashChainCanvas';
 import { OutcomesStrip } from '@/components/marketing/OutcomesStrip';
 import { SectorTrust } from '@/components/marketing/SectorTrust';
+import { HomeVerifierSection } from '@/components/marketing/HomeVerifierSection';
 import { getGlobalMetrics } from '@/lib/marketing/global-metrics';
 import { WhitePaperQuote } from '@/components/marketing/Quote';
 import { VoiceSection, WordPressDiagram } from '@/components/marketing/VoiceSection';
@@ -67,6 +68,10 @@ export default async function LandingPage() {
       <MarketingHeader authChip={<HeaderAuthChip />} />
       <main>
         <Hero proofExampleId={proofExampleId} />
+        {/* The verifier no longer lives in the hero — it gets its own
+            dedicated section so the hero can breathe and the verifier
+            can be the centerpiece it deserves to be. */}
+        <HomeVerifierSection />
         <OutcomesStrip metrics={metrics} />
         <SectorTrust />
         <Audience />
