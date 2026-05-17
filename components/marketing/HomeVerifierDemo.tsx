@@ -417,18 +417,21 @@ export function HomeVerifierDemo() {
           </div>
         </div>
 
-        {/* min-h locks the container so the absolutely-positioned RunningPane
-            has somewhere to render while the ComposePane's exit animation
-            finishes. mode="wait" serializes the picker→running→result
-            transitions so two phases never render simultaneously — fixes
-            the overlay bug where the textarea ghosted behind the streaming
-            log. All four branches have explicit exit props, so wait mode
-            never wedges. */}
+        {/* Phase swap WITHOUT AnimatePresence.
+            Earlier iterations used framer's AnimatePresence with mode="wait"
+            but the exit animation got stuck mid-transition — the compose
+            pane stayed visible at ~30% opacity for the entire run instead
+            of unmounting. Replaced with hard conditional rendering plus a
+            CSS-only fade-in animation on the entering pane. Trade-off:
+            no exit animation, but reliable phase swaps. min-h locks the
+            container height so swaps don't cause layout jump.
+
+            The `key` on the wrapper div forces React to remount on phase
+            change, which retriggers the CSS `animate-in fade-in` class. */}
         <div className="relative min-h-[488px]">
-          <AnimatePresence initial={false} mode="wait">
+          <div key={phase} className="animate-in fade-in duration-200">
             {phase === 'compose' && (
               <ComposePane
-                key="compose"
                 text={text}
                 setText={setText}
                 industry={industry}
@@ -443,7 +446,6 @@ export function HomeVerifierDemo() {
             )}
             {phase === 'running' && (
               <RunningPane
-                key="running"
                 log={log}
                 packContext={packContext}
                 logEndRef={logEndRef}
@@ -452,7 +454,6 @@ export function HomeVerifierDemo() {
             )}
             {phase === 'result' && result && verdictTone && (
               <ResultPane
-                key="result"
                 result={result}
                 tone={verdictTone}
                 packContext={packContext}
@@ -462,13 +463,7 @@ export function HomeVerifierDemo() {
               />
             )}
             {phase === 'error' && (
-              <motion.div
-                key="error"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="px-5 py-6"
-              >
+              <div className="px-5 py-6">
                 <div className="rounded-md border border-red-500/40 bg-red-500/[0.06] p-3 text-[12.5px] text-red-700">
                   Verification didn&rsquo;t complete: {errorMessage ?? 'Unknown error'}
                 </div>
@@ -479,9 +474,9 @@ export function HomeVerifierDemo() {
                 >
                   Try again
                 </button>
-              </motion.div>
+              </div>
             )}
-          </AnimatePresence>
+          </div>
         </div>
 
         {/* Footer link to full wizard */}
@@ -532,12 +527,7 @@ function ComposePane({
 }) {
   const tooShort = text.trim().length > 0 && text.trim().length < 80;
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0, transition: { duration: 0.18 } }}
-      className="px-5 pt-5 pb-4"
-    >
+    <div className="px-5 pt-5 pb-4">
       <div className="mb-2.5 flex items-center justify-between">
         <div className="text-[10.5px] font-semibold uppercase tracking-[0.18em] text-foreground/65">
           Paste or pick a sample · verify in 6 seconds
@@ -625,7 +615,7 @@ function ComposePane({
       <p className="mt-2 text-center text-[10.5px] text-muted-foreground">
         Real pipeline · real audit row · real public /v/&lt;id&gt; URL · no signup
       </p>
-    </motion.div>
+    </div>
   );
 }
 
@@ -687,18 +677,9 @@ function RunningPane({
   accent: string;
 }) {
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0, transition: { duration: 0.18 } }}
+    <div
       role="status"
       aria-live="polite"
-      // In-flow (not absolute). The previous `absolute inset-0` created a
-      // stacking context that interacted with framer's opacity animation
-      // and the parent's transform context, producing a stuck-at-low-
-      // opacity bug where the streaming log rendered at ~13% visibility
-      // through the whole run. The parent's min-h-[488px] keeps the
-      // container stable across the compose/running/result transitions.
       className="flex h-[488px] flex-col px-5 pt-4 pb-4"
     >
       <div className="mb-2 flex items-baseline justify-between">
@@ -763,7 +744,7 @@ function RunningPane({
         </ul>
         <div ref={logEndRef} />
       </div>
-    </motion.div>
+    </div>
   );
 }
 
@@ -799,13 +780,7 @@ function ResultPane({
   copied: boolean;
 }) {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, transition: { duration: 0.18 } }}
-      transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
-      className="max-h-[520px] overflow-y-auto px-5 pt-4 pb-4"
-    >
+    <div className="max-h-[520px] overflow-y-auto px-5 pt-4 pb-4">
       {/* Verdict band */}
       <div className="flex items-start justify-between gap-3">
         <div>
@@ -983,7 +958,7 @@ function ResultPane({
         <RefreshCw className="h-3 w-3" />
         Verify another piece
       </button>
-    </motion.div>
+    </div>
   );
 }
 
