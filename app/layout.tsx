@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Geist, Geist_Mono, Instrument_Serif } from 'next/font/google';
+import { Geist, Geist_Mono, Instrument_Serif, Fraunces, Allison } from 'next/font/google';
 import { Analytics } from '@vercel/analytics/next';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import './globals.css';
@@ -19,6 +19,21 @@ const instrumentSerif = Instrument_Serif({
   subsets: ['latin'],
   weight: '400',
   style: ['normal', 'italic'],
+  display: 'swap',
+});
+const fraunces = Fraunces({
+  variable: '--font-display',
+  subsets: ['latin'],
+  axes: ['SOFT', 'WONK', 'opsz'],
+  display: 'swap',
+});
+// Allison — thin single-weight handwriting script used for the personal
+// sign-off at the bottom of the prototype disclaimer. Self-hosted via
+// next/font/google so we don't trip the CSP's Google-Fonts-CDN block.
+const allison = Allison({
+  variable: '--font-script',
+  subsets: ['latin'],
+  weight: ['400'],
   display: 'swap',
 });
 
@@ -113,7 +128,18 @@ export default function RootLayout({
         />
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${instrumentSerif.variable} font-sans antialiased`}
+        // suppressHydrationWarning is the React-sanctioned escape hatch
+        // for body attribute mismatches caused by browser extensions
+        // (ColorZilla injects cz-shortcut-listen, Grammarly injects
+        // data-gramm, LastPass / Honey / etc. all do similar things).
+        // The extension modifies the body DOM before React hydrates,
+        // so React sees a mismatch between server HTML (no attribute)
+        // and client DOM (extension-added attribute). This warning
+        // doesn't affect the page — it's purely an extension artifact
+        // — but it pollutes the dev console and triggers the Next.js
+        // error overlay. Suppressing here is the canonical fix.
+        suppressHydrationWarning
+        className={`${geistSans.variable} ${geistMono.variable} ${instrumentSerif.variable} ${fraunces.variable} ${allison.variable} font-sans antialiased`}
       >
         <a href="#hero" className="skip-link">
           Skip to main content

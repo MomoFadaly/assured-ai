@@ -1,0 +1,17 @@
+import { chromium } from 'playwright';
+import { writeFile } from 'node:fs/promises';
+const b = await chromium.launch({ headless: true });
+const c = await b.newContext({ viewport: { width: 1440, height: 900 }, deviceScaleFactor: 2 });
+const p = await c.newPage();
+const errs = [];
+p.on('pageerror', e => errs.push(e.message));
+p.on('console', m => { if (m.type() === 'error') errs.push(`[err] ${m.text()}`); });
+await p.goto('http://localhost:3030', { waitUntil: 'networkidle', timeout: 90000 });
+await p.waitForTimeout(5000);
+const finalHtml = await p.evaluate(() => document.documentElement.outerHTML);
+await writeFile('/tmp/final-dom.html', finalHtml);
+console.log(`DOM dumped, length=${finalHtml.length}`);
+console.log('cinema sound matches:', (finalHtml.match(/cinema sound/g) || []).length);
+console.log('Sound on/off matches:', (finalHtml.match(/Sound o[nf]f/g) || []).length);
+console.log('Errors:', errs.slice(0, 5));
+await b.close();

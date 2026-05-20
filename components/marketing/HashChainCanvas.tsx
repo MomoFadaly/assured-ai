@@ -216,7 +216,7 @@ function ChainBlock({
         fill="white"
         stroke={colors.fill}
         strokeWidth="1.5"
-        initial={reduceMotion ? false : { boxShadow: 'none' }}
+        initial={reduceMotion ? false : { filter: 'drop-shadow(0 0 0 rgba(0,0,0,0))' }}
         animate={inView ? { filter: 'drop-shadow(0 8px 16px rgba(0,0,0,0.08))' } : undefined}
       />
       {/* Tone bar at top */}

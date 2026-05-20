@@ -61,3 +61,10 @@ Thumbs.db
 
 # external white papers / large binaries — should be linked, not vendored
 docs/*.pdf
+
+# video build artifacts (large, regeneratable)
+/.video-build/
+
+# backup files
+*.backup-*
+*.backup

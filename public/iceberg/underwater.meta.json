@@ -1,0 +1,9 @@
+{
+  "slot": "underwater",
+  "model": "fal-ai/flux-pro/v1.1-ultra",
+  "prompt": "Photograph taken from deep beneath the ocean surface, looking upward at the colossal underside of an iceberg. The iceberg's submerged bulk fills the upper two-thirds of the frame as a luminous ethereal blue-green cathedral of ice, irregular and cavernous. Above the iceberg the waterline glows with diffused sunlight breaking through, like backlit stained glass. Long god-rays pierce downward into the indigo depths below. Eerie cold reverent atmosphere. Cinematic. Hyper-realistic. National Geographic underwater photography style. No divers, no fish, no submarines, no text, no letters, no logos, no annotations. 3:2 aspect ratio.",
+  "seed": 3539003807,
+  "generatedAt": "2026-05-19T20:25:56.746Z",
+  "elapsedSeconds": 9.7,
+  "bytes": 708796
+}

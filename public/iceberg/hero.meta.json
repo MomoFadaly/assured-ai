@@ -1,0 +1,9 @@
+{
+  "slot": "hero",
+  "model": "fal-ai/flux-pro/v1.1-ultra",
+  "prompt": "Cinematic split-view photograph of a massive iceberg in cold Arctic ocean, shown from a side angle so that both the above-water peak and the enormous below-water mass are visible simultaneously through the waterline. The tip above water is small and sharply pointed, perhaps 10% of the total bulk, brilliant white with cool blue shadow. The underwater portion is vast, ethereally glowing in deep teal and emerald, extending downward like a cathedral. A sharp horizontal waterline cleanly divides the frame. Dramatic side-lighting from the upper left casts long shadows. Cool muted palette of steel-blue, deep teal, off-white, and pale gold rim-light. Subtle volumetric god-rays piercing the water below. Misty atmospheric depth, faint Arctic horizon. Editorial National Geographic photography style. Hyper-realistic. Shot on Hasselblad H6D-100c, 50mm lens, f/8, ISO 200, polarising filter. No people, no boats, no birds, no text, no letters, no logos, no UI elements, no annotations. 16:9 aspect ratio.",
+  "seed": 3833768128,
+  "generatedAt": "2026-05-19T20:25:09.260Z",
+  "elapsedSeconds": 9.8,
+  "bytes": 543558
+}

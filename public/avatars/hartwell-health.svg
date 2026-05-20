@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">
+  <defs>
+    <linearGradient id="hh-bg" x1="0" y1="0" x2="120" y2="120" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#1f5b3c"/>
+      <stop offset="1" stop-color="#0e3c25"/>
+    </linearGradient>
+  </defs>
+  <rect width="120" height="120" rx="60" fill="url(#hh-bg)"/>
+  <!-- Medical cross — universally legible as "health brand" at small sizes.
+       Rounded corners give it a modern, branded feel rather than a generic
+       first-aid icon. -->
+  <rect x="50" y="26" width="20" height="68" rx="6" fill="#FFFFFF"/>
+  <rect x="26" y="50" width="68" height="20" rx="6" fill="#FFFFFF"/>
+</svg>

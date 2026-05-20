@@ -2,6 +2,19 @@
 @tailwind components;
 @tailwind utilities;
 
+/* When the IndustryShowcase section is in viewport, the cinematic
+   full-bleed layout owns the entire viewport — we hide the sticky
+   marketing header, scroll progress bar, and any other chrome so
+   the immersive composition reads without competing UI. The class
+   is toggled on <body> by an IntersectionObserver in IndustryShowcase. */
+body.industry-immersive header.sticky,
+body.industry-immersive [aria-label="Top progress indicator"] {
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 220ms ease, visibility 0s linear 220ms;
+}
+
 @layer base {
   :root {
     /* Calm, professional palette tuned for editorial workflows */
@@ -99,6 +112,96 @@
   /* Subtle dotted underline for inline annotations */
   .pii-token {
     @apply rounded bg-amber-100/80 px-1 py-px font-mono text-[0.85em] text-amber-900 dark:bg-amber-900/30 dark:text-amber-200;
+  }
+
+  /* ───────────────────────────────────────────────────────────────────
+     Editorial layer — scoped to /business via .editorial wrapper.
+     Applies world-class type defaults across the whole brief without
+     having to tag every individual paragraph or table cell.
+     Reference register: Stripe Press · Atlantic Brief · FT Weekend.
+     ─────────────────────────────────────────────────────────────── */
+  .editorial {
+    /* Tabular figures everywhere — numbers align column-to-column in
+       charts, tables, stats, financial lines. Lining figures (uppercase
+       digit style). Hanging punctuation enabled. */
+    font-variant-numeric: tabular-nums lining-nums;
+    font-feature-settings: 'cv11', 'ss01', 'ss03', 'ss04', 'tnum', 'lnum';
+    hanging-punctuation: first last;
+  }
+  /* All numbers in chart SVG text default to tabular */
+  .editorial svg text {
+    font-variant-numeric: tabular-nums;
+  }
+  /* Pretty wrapping on every paragraph; balanced wrapping on headings */
+  .editorial p,
+  .editorial dd,
+  .editorial li {
+    text-wrap: pretty;
+  }
+  .editorial h1,
+  .editorial h2,
+  .editorial h3,
+  .editorial h4 {
+    text-wrap: balance;
+  }
+  /* Body line-length discipline — caps reading column at 68ch unless
+     an explicit max-w utility overrides. Optimal reading is 45–75ch. */
+  .editorial .reading-column {
+    max-width: 68ch;
+  }
+  /* Fraunces optical sizing — bigger opsz on large display, smaller on
+     small. Cascades to every font-display element inside .editorial. */
+  .editorial .font-display {
+    font-variation-settings: 'opsz' 144, 'SOFT' 50, 'WONK' 0;
+  }
+  .editorial .font-display.is-small,
+  .editorial h3.font-display,
+  .editorial p.font-display {
+    font-variation-settings: 'opsz' 24, 'SOFT' 50, 'WONK' 0;
+  }
+  /* Drop-cap utility — opt-in via `editorial-dropcap` on a paragraph.
+     First letter renders as 4-line tall Fraunces with optical 144. */
+  .editorial p.editorial-dropcap::first-letter {
+    font-family: var(--font-display), Georgia, serif;
+    font-weight: 500;
+    font-variation-settings: 'opsz' 144, 'SOFT' 30, 'WONK' 0;
+    font-size: 4.2em;
+    line-height: 0.85;
+    float: left;
+    padding: 0.05em 0.12em 0 0;
+    color: hsl(var(--primary));
+  }
+  /* Pull-quote treatment — italic Fraunces with hanging quote mark. */
+  .editorial blockquote.pull {
+    @apply border-l-2 border-emerald-700/40 pl-8;
+    font-family: var(--font-display), Georgia, serif;
+    font-style: italic;
+    font-size: clamp(1.4rem, 2.2vw, 1.9rem);
+    line-height: 1.35;
+    font-variation-settings: 'opsz' 72, 'SOFT' 80, 'WONK' 0;
+    text-wrap: balance;
+  }
+  /* Caption convention — italic Fraunces. */
+  .editorial figcaption,
+  .editorial .caption {
+    font-family: var(--font-display), Georgia, serif;
+    font-style: italic;
+    font-size: 14px;
+    line-height: 1.5;
+    color: hsl(var(--muted-foreground));
+  }
+  /* Mono caps eyebrow — one tracking value, system-wide. */
+  .editorial .eyebrow {
+    font-family: var(--font-geist-mono), ui-monospace, monospace;
+    font-size: 12px;
+    line-height: 1.4;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    font-variant-numeric: tabular-nums;
+  }
+  /* Smart selection on dark or light canvas — emerald instead of blue */
+  .editorial ::selection {
+    background: hsl(152 60% 50% / 0.22);
   }
 }
 
@@ -445,6 +548,539 @@
     animation: chain-block-in 700ms cubic-bezier(0.16, 1, 0.3, 1) backwards;
   }
 
+  /* Cinema cold-open grain drift — see ColdOpenGrain in StoryCinema.tsx.
+     A 60s linear loop of subtle paper-grain translation. Translates by
+     exactly one full tile (240px) on each axis so the loop is seamless
+     — no visible "jump" at the wrap point. The slow speed keeps it
+     readable as grain (a surface), not as motion (a moving overlay). */
+  @keyframes cinemaGrainDrift {
+    0%   { background-position:   0px   0px; }
+    50%  { background-position: 240px 120px; }
+    100% { background-position: 480px 240px; }
+  }
+
+  /* ── Cold-open type-on character entry ───────────────────────────
+     Each character of the prequel/headline enters with a 110ms
+     easeOut fade-in from opacity 0 + translateY(4px) — the physical
+     motion of a keystrike, transposed to type. The eye doesn't
+     consciously see the easing but it FEELS the difference between
+     "characters teleport in" (the previous behavior) and "characters
+     are being written" (this behavior). This is the single biggest
+     craft change in the polish pass. */
+  /* Char arrival — opacity + translateY + a brief blur-clear. The
+     blur (1.2px → 0) reads as "ink still wet" — the char arrives
+     slightly out of focus then crisps up. Pairs with the translateY
+     to make the arrival feel physical (ink landing on paper) rather
+     than digital (state swap). */
+  @keyframes coldOpenCharIn {
+    from { opacity: 0; transform: translateY(4px); filter: blur(1.2px); }
+    to   { opacity: 1; transform: translateY(0); filter: blur(0); }
+  }
+  /* Alex caption shift — when Alex's caption changes between mood
+     states, the new caption fades-in from below over 280ms. Subtle
+     enough not to demand attention; perceptible enough that the
+     user registers "her face just changed meaning." */
+  @keyframes alexCaptionIn {
+    from { opacity: 0; transform: translateY(3px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  /* David Chen heartbeat — slow 60bpm pulse on the spotlight
+     portrait border during the devastating-line moment. Used by
+     DavidChenSpotlight when active. */
+  /* David spotlight portrait — heartbeat pulse SYNCED to audio (T4).
+     Previously ran on a 1000ms fixed CSS animation, which drifted
+     from the audio heartbeat over time. Now the audio engine fires
+     `cinema:david-pulse` events at the exact moment each audio
+     heartbeat plays — synced to AudioContext.currentTime (precise to
+     the millisecond). React state toggles `data-pulse` on the
+     portrait, triggering this one-shot 600ms animation. Audio and
+     visual literally share the same clock — they CAN'T desync. */
+  @keyframes davidHeartbeatPulse {
+    0%   { box-shadow: 0 30px 60px -20px rgba(0,0,0,0.85), 0 0 0 1px rgba(198,43,43,0.22), 0 0 60px -20px rgba(198,43,43,0.28); }
+    25%  { box-shadow: 0 30px 60px -20px rgba(0,0,0,0.85), 0 0 0 1px rgba(198,43,43,0.65), 0 0 130px -20px rgba(198,43,43,0.72); }
+    100% { box-shadow: 0 30px 60px -20px rgba(0,0,0,0.85), 0 0 0 1px rgba(198,43,43,0.22), 0 0 60px -20px rgba(198,43,43,0.28); }
+  }
+  .david-heartbeat-frame[data-pulse="1"],
+  .david-heartbeat-frame[data-pulse="2"] {
+    animation: davidHeartbeatPulse 600ms cubic-bezier(0.34, 1.4, 0.64, 1);
+  }
+  /* Word counter pulse — fires once when Alex hovers Publish.
+     The counter scales briefly + brightens from faint gray to
+     muted-text so the eye registers it as a beat. */
+  @keyframes wordCounterPulse {
+    0%   { transform: scale(1);    color: rgba(22,22,26,0.38); }
+    35%  { transform: scale(1.18); color: rgba(22,22,26,0.78); }
+    100% { transform: scale(1);    color: rgba(22,22,26,0.38); }
+  }
+  /* Viewport shake — motion-audit tuned.
+     Was 12 keyframes of ±5px which made users dizzy. Now: a single
+     subtle thump (3 keyframes, ±2px max) over 200ms. The audio
+     gavel carries the violence; visual is a felt thump, not a
+     tremor. */
+  @keyframes viewportShake {
+    0%   { transform: translate(0, 0); }
+    35%  { transform: translate(-1.5px, 2px); }
+    65%  { transform: translate(1px, -1px); }
+    100% { transform: translate(0, 0); }
+  }
+  /* T7 — SYNCED LAWSUIT MULTI-MODAL BEAT (motion-audit tuned)
+     Text bleed-in + viewport shake + audio gavel share the SAME
+     beat. Motion audit reduced shake intensity: was 400ms with
+     12 keyframes of ±5px translates which made even non-sensitive
+     users dizzy. Now: 200ms, single thump in/out with ±2px max —
+     still felt as physical weight, no longer disorienting.
+     The AUDIO gavel does the violence work; the visual is just
+     a subtle thump to confirm impact. */
+  body.cinema-lawsuit-shake {
+    animation: viewportShake 200ms cubic-bezier(0.36, 0, 0.66, -0.56);
+  }
+  @keyframes lawsuitBleedIn {
+    0%   { filter: blur(8px) saturate(2.4); letter-spacing: 0.08em; opacity: 0; }
+    40%  { filter: blur(4px) saturate(1.8); letter-spacing: 0.04em; opacity: 0.7; }
+    100% { filter: blur(0) saturate(1);    letter-spacing: -0.015em; opacity: 1; }
+  }
+  .lawsuit-line-violence[data-lawsuit-text] {
+    animation: lawsuitBleedIn 400ms cubic-bezier(0.36, 0, 0.66, -0.56);
+    animation-fill-mode: backwards;
+  }
+  /* Adaptive CTA crossfade — when the cinema CTA label changes
+     (T12), the new label fades in from below over 320ms. The key
+     prop change in the React component triggers a remount, which
+     re-fires this animation. Subtle enough to not draw focus, but
+     perceivable enough that the user registers the offer evolving. */
+  @keyframes cinemaCtaSwap {
+    0%   { opacity: 0; transform: translateY(6px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+  .cinema-cta-adaptive {
+    animation: cinemaCtaSwap 320ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  /* Urgency pulse — the red dot beside "47 of 100 spots remaining"
+     pulses at a heartbeat rhythm. Creates subtle "ticking down"
+     sense without resorting to a literal countdown timer. */
+  @keyframes urgencyPulse {
+    0%, 100% { opacity: 1;   transform: scale(1);    box-shadow: 0 0 8px rgba(198,43,43,0.85); }
+    50%      { opacity: 0.55; transform: scale(1.35); box-shadow: 0 0 14px rgba(198,43,43,0.45); }
+  }
+  /* SCROLL-PACE idle nudge — the "↓ KEEP SCROLLING" hint that fades
+     in after 8s of mid-cinema idle. Bounce stays subtle (6px) so it
+     reads as a gentle pulse, not an attention-grab. */
+  @keyframes idleNudgeBounce {
+    0%, 100% { transform: translateY(0);   opacity: 0.62; }
+    50%      { transform: translateY(6px); opacity: 0.95; }
+  }
+  /* Mood-bloom shimmer — motion-audit tuned.
+     Removed the continuous 8s animation cycle (was ambient noise
+     that constantly drew the eye). Kept the static grain texture
+     for organic "film stock" feel without the temporal motion.
+     The grain reads as analog imperfection at rest, no longer
+     contributes to dizziness from the constant cycle. */
+  .mood-bloom-shimmer {
+    background-image:
+      url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' seed='3'/%3E%3CfeColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.18 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-size: 400px 400px;
+  }
+  /* `display: inline-block` is needed so the per-char transform
+     (translateY) actually shifts the glyph — transform on a pure
+     inline element gets clipped to the line box and produces no
+     visible motion. Inline-block keeps the glyph in normal text flow
+     while letting transform/opacity apply. */
+  .cold-open-char {
+    display: inline-block;
+    animation: coldOpenCharIn 130ms cubic-bezier(0.22, 1, 0.36, 1) backwards;
+    will-change: transform, opacity, filter;
+  }
+  .cold-open-char-space {
+    display: inline-block;
+    width: 0.32em;
+  }
+
+  /* The "bad" word in the cold-open punchline transitions from neutral
+     text color to editorial red AFTER all three of its characters have
+     been typed.
+     Previous design (per-character animation) failed in practice — each
+     char ran its OWN 260ms color transition starting 80ms after mount,
+     but the eye can't perceive a transition that begins mid-key-strike.
+     By the time you registered "b", the color animation had already
+     completed; the recognition moment never reached the viewer.
+     New design: the entire WORD turns red as a single gesture. Each
+     char animates IN at white via `coldOpenCharIn` (neutral, just
+     typing). The wrapper `.cold-open-bad-word` is white by default.
+     When all 3 chars are present, the wrapper gets `.cold-open-bad-word-settled`
+     which transitions color over 460ms with a 140ms hold. That hold is
+     critical — it lets the viewer's eye land on the finished word in
+     its neutral form for a beat before the meaning reveals itself in
+     red. The recognition is now a perceivable event, not a microsecond. */
+  /* "bad" word transition — timing extended (520ms / 180ms hold, was
+     460/140) for more anticipation. The longer hold lets the eye
+     register the neutral word for a beat before the meaning ignites;
+     the longer transition makes the bloom itself perceivable as a
+     gesture rather than a state swap. Also transitions text-shadow
+     so the red glow halo arrives in lockstep with the color. */
+  .cold-open-bad-word {
+    color: #F4F4F6;
+    text-shadow: 0 0 0 rgba(198, 43, 43, 0);
+    transition:
+      color 520ms cubic-bezier(0.22, 1, 0.36, 1) 180ms,
+      text-shadow 620ms cubic-bezier(0.22, 1, 0.36, 1) 180ms;
+  }
+  /* Settled state — color flips to editorial red AND a soft red glow
+     halo appears behind the word (text-shadow with no offset, large
+     blur). The halo adds heat to the word visually — the eye reads
+     it as "this is dangerous" not "this is one word styled differently". */
+  .cold-open-bad-word-settled {
+    color: #C62B2B;
+    text-shadow: 0 0 24px rgba(198, 43, 43, 0.36), 0 0 8px rgba(198, 43, 43, 0.18);
+  }
+  /* Lawsuit callback — the "bad" word in the pinned thesis briefly
+     intensifies its glow at the moment the "1 lawsuit." stat lands.
+     The warning word reacts to the consequence it predicted. The
+     filter approach (drop-shadow + brightness) layers on top of the
+     existing text-shadow without conflicting; the scale-pulse is tiny
+     (1.04) so it reads as a heartbeat, not a wobble. */
+  @keyframes coldOpenBadCallback {
+    0%   {
+      transform: scale(1);
+      text-shadow: 0 0 24px rgba(198, 43, 43, 0.36), 0 0 8px rgba(198, 43, 43, 0.18);
+      filter: brightness(1);
+    }
+    18%  {
+      transform: scale(1.045);
+      text-shadow: 0 0 38px rgba(255, 74, 74, 0.78), 0 0 16px rgba(255, 74, 74, 0.55), 0 0 6px rgba(255, 200, 200, 0.4);
+      filter: brightness(1.18);
+    }
+    55%  {
+      transform: scale(1.02);
+      text-shadow: 0 0 32px rgba(255, 74, 74, 0.55), 0 0 12px rgba(255, 74, 74, 0.35);
+      filter: brightness(1.08);
+    }
+    100% {
+      transform: scale(1);
+      text-shadow: 0 0 24px rgba(198, 43, 43, 0.36), 0 0 8px rgba(198, 43, 43, 0.18);
+      filter: brightness(1);
+    }
+  }
+  /* Target both section-level and body-level class triggers. The
+     listener writes to the section (Next.js layout owns body
+     className and would wipe an added class), but we keep the body
+     selector for symmetry with any future global handler. */
+  .cinema-lawsuit-callback .cold-open-bad-word-settled,
+  section.cinema-lawsuit-callback .cold-open-bad-word-settled,
+  body.cinema-lawsuit-callback .cold-open-bad-word-settled {
+    animation: coldOpenBadCallback 880ms cubic-bezier(0.22, 1, 0.36, 1) both;
+    display: inline-block;
+    transform-origin: center;
+  }
+
+  /* Editor article title caret — slim vertical bar following the end
+     of the title as it types in. Blink cadence matches the cold-open's
+     breathing rhythm (the BlinkingCursor's 1s loop with eased fades)
+     so all the cinema's carets read as the same "breathing" character
+     rather than competing rhythms. The previous linear-1s blink was a
+     code-editor chop; this is a held breath. */
+  @keyframes editorTitleCaretBreath {
+    0%, 30%   { opacity: 1; }
+    50%, 80%  { opacity: 0; }
+    100%      { opacity: 1; }
+  }
+  /* Refined to 0.85em (was 0.92em) — tighter, more elegant against
+     the serif H1's cap height. translateY shifted to better align
+     with the serif baseline (was -1px causing a slight float). */
+  .editor-title-caret {
+    display: inline-block;
+    width: 2px;
+    height: 0.85em;
+    margin-left: 2px;
+    vertical-align: text-bottom;
+    transform: translateY(-2px);
+    background-color: rgba(22, 22, 26, 0.62);
+    border-radius: 1px;
+    animation: editorTitleCaretBreath 1s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  /* Editor approval dot — sized larger (12×12) than the prior 1.5×1.5
+     to host a small status icon (checkmark / clock / dash). Inline-flex
+     centers the icon. The colored fill provides at-a-glance color
+     status; the icon makes the state readable for screen readers and
+     anyone not reading by color. */
+  .editor-approval-dot {
+    box-shadow: 0 0 0 1px rgba(255,255,255,0.4) inset;
+  }
+  /* Stamp-landing animation — overshoot bumped to 1.38 (was 1.32)
+     for a more emphatic "gate cleared" moment. The taller bounce
+     coupled with the brightness pulse reads as the stamp pressing
+     down with weight, then releasing back to rest. */
+  @keyframes editorApprovalStamp {
+    0%   { transform: scale(0.6); filter: brightness(1.6); }
+    35%  { transform: scale(1.38); filter: brightness(1.25); }
+    100% { transform: scale(1); filter: brightness(1); }
+  }
+  .editor-approval-dot-flip {
+    animation: editorApprovalStamp 280ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  /* AB avatar entry — overshoot bumped to 1.22 (was 1.18) for a
+     more satisfying sticker-placement bounce. The slight extra
+     overshoot makes the avatar's arrival feel grounded — like a
+     finger pressing the sticker against the paper before lifting. */
+  @keyframes editorAvatarPop {
+    0%   { transform: scale(0.4); opacity: 0; }
+    60%  { transform: scale(1.22); opacity: 1; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  .editor-avatar-pop {
+    animation: editorAvatarPop 380ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  }
+
+  /* Ken Burns slow pan on the featured photo. Once it has materialized,
+     the photo slowly drifts upward by ~2% over 12 seconds with a
+     reciprocal scale to avoid revealing edges. Adds quiet life to
+     the static image during the long pinned-thesis body. */
+  @keyframes editorPhotoKenBurns {
+    0%   { transform: translateY(0) scale(1.0); }
+    100% { transform: translateY(-2.2%) scale(1.03); }
+  }
+  .photo-ken-burns {
+    transform-origin: 50% 60%;
+    animation: editorPhotoKenBurns 12s ease-in-out infinite alternate;
+  }
+
+  /* Checkmark-as-character — the ✓ in the corner PublishButton
+     reacts to consequences. Each time a CRITICAL comment lands, the
+     checkmark briefly flashes red with a tiny scale tremor (witness
+     beat). At the lawsuit moment, a sustained 600ms red glow fires
+     (the climax beat). The checkmark accumulates emotional weight
+     across the storm — same symbol that confirmed "this was good"
+     becomes the symbol of the damage, then lifts out to become the
+     clock that undoes time.
+     The animation targets `filter` (drop-shadow for the glow) +
+     `color` for the SVG stroke (when the parent applies color)
+     and `transform: scale` for the tremor. Inline-block so transform
+     works on the wrapping span. */
+  @keyframes checkmarkWitnessFlash {
+    0%   { transform: scale(1);    filter: drop-shadow(0 0 0 rgba(255,74,74,0)); }
+    25%  { transform: scale(1.10); filter: drop-shadow(0 0 6px rgba(255,74,74,0.75)) drop-shadow(0 0 14px rgba(255,74,74,0.45)); }
+    100% { transform: scale(1);    filter: drop-shadow(0 0 0 rgba(255,74,74,0)); }
+  }
+  .checkmark-witness-flash {
+    animation: checkmarkWitnessFlash 280ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  /* Climax glow — longer + more intense than the witness flash.
+     Fires when "1 lawsuit." lands. The sustained red bloom on the
+     ✓ visually connects to the lawsuit's red type and the dangerGlow
+     on the post — three reds aligned in one beat. */
+  @keyframes checkmarkWitnessClimax {
+    0%   { transform: scale(1);    filter: drop-shadow(0 0 0 rgba(255,74,74,0)); }
+    15%  { transform: scale(1.14); filter: drop-shadow(0 0 12px rgba(255,74,74,0.95)) drop-shadow(0 0 28px rgba(255,74,74,0.62)); }
+    60%  { transform: scale(1.08); filter: drop-shadow(0 0 14px rgba(255,74,74,0.85)) drop-shadow(0 0 30px rgba(255,74,74,0.55)); }
+    100% { transform: scale(1);    filter: drop-shadow(0 0 0 rgba(255,74,74,0)); }
+  }
+  .checkmark-witness-climax {
+    animation: checkmarkWitnessClimax 800ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  /* Publish-button loading spinner — visible between the press
+     (raw 0.381) and the success state (raw 0.391). A 14×14 ring
+     with a brighter arc that spins at 720°/s — the universal "this
+     is happening" affordance. White-on-red so it pops against the
+     active pill background. */
+  @keyframes publishSpinnerRotate {
+    0%   { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  .publish-spinner {
+    border-radius: 50%;
+    border: 1.5px solid rgba(255, 255, 255, 0.32);
+    border-top-color: #FFFFFF;
+    animation: publishSpinnerRotate 0.7s linear infinite;
+  }
+
+  /* PUBLISH ready-state breath — period shortened from 2.4s to 1.9s
+     so the pulse feels more alive (closer to a relaxed human breath
+     cadence ~3-4 cycles per 10s). At 2.4s it read as "idle UI"; at
+     1.9s it reads as "ready to act." Peak glow intensified to 0.40
+     (was 0.32) for slightly stronger anticipation. */
+  @keyframes editorPublishReadyBreath {
+    0%, 100% { box-shadow: inset 0 0 0 0 rgba(255,74,74,0); }
+    50%      { box-shadow: inset 0 0 14px 0 rgba(255,74,74,0.40); }
+  }
+  .editor-publish-ready-breath {
+    animation: editorPublishReadyBreath 1.9s ease-in-out infinite;
+  }
+
+  /* Sidebar right-edge fadeout — gradient mask widened to 22px (was
+     16px) so the atmospheric edge is actually perceivable. At 16px
+     it was so subtle it read as "is that on purpose?"; at 22px it
+     clearly softens the right edge without breaking the column's
+     legibility. */
+  .editor-sidebar-fadeout {
+    -webkit-mask-image: linear-gradient(to right, #000 0%, #000 calc(100% - 22px), rgba(0,0,0,0.80) 100%);
+    mask-image: linear-gradient(to right, #000 0%, #000 calc(100% - 22px), rgba(0,0,0,0.80) 100%);
+  }
+
+  /* Editor paper grain — fine noise overlay matching the cinema's
+     stage grain. Opacity reduced from 0.18 to 0.13 — the previous
+     value was just on the edge of being consciously visible; the
+     finer texture reads as "paper" without registering as "noise."
+     Mode kept as multiply so the grain darkens the paper subtly
+     without lightening it. */
+  .editor-paper-grain {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.13;
+    mix-blend-mode: multiply;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='1.7' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.13   0 0 0 0 0.12   0 0 0 0 0.10   0 0 0 0.18 0'/></filter><rect width='100%' height='100%' filter='url(%23n)' opacity='0.55'/></svg>");
+    background-size: 160px 160px;
+  }
+  /* Featured image vignette — subtle corner darkening that lifts the
+     photo off the paper and gives it photographic depth. Sits ON TOP
+     of the photo (z above) via an absolute pseudo. ~6% corner
+     darkening at the extremes, fully transparent in the middle 60%
+     of the frame. Multiply blend so it tones the photo without
+     adding a gray cast. */
+  .editor-photo-vignette::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: radial-gradient(ellipse 75% 65% at 50% 50%, transparent 35%, rgba(0,0,0,0.085) 85%, rgba(0,0,0,0.14) 100%);
+    border-radius: inherit;
+    z-index: 2;
+  }
+
+  /* Legal-skipped status pulse — the sidebar shows "Legal · Skipped"
+     in muted gray, but this status is thematically critical: it's
+     the moment of carelessness that lets the dangerous claim slip
+     through editorial review. A gentle 2.8s pulse on the status dot
+     foregrounds it without shouting. The pulse is small (alpha
+     0.45 → 1 → 0.45) and slow so it reads as "this is unresolved"
+     rather than as a UI alarm. */
+  @keyframes editorLegalSkipPulse {
+    0%, 100% { background-color: rgba(202, 138, 4, 0.42); transform: scale(1); }
+    50%      { background-color: rgba(202, 138, 4, 0.95); transform: scale(1.18); }
+  }
+  .editor-legal-skip-dot {
+    animation: editorLegalSkipPulse 2.8s ease-in-out infinite;
+  }
+
+  /* Cold-open caret glow pulse — the BlinkingCursor's boxShadow is
+     static (14px + 28px glow), which is great at rest but doesn't
+     "breathe." This keyframe oscillates the glow radius (14px ↔ 22px)
+     and inner intensity in a slow 2.6s loop, layered on top of the
+     existing blink animation. Reads as a candle flicker rather than
+     a hard pulse. Applied via the .cold-open-caret-pulse class on
+     headline carets during the cold-open beats.
+     NOTE: keyframe targets background+box-shadow only — the existing
+     opacity blink (handled by motion's animate prop) runs in parallel.
+     The combination is: opacity blinks every 1s, glow pulses every
+     2.6s — two layered rhythms create a subtly alive caret. */
+  @keyframes coldOpenCaretGlowPulse {
+    0%, 100% {
+      box-shadow: 0 0 14px rgba(244, 239, 229, 0.70), 0 0 28px rgba(244, 239, 229, 0.32);
+    }
+    50% {
+      box-shadow: 0 0 22px rgba(244, 239, 229, 0.88), 0 0 40px rgba(244, 239, 229, 0.42);
+    }
+  }
+  .cold-open-caret-pulse {
+    animation: coldOpenCaretGlowPulse 2.6s ease-in-out infinite;
+  }
+
+  /* Punchline period emphasis — overshoot bumped to 1.24 (was 1.18)
+     for a more emphatic landing of the punctuation. The period is the
+     terminal mark of the entire cold-open thesis — it deserves a beat
+     more weight. Duration extended slightly (300ms, was 280ms) so the
+     punch lands then settles rather than feeling clipped.
+     `transform-origin: 50% 90%` keeps the punch grounded on the
+     baseline — without it, the period would float upward as it scaled. */
+  @keyframes coldOpenPeriodPunch {
+    0%   { transform: scale(1.0); }
+    35%  { transform: scale(1.24); }
+    100% { transform: scale(1.0); }
+  }
+  .cold-open-period {
+    display: inline-block;
+    transform-origin: 50% 90%;
+    animation: coldOpenCharIn 130ms cubic-bezier(0.22, 1, 0.36, 1) backwards,
+               coldOpenPeriodPunch 300ms cubic-bezier(0.34, 1.56, 0.64, 1) 130ms;
+  }
+
+  /* Cinema sound pill — attention pulse only in the "needs activation"
+     state (when sound is on by default but audio is still locked by
+     browser autoplay policy until the user clicks). The pulse is a
+     gentle scale + box-shadow swell on a 2.2s ease-in-out loop so it
+     reads as "click me" without being aggressive. After the user
+     clicks anywhere on the page (including this pill itself), the
+     pulse disappears and the pill becomes the normal toggle. */
+  @keyframes cinemaSoundPulse {
+    0%, 100% {
+      transform: scale(1);
+      box-shadow: 0 0 18px rgba(220, 38, 38, 0.12);
+    }
+    50% {
+      transform: scale(1.04);
+      box-shadow: 0 0 28px rgba(220, 38, 38, 0.32);
+    }
+  }
+
+  /* Cinema continuous breath — a barely-perceptible scale oscillation
+     on a 6-second cycle that runs in the background after the initial
+     arrival breath finishes. Imperceptible per-frame, but the viewer
+     feels the canvas is alive instead of dead-still. Award-grade
+     cold-opens always have continuous camera motion at this level. */
+  @keyframes cinemaCanvasBreath {
+    0%   { transform: scale(1.000); }
+    50%  { transform: scale(1.006); }
+    100% { transform: scale(1.000); }
+  }
+  .cinema-canvas-breath {
+    animation: cinemaCanvasBreath 6.4s ease-in-out infinite;
+    will-change: transform;
+  }
+
+  /* ── Cinema intro splash ──────────────────────────────────────
+     Three keyframes power the intro overlay (see CinemaIntro.tsx):
+       cinemaIntroFadeUp   — generic content fade-in + 8px rise.
+                             Used on the wordmark, tagline, loader,
+                             and CTA so each lands in sequence.
+       cinemaIntroLoad     — the ceremonial loader bar fills left→
+                             right over 1.6s. Pure UI flair (no real
+                             loading happens) but gives the brand a
+                             beat to sit before the CTA reveals.
+       cinemaIntroBtnPulse — gentle attention swell on the Begin
+                             button so the user sees it as a target.
+  */
+  @keyframes cinemaIntroFadeUp {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes cinemaIntroLoad {
+    from { transform: translateX(-100%); }
+    to   { transform: translateX(0); }
+  }
+  @keyframes cinemaIntroBtnPulse {
+    0%, 100% {
+      box-shadow:
+        0 0 0 0 rgba(244, 239, 229, 0),
+        0 0 18px 0 rgba(244, 239, 229, 0.04);
+    }
+    50% {
+      box-shadow:
+        0 0 0 6px rgba(244, 239, 229, 0.04),
+        0 0 28px 0 rgba(244, 239, 229, 0.20);
+    }
+  }
+  .cinema-intro-begin-btn:hover {
+    background: rgba(244, 239, 229, 0.08) !important;
+    border-color: rgba(244, 239, 229, 0.85) !important;
+    transform: translateY(-1px);
+  }
+  .cinema-intro-begin-btn:active {
+    transform: translateY(0);
+    background: rgba(244, 239, 229, 0.14) !important;
+  }
+
   /* Smooth scroll for anchor links + sticky-header offset */
   html { scroll-behavior: smooth; scroll-padding-top: 80px; }
 
@@ -662,4 +1298,310 @@
       hsl(0 0% 100% / 0.015) 3px
     );
   }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   STAKES CINEMA — Awwwards-tier scroll moment, scoped to .cinema-stage
+   ───────────────────────────────────────────────────────────────────── */
+
+:root {
+  /* Frame-perfect easings (no browser defaults) */
+  --ease-settle: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-cascade: cubic-bezier(0.25, 1, 0.5, 1);
+  --ease-grade: cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+/* Marketing chrome (top header + side section nav + back-to-top)
+   is HIDDEN by default. The body gets `data-chrome-visible` only when the user
+   actively scrolls UP (see HeroChromeGate.tsx). Hiding by default eliminates
+   the flash window that used to appear at the hero → cinema boundary.
+   The cinema sound button is INTENTIONALLY excluded from this list — it's
+   the cinema's own UI and needs to be reachable during the cinema, not
+   hidden as if it were external chrome. See the dedicated rule below. */
+header[class*="sticky"],
+nav[aria-label="Section navigation"],
+button[aria-label="Back to top"] {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 260ms ease-out, transform 320ms ease-out;
+}
+/* Force fixed positioning so the hidden chrome doesn't reserve 57px of
+   layout space at the top. With sticky it still occupied vertical space
+   even at opacity 0, which pushed the StoryCinema section down 57px and
+   broke the data-cinema-active detection at scroll 0. */
+header[class*="sticky"] {
+  position: fixed !important;
+  top: 0;
+  left: 0;
+  right: 0;
+  transform: translateY(-12px);
+}
+body[data-chrome-visible] header[class*="sticky"] {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+body[data-chrome-visible] nav[aria-label="Section navigation"],
+body[data-chrome-visible] button[aria-label="Back to top"] {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+/* Even when the user scrolls up DURING the cinema, the cinema's
+   uncluttered moment takes priority — header + side nav + back-to-top
+   stay hidden. */
+body[data-cinema-active] header[class*="sticky"],
+body[data-cinema-active] nav[aria-label="Section navigation"],
+body[data-cinema-active] button[aria-label="Back to top"] {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+/* Cinema sound toggle — ALWAYS visible (including during cinema). It's
+   the cinema's own opt-in UI: users need to enable sound BEFORE the
+   keystroke audio moments scroll past. Previously this was lumped in
+   with the rest of the chrome and force-hidden during cinema, which
+   meant nobody could find it during the moments where it matters. */
+button[aria-label*="cinema sound"] {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transition: opacity 260ms ease-out;
+}
+
+/* CinemaTopBar — the inverse rule. Hidden by default, shown ONLY while a
+   cinema section is sticky-active. Gives visitors a quiet anchor (logo +
+   Login + Get Started) during the dramatic open without competing with
+   the cinema for attention. */
+[data-cinema-topbar] {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 280ms ease-out;
+}
+body[data-cinema-active] [data-cinema-topbar] {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: none; /* outer wrapper stays non-blocking; child has pointer-events: auto */
+}
+/* Cold-open beat — for the first ~3% of the cinema's scroll range,
+   the topbar is hidden so the empty stage is genuinely empty. Even
+   the logo + Login + Get Started compete for attention against the
+   single blinking caret; in that frame we want pure stage. Fades
+   back in as the prequel begins typing. Set by a useMotionValueEvent
+   in StoryCinema.tsx that toggles body[data-cinema-cold-open]. */
+body[data-cinema-cold-open] [data-cinema-topbar] {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+  transition: opacity 600ms ease-out, visibility 0s 600ms;
+}
+
+/* Pinned-thesis beat — once the cold-open headline has shrunk + risen
+   into its pinned subtitle position at the top of the viewport
+   (raw 0.275 → 0.730), the cinema top-bar mutes itself to ~50%
+   opacity. Two things both need to live in the upper band — the
+   brand mark (top-left) plus Login/Get-Started (top-right) AND the
+   pinned thesis (top-center). Without this rule they all compete
+   at full strength and the composition feels cluttered. Muting the
+   top-bar lets the thesis own the moment while keeping the chrome
+   discoverable. Transitions slowly enough (520ms) that the shift
+   reads as the cinema dimming the lights, not a UI glitch. */
+body[data-cinema-thesis-pinned] [data-cinema-topbar] {
+  opacity: 0.5;
+  transition: opacity 520ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.cinema-stage {
+  /* The dark cinema scope — overrides selection color, hides cursor caret. */
+  cursor: none;
+}
+.cinema-stage *,
+.cinema-stage *::before,
+.cinema-stage *::after {
+  cursor: none;
+}
+.cinema-stage ::selection {
+  background: #DC2626;
+  color: #050912;
+}
+.cinema-stage::-webkit-scrollbar { display: none; }
+.cinema-stage { scrollbar-width: none; }
+
+/* Custom cursor dot + ring + redaction state */
+.cinema-cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 4px;
+  border-radius: 9999px;
+  background: #F4EFE5;
+  pointer-events: none;
+  z-index: 9999;
+  transform: translate3d(-50%, -50%, 0);
+  mix-blend-mode: difference;
+  transition: width 220ms var(--ease-settle), height 220ms var(--ease-settle), background 220ms var(--ease-settle), border-radius 220ms var(--ease-settle);
+}
+.cinema-cursor[data-state="ring"] {
+  width: 32px;
+  height: 32px;
+  background: transparent;
+  border: 1px solid #F4EFE5;
+}
+.cinema-cursor[data-state="redact"] {
+  width: 64px;
+  height: 18px;
+  background: #DC2626;
+  border-radius: 2px;
+  mix-blend-mode: normal;
+}
+
+/* Real 16mm-style film grain plate — 2.5s WebM loop, 24fps, temporal noise
+   that has real frame-to-frame correlation. mix-blend-mode: overlay layers
+   the grain over content without color shift. The SVG filter fallback below
+   is kept for environments that block <video>. */
+.cinema-grain-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+  opacity: 0.18;
+  mix-blend-mode: overlay;
+  /* Slight scale so the loop seam isn't visible at the edges. */
+  transform: scale(1.06);
+}
+/* SVG-filter fallback grain (used when video is blocked or reduce-motion). */
+.cinema-grain-svg {
+  position: absolute;
+  inset: -2%;
+  pointer-events: none;
+  opacity: 0.10;
+  mix-blend-mode: overlay;
+  filter: url(#cinema-grain-filter);
+  background: #fff;
+}
+@keyframes cinema-grain-shift {
+  0%   { transform: translate3d(0, 0, 0); }
+  20%  { transform: translate3d(1%, 2%, 0); }
+  40%  { transform: translate3d(2%, -2%, 0); }
+  60%  { transform: translate3d(3%, 2%, 0); }
+  80%  { transform: translate3d(1%, -1%, 0); }
+  100% { transform: translate3d(0, 0, 0); }
+}
+.cinema-grain-svg { animation: cinema-grain-shift 1.6s steps(8, end) infinite; }
+
+/* Caret blink for the typing effect */
+@keyframes cinema-caret-blink {
+  0%, 49%   { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+.cinema-caret {
+  display: inline-block;
+  width: 2px;
+  height: 1.05em;
+  margin-left: 4px;
+  vertical-align: text-bottom;
+  background: #F4EFE5;
+  animation: cinema-caret-blink 530ms steps(2) infinite;
+}
+
+/* Chromatic aberration on the big headline. Triggered by adding .cinema-aberrant.
+   900ms total — long enough to be visible in screenshots and to read as
+   "projector locking focus" instead of a brief glitch. */
+@keyframes cinema-aberrant-r {
+  0%   { transform: translate3d(-6px, 0, 0); opacity: 0.92; }
+  35%  { transform: translate3d(-4px, 0, 0); opacity: 0.78; }
+  70%  { transform: translate3d(-1.5px, 0, 0); opacity: 0.35; }
+  100% { transform: translate3d(0, 0, 0); opacity: 0; }
+}
+@keyframes cinema-aberrant-b {
+  0%   { transform: translate3d(6px, 0, 0); opacity: 0.92; }
+  35%  { transform: translate3d(4px, 0, 0); opacity: 0.78; }
+  70%  { transform: translate3d(1.5px, 0, 0); opacity: 0.35; }
+  100% { transform: translate3d(0, 0, 0); opacity: 0; }
+}
+.cinema-aberrant {
+  position: relative;
+}
+.cinema-aberrant::before,
+.cinema-aberrant::after {
+  content: attr(data-text);
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  font-family: inherit;
+  font-style: inherit;
+  font-weight: inherit;
+  letter-spacing: inherit;
+}
+.cinema-aberrant::before {
+  color: #FF003C;
+  animation: cinema-aberrant-r 900ms var(--ease-settle) forwards;
+}
+.cinema-aberrant::after {
+  color: #00B8FF;
+  animation: cinema-aberrant-b 900ms var(--ease-settle) forwards;
+}
+
+/* CNN chyron — bottom strip, always-alive ticker decoupled from scroll. */
+@keyframes cinema-chyron-scroll {
+  0%   { transform: translate3d(0, 0, 0); }
+  100% { transform: translate3d(-50%, 0, 0); }
+}
+.cinema-chyron-track {
+  animation: cinema-chyron-scroll 38s linear infinite;
+  will-change: transform;
+}
+
+/* Marker stroke jitter — gives the redaction line a hand-drawn feel.
+   Drives `top` (not transform) so the inner element's scaleX is preserved. */
+@keyframes cinema-stroke-jitter {
+  0%   { top: calc(50% - 3.5px); }
+  25%  { top: calc(50% - 3.9px); }
+  50%  { top: calc(50% - 2.9px); }
+  75%  { top: calc(50% - 3.7px); }
+  100% { top: calc(50% - 3.5px); }
+}
+.cinema-stroke-wrapper { animation: cinema-stroke-jitter 180ms steps(4) infinite; }
+
+/* The "FLAGGED" chip — hard shadow, slight rotation, like rubber-stamped. */
+.cinema-flagged-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  background: #DC2626;
+  color: #050912;
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  border-radius: 2px;
+  box-shadow: 3px 3px 0 rgba(220, 38, 38, 0.25);
+  transform: rotate(-1.4deg);
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+}
+
+/* Reduced motion — full kill switch */
+@media (prefers-reduced-motion: reduce) {
+  .cinema-grain,
+  .cinema-caret,
+  .cinema-aberrant::before,
+  .cinema-aberrant::after,
+  .cinema-stroke-jitter,
+  .cinema-chyron-track {
+    animation: none !important;
+  }
+  .cinema-stage,
+  .cinema-stage * {
+    cursor: auto !important;
+  }
+  .cinema-cursor { display: none !important; }
 }
